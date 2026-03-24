@@ -36,7 +36,7 @@ const parseLRC = (lrcText) => {
   return result.sort((a, b) => a.time - b.time);
 };
 
-// --- 2. 动态字号适配 (确保不需左右滑动) ---
+// --- 2. 动态字号适配 ---
 const getLyricTextSize = (text, isActive) => {
   const len = text?.length || 0;
   if (isActive) {
@@ -48,7 +48,7 @@ const getLyricTextSize = (text, isActive) => {
   return "text-[11px] opacity-75 text-gray-500";
 };
 
-// --- 3. 组件：黑胶唱片 (根据你的要求调整中心大小) ---
+// --- 3. 组件：黑胶唱片 ---
 const VinylRecord = ({ isPlaying, coverUrl }) => (
   <div className="relative shrink-0 w-40 h-40 flex items-center justify-center">
     <div className="absolute w-36 h-36 rounded-full bg-black/10 shadow-[0_8px_25px_rgba(0,0,0,0.2)]"></div>
@@ -61,13 +61,15 @@ const VinylRecord = ({ isPlaying, coverUrl }) => (
           background: `repeating-radial-gradient(circle, #444, #444 1px, #111 2px, #444 3px)`,
         }}
       ></div>
-
-      {/* 调整：有封面时图片更大，无封面保持原始红色 */}
       <div
         className={`${coverUrl ? "w-20 h-20" : "w-10 h-10"} rounded-full border-2 border-black/20 flex items-center justify-center z-10 relative overflow-hidden bg-[#7A2A3A] transition-all duration-500`}
       >
         {coverUrl ? (
-          <img src={coverUrl} className="w-full h-full object-cover" />
+          <img
+            src={coverUrl}
+            className="w-full h-full object-cover"
+            alt="cover"
+          />
         ) : (
           <div className="w-1.5 h-1.5 bg-black rounded-full shadow-inner"></div>
         )}
@@ -76,7 +78,7 @@ const VinylRecord = ({ isPlaying, coverUrl }) => (
   </div>
 );
 
-// --- 4. 组件：连接状态 (缩短头像距离) ---
+// --- 4. 组件：连接状态 ---
 const ConnectionHeader = ({
   isPlaying,
   userAvatar,
@@ -93,7 +95,11 @@ const ConnectionHeader = ({
       )}
       <div className="w-10 h-10 rounded-full border-2 border-white shadow-lg overflow-hidden bg-gray-100">
         {userAvatar ? (
-          <img src={userAvatar} className="w-full h-full object-cover" />
+          <img
+            src={userAvatar}
+            className="w-full h-full object-cover"
+            alt="user"
+          />
         ) : (
           <div className="w-full h-full bg-gray-200" />
         )}
@@ -123,7 +129,11 @@ const ConnectionHeader = ({
       )}
       <div className="w-10 h-10 rounded-full border-2 border-white shadow-lg overflow-hidden bg-[#7A2A3A] flex items-center justify-center">
         {charAvatar ? (
-          <img src={charAvatar} className="w-full h-full object-cover" />
+          <img
+            src={charAvatar}
+            className="w-full h-full object-cover"
+            alt="char"
+          />
         ) : (
           <Sparkles size={14} className="text-white" />
         )}
@@ -137,13 +147,14 @@ const MusicApp = ({
   persona,
   userAvatar,
   charAvatar,
+  userName,
   chatHistory,
   triggerAIResponse,
   useStickyState,
   showToast,
+  audioRef,
 }) => {
   const [musicTab, setMusicTab] = useState("together");
-
   const [playlistName, setPlaylistName] = useStickyState(
     "我的共鸣旋律",
     "echoes_pl_name",
@@ -171,21 +182,72 @@ const MusicApp = ({
   const [showQuickReply, setShowQuickReply] = useState(false);
   const [replyContent, setReplyContent] = useState("");
 
-  const audioRef = useRef(null);
   const lrcScrollRef = useRef(null);
   const lastCommentTime = useRef(0);
   const lastTriggeredLrc = useRef("");
 
-  // 歌词滚动
+  // --- 关键顺序：先定义数据，再定义 Effect ---
+  const currentTrack = useMemo(
+    () => playlistTracks[currentTrackIndex] || null,
+    [playlistTracks, currentTrackIndex],
+  );
+  const currentLrc = useMemo(
+    () => parseLRC(currentTrack?.lrcText),
+    [currentTrack?.lrcText],
+  );
+
+  // 1. 播放进度监听与 AI 点评触发
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    const handleTimeUpdate = () => {
+      const time = audio.currentTime;
+      setCurrentTime(time);
+
+      if (currentLrc && currentLrc.length > 0) {
+        const index = currentLrc.findIndex((l, i) => {
+          const next = currentLrc[i + 1];
+          return time >= l.time && (!next || time < next.time);
+        });
+
+        if (index !== -1 && index !== activeLrcIndex) {
+          setActiveLrcIndex(index);
+          handleAiMusicInsight(index);
+        }
+      }
+    };
+
+    const handleLoadedMetadata = () => setDuration(audio.duration);
+    const handleEnded = () => handleNextTrack();
+
+    audio.addEventListener("timeupdate", handleTimeUpdate);
+    audio.addEventListener("loadedmetadata", handleLoadedMetadata);
+    audio.addEventListener("ended", handleEnded);
+
+    return () => {
+      audio.removeEventListener("timeupdate", handleTimeUpdate);
+      audio.removeEventListener("loadedmetadata", handleLoadedMetadata);
+      audio.removeEventListener("ended", handleEnded);
+    };
+  }, [currentLrc, activeLrcIndex, audioRef]);
+
+  // 2. 歌词居中滚动
   useEffect(() => {
     if (lrcScrollRef.current && activeLrcIndex !== -1) {
-      const activeLine = lrcScrollRef.current.children[activeLrcIndex];
-      if (activeLine)
-        activeLine.scrollIntoView({ behavior: "smooth", block: "center" });
+      const container = lrcScrollRef.current;
+      const activeLine = container.children[activeLrcIndex];
+      if (activeLine) {
+        const targetScrollTop =
+          activeLine.offsetTop -
+          container.clientHeight / 2 +
+          activeLine.clientHeight / 2;
+        container.scrollTo({ top: targetScrollTop, behavior: "smooth" });
+      }
     }
   }, [activeLrcIndex]);
 
-  // 气泡同步
+  // 3. 气泡同步
   useEffect(() => {
     if (chatHistory?.length > 0) {
       const last = chatHistory[chatHistory.length - 1];
@@ -200,12 +262,6 @@ const MusicApp = ({
       }
     }
   }, [chatHistory]);
-
-  const currentTrack = playlistTracks[currentTrackIndex] || null;
-  const currentLrc = useMemo(
-    () => parseLRC(currentTrack?.lrcText),
-    [currentTrack?.lrcText],
-  );
 
   const currentAudioUrl = useMemo(
     () =>
@@ -226,10 +282,27 @@ const MusicApp = ({
     [playlistCoverFile],
   );
 
-  // AI 点评逻辑 (优化 Prompt 尺度)
+  useEffect(() => {
+    if (audioRef?.current && currentAudioUrl) {
+      audioRef.current.src = currentAudioUrl;
+      if (isPlaying)
+        audioRef.current.play().catch((e) => console.log("Play blocked", e));
+    }
+  }, [currentAudioUrl, isPlaying, audioRef]);
+
+  const handleNextTrack = () => {
+    if (playlistTracks.length === 0) return;
+    let nextIndex =
+      playMode === "shuffle"
+        ? Math.floor(Math.random() * playlistTracks.length)
+        : (currentTrackIndex + 1) % playlistTracks.length;
+    setCurrentTrackIndex(nextIndex);
+    setIsPlaying(true);
+  };
+
   const handleAiMusicInsight = (index) => {
     const now = Date.now();
-    if (now - lastCommentTime.current < 45000) return;
+    if (now - lastCommentTime.current < 80000) return;
     const start = Math.max(0, index - 1);
     const end = Math.min(currentLrc.length, index + 2);
     const contextLines = currentLrc
@@ -237,19 +310,17 @@ const MusicApp = ({
       .map((l) => l.text)
       .join(" / ");
     if (!contextLines || contextLines === lastTriggeredLrc.current) return;
-
     lastCommentTime.current = now;
     lastTriggeredLrc.current = contextLines;
-
-    const musicPrompt = `[SYSTEM_NOTE: \${char}和\${user}正在一起听一首叫做《${currentTrack?.title}》的歌曲。当前歌词：“${contextLines}”。请遵循以下尺度：1.审美优先，点评意境或旋律氛围。2.严禁强行将歌词映射为 \${user} 的过往经历或内心秘密。3.适度表达 \${char} 自己的听感。4.保持自然的交流，不超过 30 字。]`;
+    const musicPrompt = `[SYSTEM_NOTE: {{char}}和{{user}}正在一起听一首叫做《${currentTrack?.title}》的歌曲。当前歌词：“${contextLines}”。请遵循以下尺度：1.审美优先，点评意境或旋律氛围。2.严禁强行将歌曲映射为 \${user} 的过往经历或内心秘密，如“这首歌像你”“你就是这样”“你为什么喜欢这种歌，是不是因为你也想...”“你听这首歌是因为在歌词里看到了自己吧”等言论，需要避免。3.适度表达 \${char} 自己的听感。4.不一定非要谈论歌曲本身，也可根据情况保持自然的日常交流。5.不超过 30 字。]`;
     triggerAIResponse(null, musicPrompt);
   };
 
   const handleUserReply = () => {
     const content = replyContent.trim();
     if (!content) return;
-    const musicContext = `[\${char}和\${user}正在一起听一首叫做《${currentTrack?.title}》的歌曲。当前歌词：${currentLrc[activeLrcIndex]?.text || "..."}]`;
-    triggerAIResponse(content, "", musicContext);
+    const musicContext = `[{{char}}和{{user}}正在一起听一首叫做《${currentTrack?.title}》的歌曲。当前歌词：${currentLrc[activeLrcIndex]?.text || "..."}]`;
+    triggerAIResponse(content, "", musicContext, { source: "music_app" });
     setReplyContent("");
     setShowQuickReply(false);
   };
@@ -299,7 +370,6 @@ const MusicApp = ({
           歌单
         </button>
       </div>
-
       <div className="flex-grow overflow-hidden">
         {musicTab === "together" ? (
           <div className="h-full flex flex-col p-4 overflow-hidden">
@@ -316,12 +386,11 @@ const MusicApp = ({
                 {currentTrack?.title || "等待选择歌曲"}
               </h3>
             </div>
-
             <div
               ref={lrcScrollRef}
               className="flex-grow w-full overflow-y-auto overflow-x-hidden space-y-5 text-center py-8 my-3 border-t border-b border-black/5 custom-scrollbar"
             >
-              {currentLrc.length > 0 ? (
+              {currentLrc && currentLrc.length > 0 ? (
                 currentLrc.map((line, idx) => (
                   <p
                     key={idx}
@@ -336,7 +405,6 @@ const MusicApp = ({
                 </div>
               )}
             </div>
-
             <div className="shrink-0 flex items-center justify-between px-2 h-14">
               <span className="text-[9px] font-mono text-gray-400 w-8">
                 {Math.floor(currentTime / 60)}:
@@ -411,6 +479,7 @@ const MusicApp = ({
                 <img
                   src={playlistCoverUrl}
                   className="w-full h-full object-cover"
+                  alt="cover"
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-gray-500 font-bold text-sm">
@@ -453,12 +522,27 @@ const MusicApp = ({
                       } else showToast("error", "请上传音乐");
                     }}
                   >
-                    {isEditing && (
+                    {isEditing ? (
                       <div
                         className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${selectedIds.has(track.id) ? "bg-[#7A2A3A] border-[#7A2A3A]" : "border-gray-300"}`}
                       >
                         {selectedIds.has(track.id) && (
                           <CheckCircle2 size={12} className="text-white" />
+                        )}
+                      </div>
+                    ) : (
+                      <div className="w-4 h-4 flex items-center justify-center shrink-0">
+                        {isPlaying && currentTrackIndex === index ? (
+                          <div className="flex items-end gap-0.5 h-3.5 pb-0.5">
+                            <div className="w-0.5 bg-[#7A2A3A] animate-music-bar delay-1" />
+                            <div className="w-0.5 bg-[#7A2A3A] animate-music-bar delay-2" />
+                            <div className="w-0.5 bg-[#7A2A3A] animate-music-bar delay-3" />
+                          </div>
+                        ) : (
+                          <Play
+                            size={10}
+                            className="text-gray-400 fill-current opacity-60"
+                          />
                         )}
                       </div>
                     )}
@@ -539,7 +623,6 @@ const MusicApp = ({
           </div>
         )}
       </div>
-
       {showQuickReply && (
         <div className="absolute inset-x-4 bottom-20 bg-white p-2.5 rounded-2xl shadow-2xl border border-[#7A2A3A]/10 z-[100] flex gap-2 animate-slide-up">
           <input
@@ -558,34 +641,6 @@ const MusicApp = ({
           </button>
         </div>
       )}
-
-      <audio
-        ref={audioRef}
-        src={currentAudioUrl}
-        onEnded={() => {
-          let nextIndex = currentTrackIndex;
-          if (playMode === "shuffle")
-            nextIndex = Math.floor(Math.random() * playlistTracks.length);
-          else if (playMode === "list")
-            nextIndex = (currentTrackIndex + 1) % playlistTracks.length;
-          setCurrentTrackIndex(nextIndex);
-          setTimeout(() => audioRef.current?.play(), 200);
-        }}
-        onTimeUpdate={(e) => {
-          const time = e.target.currentTime;
-          setCurrentTime(time);
-          const index = currentLrc.findIndex(
-            (line, i) =>
-              time >= line.time &&
-              (!currentLrc[i + 1] || time < currentLrc[i + 1].time),
-          );
-          if (index !== activeLrcIndex && index !== -1) {
-            setActiveLrcIndex(index);
-            if (isPlaying) handleAiMusicInsight(index);
-          }
-        }}
-        onLoadedMetadata={(e) => setDuration(e.target.duration)}
-      />
     </div>
   );
 };

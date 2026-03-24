@@ -1416,15 +1416,16 @@ const App = () => {
   }, []);
 
   const handleFontUrlSubmit = async () => {
-    // 加上 async
-    const url = fontUrlInput.trim();
+    const url = inputUrl.trim(); // 使用你定义好的 inputUrl 状态
     if (url) {
       applyFont("UserCustomFont", url);
       setFontName("自定义字体");
       await echoesDB.setItem("custom-font-url", url);
       await echoesDB.setItem("custom-font-name", "自定义字体");
-      setShowFontInput(false);
-      showToast("success", "字体已应用并存入数据库");
+      // setShowFontInput(false); // 如果有这个状态就加上
+      showToast("success", "字体已应用");
+    } else {
+      showToast("error", "请输入字体 URL");
     }
   };
 
@@ -1446,7 +1447,7 @@ const App = () => {
     "echoes_custom_icons",
   );
 
-  const handleAppIconUpload = async (e) => {
+  const handleAppIconUpload = async (e, appId) => {
     // 加上 async
     const file = e.target.files[0];
     if (!file) return;
@@ -1455,7 +1456,7 @@ const App = () => {
     reader.onload = async (event) => {
       // 这里的匿名回调也要加 async
       const base64 = event.target.result;
-      const newIcons = { ...customIcons, [activeApp]: base64 };
+      const newIcons = { ...customIcons, [appId]: base64 };
       setCustomIcons(newIcons);
       await echoesDB.setItem("my_custom_icons", newIcons);
       showToast("success", "图标已更新");
@@ -1517,6 +1518,7 @@ const App = () => {
     msgCountSinceSummaryLoaded,
   ] = useStickyState(0, "echoes_msg_count");
 
+  const audioRef = useRef(null);
   // User Profile
   const [userPersona, setUserPersona, userPersonaLoaded] = useStickyState(
     "",
@@ -3076,6 +3078,7 @@ Requirements:
     );
 
     // --- 3. 构建 Prompt ---
+    // --- 3. 构建 Prompt ---
     const stickerInst = getStickerInstruction(charStickers, stickersEnabled);
     let styleInst = stylePrompts[chatStyle];
 
@@ -3085,11 +3088,21 @@ Requirements:
     if (lastCharMsg && lastCharMsg.style && lastCharMsg.style !== chatStyle) {
       styleInst += `\n\n[FORMATTING OVERRIDE]: You have switched to a NEW writing style (${chatStyle}). IGNORE the formatting patterns of previous messages in history. You must strictly adhere to the new style defined above immediately.`;
     }
-    if (finalHint) styleInst += `\n[Special Instruction]: ${finalHint}`;
+
+    // 核心修复：对 finalHint 进行占位符替换处理
+    if (finalHint) {
+      const processedHint = replacePlaceholders(
+        finalHint,
+        persona.name,
+        userName || "你",
+      );
+      styleInst += `\n[Special Instruction]: ${processedHint}`;
+    }
 
     const rawForwardContext = overrideContext || forwardContext;
+    // 核心修复：对 forwardContext 进行占位符替换处理
     const finalForwardSection = rawForwardContext
-      ? `\n**Forwarded Content Context**: ${rawForwardContext}`
+      ? `\n**Forwarded Content Context**: ${replacePlaceholders(rawForwardContext, persona.name, userName || "你")}`
       : "";
 
     const modeInstruction =
@@ -4101,7 +4114,6 @@ Requirements:
     <div className="h-screen w-full bg-[#EBEBF0] flex items-center justify-center text-[#2C2C2C] overflow-hidden relative">
       <div className="absolute top-[-20%] left-[-10%] w-[800px] h-[800px] bg-blue-100/30 rounded-full blur-3xl pointer-events-none"></div>
       <div className="absolute bottom-[-20%] right-[-10%] w-[600px] h-[600px] bg-orange-50/40 rounded-full blur-3xl pointer-events-none"></div>
-
       {notification && (
         <div
           className={`absolute top-8 left-0 right-0 z-[100] flex justify-center toast-enter pointer-events-none`}
@@ -4126,7 +4138,6 @@ Requirements:
           </div>
         </div>
       )}
-
       <div className="relative w-full h-full md:w-[400px] md:h-[800px] bg-[#F2F2F7] md:rounded-[48px] md:border-[8px] md:border-white shadow-2xl flex flex-col overflow-hidden ring-1 ring-black/5">
         <div className="h-12 px-8 flex items-center justify-between text-[10px] text-gray-400 bg-transparent z-20 shrink-0 pt-2">
           <span>{formatTime(getCurrentTimeObj())}</span>
@@ -6197,6 +6208,7 @@ Requirements:
               echoesDB={echoesDB} // 传入你的数据库工具
               triggerAIResponse={triggerAIResponse}
               showToast={showToast}
+              audioRef={audioRef}
             />
           </AppWindow>
           <AppWindow
@@ -6235,7 +6247,6 @@ Requirements:
         </div>
         <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-32 h-1 bg-gray-800/20 rounded-full z-30"></div>
       </div>
-
       {editingSticker && (
         <StickerEditorModal
           sticker={editingSticker}
@@ -6348,6 +6359,7 @@ Requirements:
           </div>
         </div>
       )}
+      <audio ref={audioRef} style={{ display: "none" }} />;
     </div>
   );
 };
