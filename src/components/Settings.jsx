@@ -73,6 +73,7 @@ const SettingsPanel = ({
   deleteStickerGroup,
   renameStickerGroup,
   handleBulkImport,
+  customPrompt,
 
   // --- 字体参数 ---
   fontName, // 当前字体文件名
@@ -285,7 +286,7 @@ const SettingsPanel = ({
               {/* 阈值 */}
               <div className="flex items-center justify-between">
                 <label className="text-xs font-bold text-gray-600">
-                  自动总结阈值
+                  自动总结
                 </label>
                 <div className="flex items-center gap-2">
                   <input
@@ -438,8 +439,8 @@ const SettingsPanel = ({
 
                     {/* 批量导入按钮 */}
                     <button
-                      onClick={() => {
-                        const input = prompt("请输入表情包链接进行导入");
+                      onClick={async () => {
+                        const input = await customPrompt("请输入表情包链接进行导入", "", "批量导入");
                         if (input) handleBulkImport(input, "char");
                       }}
                       className="flex items-center justify-center gap-1 pl-1 pr-3 text-[10px] text-gray-400 hover:text-blue-500 transition-colors"

@@ -30,6 +30,7 @@ const WorldBook = ({
   onClose,
   showToast,
   customPrompt,
+  customConfirm,
   worldBook, // 新增接收
   setWorldBook,
 }) => {
@@ -74,8 +75,8 @@ const WorldBook = ({
     }
   };
 
-  const deleteWorldBookGroup = (groupName) => {
-    if (window.confirm(`确定删除分组 "${groupName}" 及其下的所有条目吗？`)) {
+  const deleteWorldBookGroup = async (groupName) => {
+    if (await customConfirm(`确定删除分组 "${groupName}" 及其下的所有条目吗？`, "删除分组")) {
       setWorldBook((prev) => prev.filter((w) => w.group !== groupName));
     }
   };

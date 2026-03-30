@@ -83,6 +83,7 @@ const ConnectionHeader = ({
   isPlaying,
   userAvatar,
   charAvatar,
+  charName,
   aiBubble,
   userBubble,
 }) => (
@@ -135,7 +136,9 @@ const ConnectionHeader = ({
             alt="char"
           />
         ) : (
-          <Sparkles size={14} className="text-white" />
+          <span className="text-white text-sm font-bold">
+            {charName?.[0] || "?"}
+          </span>
         )}
       </div>
     </div>
@@ -379,6 +382,7 @@ const MusicApp = ({
                 isPlaying={isPlaying}
                 userAvatar={userAvatar}
                 charAvatar={charAvatar}
+                charName={persona?.name}
                 aiBubble={aiBubble}
                 userBubble={userBubble}
               />
