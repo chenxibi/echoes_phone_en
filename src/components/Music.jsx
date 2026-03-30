@@ -128,7 +128,7 @@ const ConnectionHeader = ({
           {aiBubble}
         </div>
       )}
-      <div className="w-10 h-10 rounded-full border-2 border-white shadow-lg overflow-hidden bg-[#7A2A3A] flex items-center justify-center">
+      <div className="w-10 h-10 rounded-full border-2 border-white shadow-lg overflow-hidden bg-gray-200 flex items-center justify-center">
         {charAvatar ? (
           <img
             src={charAvatar}
@@ -136,7 +136,7 @@ const ConnectionHeader = ({
             alt="char"
           />
         ) : (
-          <span className="text-white text-sm font-bold">
+          <span className="text-gray-500 text-sm font-bold">
             {charName?.[0] || "?"}
           </span>
         )}

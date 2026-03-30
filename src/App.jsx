@@ -1469,6 +1469,19 @@ const App = () => {
   const generateBrowser = () =>
     runGenerator("browser", setBrowserHistory, prompts.browser);
 
+  const unlockDeviceDirect = () => {
+    const localPersona = {
+      name: "Char",
+      enName: null,
+      title: "Connected Soul",
+      bio: "手动模式，所有设定需手动填入。",
+      mbti: null,
+      tags: [],
+    };
+    setPersona(localPersona);
+    setIsLocked(false);
+  };
+
   const unlockDevice = async () => {
     if (!inputKey) return;
     // 不再检查 apiConfig，也不设置 isConnecting 状态，实现秒开
@@ -2862,6 +2875,16 @@ Requirements:
                   <WandSparkles size={18} />
                 </div>
               </button>
+
+              {/* 直接进入 */}
+              <button
+                onClick={unlockDeviceDirect}
+                className="w-full text-center text-[11px] text-gray-400 hover:text-[#7A2A3A] transition-colors py-1"
+                style={{ textDecorationLine: "underline", textDecorationThickness: "1px", textUnderlineOffset: "4px" }}
+              >
+                直接进入
+              </button>
+
             </div>
 
             <div
@@ -3159,7 +3182,7 @@ Requirements:
                       className="w-full h-48 bg-transparent text-xs text-gray-600 resize-none outline-none custom-scrollbar"
                       value={inputKey}
                       onChange={(e) => setInputKey(e.target.value)}
-                      placeholder="在此粘贴或修改人物设定..."
+                      placeholder="手动输入人物设定时，首行建议以 Name: 角色名 格式开始。"
                     />
                     <button
                       onClick={() => {
@@ -3205,7 +3228,7 @@ Requirements:
                       >
                         <p className="text-[10px] leading-relaxed text-gray-600 whitespace-pre-wrap">
                           {inputKey ||
-                            "暂无设定数据... 请点击编辑手动输入或上传 JSON"}
+                            "暂无设定数据，请点击编辑手动输入... "}
                         </p>
                       </div>
                       <p className="text-[9px] text-gray-400 text-center">
