@@ -223,4 +223,52 @@ export const PRESET_LOCATION_IMAGES = [
     desc: "边境/三不管地带",
     keywords: "法外，蛮荒，边境小镇，废弃工业区，公海游轮，热带雨林，罪恶",
   },
+  {
+    id: "img_office",
+    url: "https://files.catbox.moe/czxw29.png",
+    desc: "工位",
+    keywords: "写字楼，办公室，工位，办公桌",
+  },
+  {
+    id: "img_villa",
+    url: "https://files.catbox.moe/4kobl6.png",
+    desc: "别墅内部",
+    keywords: "别墅，客厅，高端，复式，落地窗",
+  },
+  {
+    id: "img_concert",
+    url: "https://files.catbox.moe/hns9ir.png",
+    desc: "演唱会",
+    keywords: "演唱会，演出，乐队，人山人海",
+  },
+  {
+    id: "img_ancient_imperial_court",
+    url: "https://files.catbox.moe/6pwxwu.png",
+    desc: "中国古代朝堂",
+    keywords: "朝堂，上朝",
+  },
+  {
+    id: "img_ancient_bedroom",
+    url: "https://files.catbox.moe/ejfdfp.png",
+    desc: "中国古代寝宫",
+    keywords: "寝宫",
+  },
+  {
+    id: "img_museum",
+    url: "https://files.catbox.moe/4owk8q.png",
+    desc: "博物馆",
+    keywords: "博物馆",
+  },
+  {
+    id: "img_art_gallery",
+    url: "https://files.catbox.moe/1mmd2f.png",
+    desc: "美术馆",
+    keywords: "美术馆",
+  },
+  {
+    id: "img_art_exhibition",
+    url: "https://files.catbox.moe/7v1sqz.png",
+    desc: "艺术展",
+    keywords: "艺术展，画展，抽象艺术",
+  },
 ];

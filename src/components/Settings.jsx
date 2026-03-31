@@ -329,7 +329,7 @@ const SettingsPanel = ({
                   value={longMemory}
                   onChange={(e) => setLongMemory(e.target.value)}
                   className="w-full h-32 p-3 bg-white/50 border border-gray-200 rounded-xl text-xs leading-relaxed resize-none focus:border-black outline-none custom-scrollbar transition-colors focus:bg-white"
-                  placeholder="角色将自动在此处积累对你的长期记忆..."
+                  placeholder="开启时，角色将自动在此处积累对你的长期记忆..."
                 />
               </div>
             </div>

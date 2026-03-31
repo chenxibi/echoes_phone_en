@@ -380,10 +380,6 @@ const App = () => {
     [],
     "echoes_chat_history",
   );
-  // 独立的音乐聊天历史，不混入主聊天记录
-  const [musicChatHistory, setMusicChatHistory] = useState([]);
-  // ref 标记当前 AI 回复是否来自 music_app，用于 messageQueue 处理 effect 路由
-  const isMusicSourceRef = useRef(false);
   const [statusHistory, setStatusHistory, statusHistoryLoaded] = useStickyState(
     [],
     "echoes_status_history",
@@ -1867,12 +1863,8 @@ Requirements:
     param1 = null, // 可以是重生成索引(number)，也可以是新消息内容(string)
     hint = "",
     overrideContext = null,
-    extra = null, // { source: "music_app", directPrompt } 等标记
   ) => {
     if (!persona) return;
-
-    const isMusicSource = extra?.source === "music_app";
-    const isDirectPrompt = extra?.directPrompt; // 独立 prompt，不走 history 构建
 
     // --- 1. 参数智能解析与消息预处理 ---
     const userContent = typeof param1 === "string" ? param1 : null;
@@ -1884,14 +1876,12 @@ Requirements:
       setPendingHint(null);
     }
 
-    const backupHistory = isMusicSource ? [...musicChatHistory] : [...chatHistory];
-    let newHistory = isMusicSource ? [...musicChatHistory] : [...chatHistory];
+    const backupHistory = [...chatHistory];
+    let newHistory = [...chatHistory];
 
     // 如果是重生成，回滚历史
     if (regenIndex !== null) {
-      newHistory = isMusicSource
-        ? musicChatHistory.slice(0, regenIndex)
-        : chatHistory.slice(0, regenIndex);
+      newHistory = chatHistory.slice(0, regenIndex);
     }
     // 如果是带内容触发（来自音乐等界面），先插入用户消息
     else if (userContent) {
@@ -1905,11 +1895,7 @@ Requirements:
     }
 
     // 立即同步状态，确保 UI 和后续逻辑基于最新的历史记录
-    if (isMusicSource) {
-      setMusicChatHistory(newHistory);
-    } else {
-      setChatHistory(newHistory);
-    }
+    setChatHistory(newHistory);
 
     setLoading((prev) => ({ ...prev, chat: true }));
     setIsTyping(true);
@@ -1922,30 +1908,27 @@ Requirements:
     const effectiveUserName = userName || "你";
 
     // --- 2. 格式化历史记录 (用于发送给 AI) ---
-    let historyText = "";
-    if (!isDirectPrompt) {
-      historyText = getRecentTurns(newHistory, contextLimit)
-        .map((m) => {
-          const senderName =
-            m.sender === "me" ? userName || "User" : persona.name;
-          let content = m.text || "";
+    const historyText = getRecentTurns(newHistory, contextLimit)
+      .map((m) => {
+        const senderName =
+          m.sender === "me" ? userName || "User" : persona.name;
+        let content = m.text || "";
 
-          if (m.isVoice) {
-            content = `(发送了一条语音): ${m.text.replace("[语音消息] ", "")}`;
+        if (m.isVoice) {
+          content = `(发送了一条语音): ${m.text.replace("[语音消息] ", "")}`;
+        }
+        if (m.sticker) {
+          if (!content || !content.trim()) {
+            content = `[发送了表情包: ${m.sticker.desc}]`;
           }
-          if (m.sticker) {
-            if (!content || !content.trim()) {
-              content = `[发送了表情包: ${m.sticker.desc}]`;
-            }
-          }
-          if (m.isForward && m.forwardData) {
-            const fwd = m.forwardData;
-            content += ` [转发了${fwd.type === "post" ? "帖子" : "评论"}: "${fwd.content.slice(0, 50)}..."]`;
-          }
-          return `${senderName}: ${content}`;
-        })
-        .join("\n");
-    }
+        }
+        if (m.isForward && m.forwardData) {
+          const fwd = m.forwardData;
+          content += ` [转发了${fwd.type === "post" ? "帖子" : "评论"}: "${fwd.content.slice(0, 50)}..."]`;
+        }
+        return `${senderName}: ${content}`;
+      })
+      .join("\n");
 
     const currentUserName = userName || "User";
     const cleanCharDesc = replacePlaceholders(
@@ -1960,90 +1943,79 @@ Requirements:
     );
 
     // --- 3. 构建 Prompt ---
-    let prompt = "";
-    let systemPrompt = "";
+    // --- 3. 构建 Prompt ---
+    const stickerInst = getStickerInstruction(charStickers, stickersEnabled);
+    let styleInst = stylePrompts[chatStyle];
 
-    if (isDirectPrompt) {
-      // music_app 直接模式：轻量自包含 prompt，不走 history/sticker/style 等构建
+    const lastCharMsg = [...newHistory]
+      .reverse()
+      .find((m) => m.sender === "char");
+    if (lastCharMsg && lastCharMsg.style && lastCharMsg.style !== chatStyle) {
+      styleInst += `\n\n[FORMATTING OVERRIDE]: You have switched to a NEW writing style (${chatStyle}). IGNORE the formatting patterns of previous messages in history. You must strictly adhere to the new style defined above immediately.`;
+    }
+
+    // 核心修复：对 finalHint 进行占位符替换处理
+    if (finalHint) {
       const processedHint = replacePlaceholders(
         finalHint,
         persona.name,
         userName || "你",
       );
-      prompt = `${persona.name}和${effectiveUserName}正在一起听歌。${processedHint}\n请只回复内容，不超过30字，语言自然。`;
-      systemPrompt = `角色名：${persona.name}\n角色描述：${cleanCharDesc}\n[仅在听歌场景下回复，保持简短自然，不超过30字]`;
-    } else {
-      const stickerInst = getStickerInstruction(charStickers, stickersEnabled);
-      let styleInst = stylePrompts[chatStyle];
-
-      const lastCharMsg = [...newHistory]
-        .reverse()
-        .find((m) => m.sender === "char");
-      if (lastCharMsg && lastCharMsg.style && lastCharMsg.style !== chatStyle) {
-        styleInst += `\n\n[FORMATTING OVERRIDE]: You have switched to a NEW writing style (${chatStyle}). IGNORE the formatting patterns of previous messages in history. You must strictly adhere to the new style defined above immediately.`;
-      }
-
-      if (finalHint) {
-        const processedHint = replacePlaceholders(
-          finalHint,
-          persona.name,
-          userName || "你",
-        );
-        styleInst += `\n[Special Instruction]: ${processedHint}`;
-      }
-
-      const rawForwardContext = overrideContext || forwardContext;
-      const finalForwardSection = rawForwardContext
-        ? `\n**Forwarded Content Context**: ${replacePlaceholders(rawForwardContext, persona.name, userName || "你")}`
-        : "";
-
-      const modeInstruction =
-        interactionMode === "online"
-          ? `[Interaction Mode: ONLINE CHAT / MESSAGING]
-          - Context: You are chatting with {{USER_NAME}} via a smartphone/app.
-          - Style: Use short texts, emojis, and internet slang.
-          - Constraint: You are PHYSICALLY SEPARATED. Do not describe touch or physical presence.`
-          : `[Interaction Mode: REALITY / ACTION RP]
-          - Context: This scene takes place in the physical world (Real Life).
-          - Style: Use descriptive, sensory narrative (Visuals, Sounds, Smells).`;
-
-      prompt = prompts.chat
-        .replaceAll("{{NAME}}", persona.name)
-        .replaceAll("{{TIME}}", getCurrentTimeObj().toLocaleString())
-        .replaceAll("{{HISTORY}}", historyText)
-        .replaceAll(
-          "{{LAST_MSG}}",
-          newHistory.length > 0
-            ? JSON.stringify(newHistory[newHistory.length - 1])
-            : "Start conversation...",
-        )
-        .replaceAll("{{STYLE_INSTRUCTION}}", styleInst)
-        .replaceAll("{{STICKER_INSTRUCTION}}", stickerInst)
-        .replaceAll("{{USER_PERSONA}}", userPersona + "\n" + trackerContext)
-        .replaceAll("{{USER_NAME}}", effectiveUserName)
-        .replaceAll("{{MODE_INSTRUCTION}}", modeInstruction)
-        .replaceAll("{{FORWARD_CONTEXT}}", finalForwardSection);
-
-      systemPrompt = prompts.system
-        .replaceAll("{{NAME}}", persona.name)
-        .replaceAll(
-          "{{CHAR_DESCRIPTION}}",
-          cleanCharDesc + "\n" + charTrackerContext,
-        )
-        .replaceAll("{{USER_PERSONA}}", userPersona + "\n" + trackerContext)
-        .replaceAll("{{USER_NAME}}", effectiveUserName)
-        .replaceAll("{{CUSTOM_RULES}}", customRules)
-        .replaceAll("{{WORLD_INFO}}", cleanWorldInfo)
-        .replaceAll(
-          "{{LONG_MEMORY}}",
-          longMemory || "No long-term memory established yet.",
-        );
+      styleInst += `\n[Special Instruction]: ${processedHint}`;
     }
+
+    const rawForwardContext = overrideContext || forwardContext;
+    // 核心修复：对 forwardContext 进行占位符替换处理
+    const finalForwardSection = rawForwardContext
+      ? `\n**Forwarded Content Context**: ${replacePlaceholders(rawForwardContext, persona.name, userName || "你")}`
+      : "";
+
+    const modeInstruction =
+      interactionMode === "online"
+        ? `[Interaction Mode: ONLINE CHAT / MESSAGING]
+        - Context: You are chatting with {{USER_NAME}} via a smartphone/app.
+        - Style: Use short texts, emojis, and internet slang.
+        - Constraint: You are PHYSICALLY SEPARATED. Do not describe touch or physical presence.`
+        : `[Interaction Mode: REALITY / ACTION RP]
+        - Context: This scene takes place in the physical world (Real Life).
+        - Style: Use descriptive, sensory narrative (Visuals, Sounds, Smells).`;
+
+    const prompt = prompts.chat
+      .replaceAll("{{NAME}}", persona.name)
+      .replaceAll("{{TIME}}", getCurrentTimeObj().toLocaleString())
+      .replaceAll("{{HISTORY}}", historyText)
+      .replaceAll(
+        "{{LAST_MSG}}",
+        newHistory.length > 0
+          ? JSON.stringify(newHistory[newHistory.length - 1])
+          : "Start conversation...",
+      )
+      .replaceAll("{{STYLE_INSTRUCTION}}", styleInst)
+      .replaceAll("{{STICKER_INSTRUCTION}}", stickerInst)
+      .replaceAll("{{USER_PERSONA}}", userPersona + "\n" + trackerContext)
+      .replaceAll("{{USER_NAME}}", effectiveUserName)
+      .replaceAll("{{MODE_INSTRUCTION}}", modeInstruction)
+      .replaceAll("{{FORWARD_CONTEXT}}", finalForwardSection);
+
+    const systemPrompt = prompts.system
+      .replaceAll("{{NAME}}", persona.name)
+      .replaceAll(
+        "{{CHAR_DESCRIPTION}}",
+        cleanCharDesc + "\n" + charTrackerContext,
+      )
+      .replaceAll("{{USER_PERSONA}}", userPersona + "\n" + trackerContext)
+      .replaceAll("{{USER_NAME}}", effectiveUserName)
+      .replaceAll("{{CUSTOM_RULES}}", customRules)
+      .replaceAll("{{WORLD_INFO}}", cleanWorldInfo)
+      .replaceAll(
+        "{{LONG_MEMORY}}",
+        longMemory || "No long-term memory established yet.",
+      );
 
     // --- 4. 调用 API ---
     try {
       const responseData = await generateContent(
-        { prompt, systemInstruction: systemPrompt, isJson: !isDirectPrompt },
+        { prompt, systemInstruction: systemPrompt, isJson: true },
         apiConfig,
         (err) => showToast("error", err),
         abortController.signal,
@@ -2051,27 +2023,6 @@ Requirements:
 
       if (responseData) {
         setForwardContext(null);
-
-        if (isDirectPrompt) {
-          // music_app 直接模式：AI 直接返回文本内容
-          const actualText =
-            typeof responseData === "string"
-              ? responseData
-              : responseData.text || String(responseData);
-          const aiMsg = {
-            sender: "char",
-            text: actualText,
-            time: formatTime(getCurrentTimeObj()),
-          };
-          if (isMusicSource) {
-            setMusicChatHistory((prev) => [...prev, aiMsg]);
-          } else {
-            setChatHistory((prev) => [...prev, aiMsg]);
-          }
-          setLoading((prev) => ({ ...prev, chat: false }));
-          abortControllerRef.current = null;
-          return;
-        }
 
         // 处理转账逻辑
         if (responseData.transfer_action) {
@@ -2174,14 +2125,8 @@ Requirements:
               `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
           }));
 
-          if (isMusicSource) {
-            // music_app 的 AI 回复直接写独立历史，不污染主聊天，不走 messageQueue
-            setMusicChatHistory((prev) => [...prev, ...finalizedMsgs]);
-            setIsTyping(false);
-          } else {
-            setIsTyping(false);
-            setMessageQueue(finalizedMsgs);
-          }
+          setIsTyping(false);
+          setMessageQueue(finalizedMsgs);
 
           // 惊喜逻辑：概率触发发帖
           if (forumData.isInitialized && Math.random() < 0.1) {
@@ -2214,13 +2159,7 @@ Requirements:
           }, 2000);
         }
       } else {
-        if (regenIndex !== null) {
-          if (isMusicSource) {
-            setMusicChatHistory(backupHistory);
-          } else {
-            setChatHistory(backupHistory);
-          }
-        }
+        if (regenIndex !== null) setChatHistory(backupHistory);
       }
     } finally {
       setLoading((prev) => ({ ...prev, chat: false }));
@@ -5141,8 +5080,9 @@ Requirements:
               userAvatar={userAvatar}
               charAvatar={avatar}
               userName={userName}
-              musicChatHistory={musicChatHistory}
-              useStickyState={useStickyState}
+              chatHistory={chatHistory}
+              useStickyState={useStickyState} // 传入你的异步钩子
+              echoesDB={echoesDB} // 传入你的数据库工具
               triggerAIResponse={triggerAIResponse}
               showToast={showToast}
               audioRef={audioRef}

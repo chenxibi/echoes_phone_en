@@ -16,79 +16,6 @@ import {
   CheckCircle2,
 } from "lucide-react";
 
-// --- 0. IndexedDB 音频存储工具 ---
-const AUDIO_STORE = "echoes_audio";
-const _dbName = "EchoesOS_DB";
-
-const _getAudioDB = () =>
-  new Promise((resolve, reject) => {
-    const request = indexedDB.open(_dbName, 2);
-    request.onupgradeneeded = (e) => {
-      const db = e.target.result;
-      if (!db.objectStoreNames.contains(AUDIO_STORE)) {
-        db.createObjectStore(AUDIO_STORE);
-      }
-    };
-    request.onsuccess = (e) => resolve(e.target.result);
-    request.onerror = (e) => reject(e);
-  });
-
-const _saveAudioBlob = async (trackId, blob) => {
-  try {
-    const db = await _getAudioDB();
-    if (!db.objectStoreNames.contains(AUDIO_STORE)) return;
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction(AUDIO_STORE, "readwrite");
-      const req = tx.objectStore(AUDIO_STORE).put(blob, String(trackId));
-      req.onsuccess = () => resolve();
-      req.onerror = (e) => reject(e);
-    });
-  } catch {}
-};
-
-const _loadAudioBlob = async (trackId) => {
-  try {
-    const db = await _getAudioDB();
-    if (!db.objectStoreNames.contains(AUDIO_STORE)) return null;
-    return new Promise((resolve) => {
-      const tx = db.transaction(AUDIO_STORE, "readonly");
-      const req = tx.objectStore(AUDIO_STORE).get(String(trackId));
-      req.onsuccess = () => resolve(req.result || null);
-      req.onerror = () => resolve(null);
-    });
-  } catch {
-    return null;
-  }
-};
-
-const _saveCoverBlob = async (trackId, blob) => {
-  try {
-    const db = await _getAudioDB();
-    if (!db.objectStoreNames.contains(AUDIO_STORE)) return;
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction(AUDIO_STORE, "readwrite");
-      const req = tx.objectStore(AUDIO_STORE).put(blob, `cover_${trackId}`);
-      req.onsuccess = () => resolve();
-      req.onerror = (e) => reject(e);
-    });
-  } catch {}
-};
-
-const _loadCoverBlob = async (trackId) => {
-  try {
-    const db = await _getAudioDB();
-    if (!db.objectStoreNames.contains(AUDIO_STORE)) return null;
-    return new Promise((resolve) => {
-      const tx = db.transaction(AUDIO_STORE, "readonly");
-      const req = tx.objectStore(AUDIO_STORE).get(`cover_${trackId}`);
-      req.onsuccess = () => resolve(req.result || null);
-      req.onerror = () => resolve(null);
-    });
-  } catch {
-    return null;
-  }
-};
-
 // --- 1. 工具函数：解析 LRC ---
 const parseLRC = (lrcText) => {
   if (!lrcText) return [];
@@ -224,7 +151,7 @@ const MusicApp = ({
   userAvatar,
   charAvatar,
   userName,
-  musicChatHistory,
+  chatHistory,
   triggerAIResponse,
   useStickyState,
   showToast,
@@ -239,7 +166,6 @@ const MusicApp = ({
     null,
     "echoes_pl_cover_file",
   );
-  // playlistTracks 只存 metadata，音频二进制存在 IndexedDB
   const [playlistTracks, setPlaylistTracks] = useStickyState(
     [],
     "echoes_pl_tracks",
@@ -254,20 +180,6 @@ const MusicApp = ({
   const [isEditing, setIsEditing] = useState(false);
   const [selectedIds, setSelectedIds] = useState(new Set());
 
-  // IndexedDB Blob URL 缓存（key = trackId，value = object URL）
-  const [audioUrlMap, setAudioUrlMap] = useState({});
-  const [coverUrlMap, setCoverUrlMap] = useState({});
-
-  // --- 依赖声明：必须在使用它们的 useEffect 之前 ---
-  const currentTrack = useMemo(
-    () => playlistTracks[currentTrackIndex] || null,
-    [playlistTracks, currentTrackIndex],
-  );
-  const currentLrc = useMemo(
-    () => parseLRC(currentTrack?.lrcText),
-    [currentTrack?.lrcText],
-  );
-
   const [aiBubble, setAiBubble] = useState(null);
   const [userBubble, setUserBubble] = useState(null);
   const [showQuickReply, setShowQuickReply] = useState(false);
@@ -276,11 +188,16 @@ const MusicApp = ({
   const lrcScrollRef = useRef(null);
   const lastCommentTime = useRef(0);
   const lastTriggeredLrc = useRef("");
-  // 用 ref 保存最新的 lrc 和 activeIndex，避免 timeupdate 闭包 stale
-  const currentLrcRef = useRef(currentLrc);
-  const activeLrcIndexRef = useRef(activeLrcIndex);
-  useEffect(() => { currentLrcRef.current = currentLrc; }, [currentLrc]);
-  useEffect(() => { activeLrcIndexRef.current = activeLrcIndex; }, [activeLrcIndex]);
+
+  // --- 关键顺序：先定义数据，再定义 Effect ---
+  const currentTrack = useMemo(
+    () => playlistTracks[currentTrackIndex] || null,
+    [playlistTracks, currentTrackIndex],
+  );
+  const currentLrc = useMemo(
+    () => parseLRC(currentTrack?.lrcText),
+    [currentTrack?.lrcText],
+  );
 
   // 1. 播放进度监听与 AI 点评触发
   useEffect(() => {
@@ -291,15 +208,13 @@ const MusicApp = ({
       const time = audio.currentTime;
       setCurrentTime(time);
 
-      const lrc = currentLrcRef.current;
-      const activeIdx = activeLrcIndexRef.current;
-      if (lrc && lrc.length > 0) {
-        const index = lrc.findIndex((l, i) => {
-          const next = lrc[i + 1];
+      if (currentLrc && currentLrc.length > 0) {
+        const index = currentLrc.findIndex((l, i) => {
+          const next = currentLrc[i + 1];
           return time >= l.time && (!next || time < next.time);
         });
 
-        if (index !== -1 && index !== activeIdx) {
+        if (index !== -1 && index !== activeLrcIndex) {
           setActiveLrcIndex(index);
           handleAiMusicInsight(index);
         }
@@ -318,26 +233,28 @@ const MusicApp = ({
       audio.removeEventListener("loadedmetadata", handleLoadedMetadata);
       audio.removeEventListener("ended", handleEnded);
     };
-  }, [audioRef]);
+  }, [currentLrc, activeLrcIndex, audioRef]);
 
-  // 2. 歌词居中滚动（手动计算scrollTop，只滚动歌词容器，不影响window）
+  // 2. 歌词居中滚动
   useEffect(() => {
-    if (activeLrcIndex === -1) return;
+    if (activeLrcIndex <= 0) return;
+    const container = lrcScrollRef.current;
+    if (!container) return;
+
     const t = setTimeout(() => {
-      const container = lrcScrollRef.current;
-      if (!container) return;
-      const activeLine = container.children[activeLrcIndex];
-      if (!activeLine) return;
-      const top = activeLine.offsetTop - container.offsetHeight / 2 + activeLine.offsetHeight / 2;
-      container.scrollTo({ top, behavior: "instant" });
-    }, 0);
+      const line = container.children[activeLrcIndex];
+      if (!line) return;
+      const target = line.offsetTop - container.clientHeight / 2 + line.offsetHeight / 2;
+      container.scrollTo({ top: Math.max(0, target), behavior: "smooth" });
+    }, 80);
+
     return () => clearTimeout(t);
   }, [activeLrcIndex]);
 
-  // 3. 气泡同步 — 监听独立的 musicChatHistory（不污染主聊天）
+  // 3. 气泡同步
   useEffect(() => {
-    if (musicChatHistory?.length > 0) {
-      const last = musicChatHistory[musicChatHistory.length - 1];
+    if (chatHistory?.length > 0) {
+      const last = chatHistory[chatHistory.length - 1];
       if (last.sender === "char") {
         setAiBubble(last.text);
         const t = setTimeout(() => setAiBubble(null), 8000);
@@ -348,51 +265,27 @@ const MusicApp = ({
         return () => clearTimeout(t);
       }
     }
-  }, [musicChatHistory]);
+  }, [chatHistory]);
 
-  // 4. 从 IndexedDB 恢复音频 Blob 并生成 URL
-  const restoreAudioUrls = async () => {
-    const newAudioUrls = {};
-    const newCoverUrls = {};
-    for (const track of playlistTracks) {
-      // audioFile 如果还是内存中的 Blob，直接用；否则从 IndexedDB 恢复
-      if (track.audioFile instanceof Blob) {
-        newAudioUrls[track.id] = URL.createObjectURL(track.audioFile);
-      } else {
-        const blob = await _loadAudioBlob(String(track.id));
-        if (blob) newAudioUrls[track.id] = URL.createObjectURL(blob);
-      }
-      if (track.coverFile instanceof Blob) {
-        newCoverUrls[track.id] = URL.createObjectURL(track.coverFile);
-      } else {
-        const coverBlob = await _loadCoverBlob(String(track.id));
-        if (coverBlob) newCoverUrls[track.id] = URL.createObjectURL(coverBlob);
-      }
-    }
-    setAudioUrlMap(newAudioUrls);
-    setCoverUrlMap(newCoverUrls);
-  };
-
-  useEffect(() => {
-    if (playlistTracks.length > 0) restoreAudioUrls();
-  }, []); // 仅挂载时执行一次
-
-  const currentAudioUrl = useMemo(() => {
-    if (!currentTrack) return null;
-    return audioUrlMap[String(currentTrack.id)] || null;
-  }, [currentTrack, audioUrlMap]);
-
-  const currentCoverUrl = useMemo(() => {
-    if (!currentTrack) return null;
-    return coverUrlMap[String(currentTrack.id)] || null;
-  }, [currentTrack, coverUrlMap]);
-
+  const currentAudioUrl = useMemo(
+    () =>
+      currentTrack?.audioFile
+        ? URL.createObjectURL(currentTrack.audioFile)
+        : null,
+    [currentTrack?.audioFile],
+  );
+  const currentCoverUrl = useMemo(
+    () =>
+      currentTrack?.coverFile
+        ? URL.createObjectURL(currentTrack.coverFile)
+        : null,
+    [currentTrack?.coverFile],
+  );
   const playlistCoverUrl = useMemo(
     () => (playlistCoverFile ? URL.createObjectURL(playlistCoverFile) : null),
     [playlistCoverFile],
   );
 
-  // 音频切换时更新 audioRef
   useEffect(() => {
     if (audioRef?.current && currentAudioUrl) {
       audioRef.current.src = currentAudioUrl;
@@ -411,7 +304,6 @@ const MusicApp = ({
     setIsPlaying(true);
   };
 
-  // AI 音乐点评 — 通过 { source: "music_app" } 标记，隔离主 chatHistory
   const handleAiMusicInsight = (index) => {
     const now = Date.now();
     if (now - lastCommentTime.current < 80000) return;
@@ -424,69 +316,46 @@ const MusicApp = ({
     if (!contextLines || contextLines === lastTriggeredLrc.current) return;
     lastCommentTime.current = now;
     lastTriggeredLrc.current = contextLines;
-    const musicPrompt = `{{char}}和{{user}}正在一起听《${currentTrack?.title}》。当前歌词："${contextLines}"。只回复内容，不超过30字，保持自然。`;
-    triggerAIResponse(null, musicPrompt, null, { source: "music_app", directPrompt: true });
+    const musicPrompt = `[SYSTEM_NOTE: {{char}}和{{user}}正在一起听一首叫做《${currentTrack?.title}》的歌曲。当前歌词：“${contextLines}”。请遵循以下尺度：1.审美优先，点评意境或旋律氛围。2.严禁强行将歌曲映射为 \${user} 的过往经历或内心秘密，如“这首歌像你”“你就是这样”“你为什么喜欢这种歌，是不是因为你也想...”“你听这首歌是因为在歌词里看到了自己吧”等言论，需要避免。3.适度表达 \${char} 自己的听感。4.不一定非要谈论歌曲本身，也可根据情况保持自然的日常交流。5.不超过 30 字。]`;
+    triggerAIResponse(null, musicPrompt);
   };
 
-  // 用户在音乐界面主动回复
   const handleUserReply = () => {
     const content = replyContent.trim();
     if (!content) return;
-    const musicContext = `[{{char}}和{{user}}正在一起听《${currentTrack?.title}》。当前歌词：${currentLrc[activeLrcIndex]?.text || "..."}]`;
-    triggerAIResponse(content, "", musicContext, { source: "music_app", directPrompt: true });
+    const musicContext = `[{{char}}和{{user}}正在一起听一首叫做《${currentTrack?.title}》的歌曲。当前歌词：${currentLrc[activeLrcIndex]?.text || "..."}]`;
+    triggerAIResponse(content, "", musicContext, { source: "music_app" });
     setReplyContent("");
     setShowQuickReply(false);
   };
 
-  // 音频文件上传 — 存 IndexedDB，更新 playlistTracks metadata
-  const handleFileUpload = async (trackId, type, file) => {
+  const handleFileUpload = (trackId, type, file) => {
     if (!file) return;
-
-    if (type === "audio") {
-      // 立即生成 URL 更新 UI（不等 IDB）
-      const objectUrl = URL.createObjectURL(file);
-      const strId = String(trackId);
-      setAudioUrlMap((prev) => ({ ...prev, [strId]: objectUrl }));
-      setPlaylistTracks((prev) =>
-        prev.map((t) =>
-          t.id === trackId
-            ? { ...t, title: file.name.replace(/\.[^/.]+$/, "") }
-            : t,
-        ),
-      );
-      // 后台写入 IDB，带超时保护
-      _saveAudioBlob(strId, file).catch(() => {});
-      showToast("success", "存储成功");
-    } else if (type === "cover") {
-      const objectUrl = URL.createObjectURL(file);
-      const strId = String(trackId);
-      setCoverUrlMap((prev) => ({ ...prev, [strId]: objectUrl }));
-      _saveCoverBlob(strId, file).catch(() => {});
-      showToast("success", "存储成功");
-    } else if (type === "lrc") {
-      const text = await file.text();
-      setPlaylistTracks((prev) =>
-        prev.map((nt) =>
-          nt.id === trackId ? { ...nt, lrcText: text } : nt,
-        ),
-      );
-      showToast("success", "歌词已保存");
-    }
-  };
-
-  // 删除歌曲时清理 IndexedDB 中的 Blob
-  const handleDeleteTrackAudio = async (trackId) => {
-    const strId = String(trackId);
-    try {
-      const db = await _getAudioDB();
-      if (db.objectStoreNames.contains(AUDIO_STORE)) {
-        const tx = db.transaction(AUDIO_STORE, "readwrite");
-        tx.objectStore(AUDIO_STORE).delete(strId);
-        tx.objectStore(AUDIO_STORE).delete(`cover_${strId}`);
+    const updated = playlistTracks.map((t) => {
+      if (t.id === trackId) {
+        if (type === "audio")
+          return {
+            ...t,
+            audioFile: file,
+            title: file.name.replace(/\.[^/.]+$/, ""),
+          };
+        if (type === "cover") return { ...t, coverFile: file };
+        if (type === "lrc") {
+          const reader = new FileReader();
+          reader.onload = (e) =>
+            setPlaylistTracks((prev) =>
+              prev.map((nt) =>
+                nt.id === trackId ? { ...nt, lrcText: e.target.result } : nt,
+              ),
+            );
+          reader.readAsText(file);
+          return t;
+        }
       }
-    } catch {}
-    if (audioUrlMap[strId]) URL.revokeObjectURL(audioUrlMap[strId]);
-    if (coverUrlMap[strId]) URL.revokeObjectURL(coverUrlMap[strId]);
+      return t;
+    });
+    if (type !== "lrc") setPlaylistTracks(updated);
+    showToast("success", "存储成功");
   };
 
   return (
@@ -524,7 +393,8 @@ const MusicApp = ({
             </div>
             <div
               ref={lrcScrollRef}
-              className="flex-grow w-full overflow-y-auto overflow-x-hidden space-y-5 text-center py-8 my-3 border-t border-b border-black/5 custom-scrollbar"
+              style={{ maxHeight: "45vh", position: "relative" }}
+              className="w-full overflow-y-auto overflow-x-hidden space-y-5 text-center py-8 my-3 border-t border-b border-black/5 custom-scrollbar"
             >
               {currentLrc && currentLrc.length > 0 ? (
                 currentLrc.map((line, idx) => (
@@ -635,133 +505,109 @@ const MusicApp = ({
               onChange={(e) => setPlaylistName(e.target.value)}
             />
             <div className="space-y-2 pb-24">
-              {playlistTracks.map((track, index) => {
-                const trackAudioUrl = audioUrlMap[String(track.id)];
-                const trackCoverUrl = coverUrlMap[String(track.id)];
-                return (
+              {playlistTracks.map((track, index) => (
+                <div
+                  key={track.id}
+                  className={`flex items-center justify-between p-4 rounded-lg ${isEditing ? "bg-white border-2 border-[#7A2A3A]/10" : "bg-gray-100"}`}
+                >
                   <div
-                    key={track.id}
-                    className={`flex items-center justify-between p-4 rounded-lg ${isEditing ? "bg-white border-2 border-[#7A2A3A]/10" : "bg-gray-100"}`}
+                    className="flex items-center gap-3 flex-grow cursor-pointer"
+                    onClick={() => {
+                      if (isEditing) {
+                        const newSet = new Set(selectedIds);
+                        if (newSet.has(track.id)) newSet.delete(track.id);
+                        else newSet.add(track.id);
+                        setSelectedIds(newSet);
+                      } else if (track.audioFile) {
+                        setCurrentTrackIndex(index);
+                        setMusicTab("together");
+                        setTimeout(() => {
+                          audioRef.current?.play();
+                          setIsPlaying(true);
+                        }, 100);
+                      } else showToast("error", "请上传音乐");
+                    }}
                   >
-                    <div
-                      className="flex items-center gap-3 flex-grow cursor-pointer"
-                      onClick={() => {
-                        if (isEditing) {
-                          const newSet = new Set(selectedIds);
-                          if (newSet.has(track.id)) newSet.delete(track.id);
-                          else newSet.add(track.id);
-                          setSelectedIds(newSet);
-                        } else if (trackAudioUrl) {
-                          setCurrentTrackIndex(index);
-                          setMusicTab("together");
-                          setTimeout(() => {
-                            audioRef.current?.play();
-                            setIsPlaying(true);
-                          }, 100);
-                        } else showToast("error", "请上传音乐");
-                      }}
-                    >
-                      {isEditing ? (
-                        <div
-                          className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${selectedIds.has(track.id) ? "bg-[#7A2A3A] border-[#7A2A3A]" : "border-gray-300"}`}
-                        >
-                          {selectedIds.has(track.id) && (
-                            <CheckCircle2 size={12} className="text-white" />
-                          )}
-                        </div>
-                      ) : (
-                        <div className="w-4 h-4 flex items-center justify-center shrink-0">
-                          {isPlaying && currentTrackIndex === index ? (
-                            <div className="flex items-end gap-0.5 h-3.5 pb-0.5">
-                              <div className="w-0.5 bg-[#7A2A3A] animate-music-bar delay-1" />
-                              <div className="w-0.5 bg-[#7A2A3A] animate-music-bar delay-2" />
-                              <div className="w-0.5 bg-[#7A2A3A] animate-music-bar delay-3" />
-                            </div>
-                          ) : (
-                            <Play
-                              size={10}
-                              className="text-gray-400 fill-current opacity-60"
-                            />
-                          )}
-                        </div>
-                      )}
-                      <span
-                        className={`text-xs font-medium truncate max-w-[120px] ${selectedIds.has(track.id) ? "text-[#7A2A3A]" : "text-gray-600"}`}
+                    {isEditing ? (
+                      <div
+                        className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${selectedIds.has(track.id) ? "bg-[#7A2A3A] border-[#7A2A3A]" : "border-gray-300"}`}
                       >
-                        {track.title}
-                      </span>
-                    </div>
-                    {!isEditing && (
-                      <div className="flex items-center gap-3 text-[10px] text-gray-400 font-bold">
-                        <label className="cursor-pointer hover:text-[#7A2A3A] flex items-center gap-0.5">
-                          <Upload size={10} />
-                          封面
-                          <input
-                            type="file"
-                            hidden
-                            accept="image/*"
-                            onChange={(e) =>
-                              handleFileUpload(
-                                track.id,
-                                "cover",
-                                e.target.files[0],
-                              )
-                            }
+                        {selectedIds.has(track.id) && (
+                          <CheckCircle2 size={12} className="text-white" />
+                        )}
+                      </div>
+                    ) : (
+                      <div className="w-4 h-4 flex items-center justify-center shrink-0">
+                        {isPlaying && currentTrackIndex === index ? (
+                          <div className="flex items-end gap-0.5 h-3.5 pb-0.5">
+                            <div className="w-0.5 bg-[#7A2A3A] animate-music-bar delay-1" />
+                            <div className="w-0.5 bg-[#7A2A3A] animate-music-bar delay-2" />
+                            <div className="w-0.5 bg-[#7A2A3A] animate-music-bar delay-3" />
+                          </div>
+                        ) : (
+                          <Play
+                            size={10}
+                            className="text-gray-400 fill-current opacity-60"
                           />
-                        </label>
-                        <label className="cursor-pointer hover:text-[#7A2A3A] flex items-center gap-0.5">
-                          <Upload size={10} />
-                          音乐
-                          <input
-                            type="file"
-                            hidden
-                            accept="audio/*"
-                            onChange={(e) =>
-                              handleFileUpload(
-                                track.id,
-                                "audio",
-                                e.target.files[0],
-                              )
-                            }
-                          />
-                        </label>
-                        <label className="cursor-pointer hover:text-[#7A2A3A] flex items-center gap-0.5">
-                          <Upload size={10} />
-                          歌词
-                          <input
-                            type="file"
-                            hidden
-                            accept=".lrc"
-                            onChange={(e) =>
-                              handleFileUpload(track.id, "lrc", e.target.files[0])
-                            }
-                          />
-                        </label>
+                        )}
                       </div>
                     )}
+                    <span
+                      className={`text-xs font-medium truncate max-w-[120px] ${selectedIds.has(track.id) ? "text-[#7A2A3A]" : "text-gray-600"}`}
+                    >
+                      {track.title}
+                    </span>
                   </div>
-                );
-              })}
-              {/* 批量删除已选歌曲 */}
-              {isEditing && selectedIds.size > 0 && (
-                <button
-                  onClick={async () => {
-                    for (const id of selectedIds) {
-                      await handleDeleteTrackAudio(id);
-                    }
-                    setPlaylistTracks((prev) =>
-                      prev.filter((t) => !selectedIds.has(t.id)),
-                    );
-                    setSelectedIds(new Set());
-                    setIsEditing(false);
-                    showToast("success", "已删除");
-                  }}
-                  className="w-full py-3 border border-dashed border-red-300 text-red-400 rounded-lg text-[10px] flex items-center justify-center gap-2"
-                >
-                  <Trash2 size={12} />
-                  删除 {selectedIds.size} 首歌曲
-                </button>
-              )}
+                  {!isEditing && (
+                    <div className="flex items-center gap-3 text-[10px] text-gray-400 font-bold">
+                      <label className="cursor-pointer hover:text-[#7A2A3A] flex items-center gap-0.5">
+                        <Upload size={10} />
+                        封面
+                        <input
+                          type="file"
+                          hidden
+                          accept="image/*"
+                          onChange={(e) =>
+                            handleFileUpload(
+                              track.id,
+                              "cover",
+                              e.target.files[0],
+                            )
+                          }
+                        />
+                      </label>
+                      <label className="cursor-pointer hover:text-[#7A2A3A] flex items-center gap-0.5">
+                        <Upload size={10} />
+                        音乐
+                        <input
+                          type="file"
+                          hidden
+                          accept="audio/*"
+                          onChange={(e) =>
+                            handleFileUpload(
+                              track.id,
+                              "audio",
+                              e.target.files[0],
+                            )
+                          }
+                        />
+                      </label>
+                      <label className="cursor-pointer hover:text-[#7A2A3A] flex items-center gap-0.5">
+                        <Upload size={10} />
+                        歌词
+                        <input
+                          type="file"
+                          hidden
+                          accept=".lrc"
+                          onChange={(e) =>
+                            handleFileUpload(track.id, "lrc", e.target.files[0])
+                          }
+                        />
+                      </label>
+                    </div>
+                  )}
+                </div>
+              ))}
               <button
                 onClick={() =>
                   setPlaylistTracks([
