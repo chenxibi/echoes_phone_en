@@ -380,6 +380,10 @@ const App = () => {
     [],
     "echoes_chat_history",
   );
+  // 独立的音乐聊天历史，不混入主聊天记录
+  const [musicChatHistory, setMusicChatHistory] = useState([]);
+  // ref 标记当前 AI 回复是否来自 music_app，用于 messageQueue 处理 effect 路由
+  const isMusicSourceRef = useRef(false);
   const [statusHistory, setStatusHistory, statusHistoryLoaded] = useStickyState(
     [],
     "echoes_status_history",
@@ -1863,8 +1867,11 @@ Requirements:
     param1 = null, // 可以是重生成索引(number)，也可以是新消息内容(string)
     hint = "",
     overrideContext = null,
+    extra = null, // { source: "music_app" } 等标记
   ) => {
     if (!persona) return;
+
+    const isMusicSource = extra?.source === "music_app";
 
     // --- 1. 参数智能解析与消息预处理 ---
     const userContent = typeof param1 === "string" ? param1 : null;
@@ -1876,12 +1883,14 @@ Requirements:
       setPendingHint(null);
     }
 
-    const backupHistory = [...chatHistory];
-    let newHistory = [...chatHistory];
+    const backupHistory = isMusicSource ? [...musicChatHistory] : [...chatHistory];
+    let newHistory = isMusicSource ? [...musicChatHistory] : [...chatHistory];
 
     // 如果是重生成，回滚历史
     if (regenIndex !== null) {
-      newHistory = chatHistory.slice(0, regenIndex);
+      newHistory = isMusicSource
+        ? musicChatHistory.slice(0, regenIndex)
+        : chatHistory.slice(0, regenIndex);
     }
     // 如果是带内容触发（来自音乐等界面），先插入用户消息
     else if (userContent) {
@@ -1895,7 +1904,11 @@ Requirements:
     }
 
     // 立即同步状态，确保 UI 和后续逻辑基于最新的历史记录
-    setChatHistory(newHistory);
+    if (isMusicSource) {
+      setMusicChatHistory(newHistory);
+    } else {
+      setChatHistory(newHistory);
+    }
 
     setLoading((prev) => ({ ...prev, chat: true }));
     setIsTyping(true);
@@ -2125,8 +2138,14 @@ Requirements:
               `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
           }));
 
-          setIsTyping(false);
-          setMessageQueue(finalizedMsgs);
+          if (isMusicSource) {
+            // music_app 的 AI 回复直接写独立历史，不污染主聊天，不走 messageQueue
+            setMusicChatHistory((prev) => [...prev, ...finalizedMsgs]);
+            setIsTyping(false);
+          } else {
+            setIsTyping(false);
+            setMessageQueue(finalizedMsgs);
+          }
 
           // 惊喜逻辑：概率触发发帖
           if (forumData.isInitialized && Math.random() < 0.1) {
@@ -2159,7 +2178,13 @@ Requirements:
           }, 2000);
         }
       } else {
-        if (regenIndex !== null) setChatHistory(backupHistory);
+        if (regenIndex !== null) {
+          if (isMusicSource) {
+            setMusicChatHistory(backupHistory);
+          } else {
+            setChatHistory(backupHistory);
+          }
+        }
       }
     } finally {
       setLoading((prev) => ({ ...prev, chat: false }));
@@ -5080,9 +5105,8 @@ Requirements:
               userAvatar={userAvatar}
               charAvatar={avatar}
               userName={userName}
-              chatHistory={chatHistory}
-              useStickyState={useStickyState} // 传入你的异步钩子
-              echoesDB={echoesDB} // 传入你的数据库工具
+              musicChatHistory={musicChatHistory}
+              useStickyState={useStickyState}
               triggerAIResponse={triggerAIResponse}
               showToast={showToast}
               audioRef={audioRef}
