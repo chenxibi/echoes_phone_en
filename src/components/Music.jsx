@@ -22,7 +22,7 @@ const _dbName = "EchoesOS_DB";
 
 const _getAudioDB = () =>
   new Promise((resolve, reject) => {
-    const request = indexedDB.open(_dbName, 1);
+    const request = indexedDB.open(_dbName, 2);
     request.onupgradeneeded = (e) => {
       const db = e.target.result;
       if (!db.objectStoreNames.contains(AUDIO_STORE)) {
