@@ -1867,11 +1867,12 @@ Requirements:
     param1 = null, // 可以是重生成索引(number)，也可以是新消息内容(string)
     hint = "",
     overrideContext = null,
-    extra = null, // { source: "music_app" } 等标记
+    extra = null, // { source: "music_app", directPrompt } 等标记
   ) => {
     if (!persona) return;
 
     const isMusicSource = extra?.source === "music_app";
+    const isDirectPrompt = extra?.directPrompt; // 独立 prompt，不走 history 构建
 
     // --- 1. 参数智能解析与消息预处理 ---
     const userContent = typeof param1 === "string" ? param1 : null;
@@ -1921,27 +1922,30 @@ Requirements:
     const effectiveUserName = userName || "你";
 
     // --- 2. 格式化历史记录 (用于发送给 AI) ---
-    const historyText = getRecentTurns(newHistory, contextLimit)
-      .map((m) => {
-        const senderName =
-          m.sender === "me" ? userName || "User" : persona.name;
-        let content = m.text || "";
+    let historyText = "";
+    if (!isDirectPrompt) {
+      historyText = getRecentTurns(newHistory, contextLimit)
+        .map((m) => {
+          const senderName =
+            m.sender === "me" ? userName || "User" : persona.name;
+          let content = m.text || "";
 
-        if (m.isVoice) {
-          content = `(发送了一条语音): ${m.text.replace("[语音消息] ", "")}`;
-        }
-        if (m.sticker) {
-          if (!content || !content.trim()) {
-            content = `[发送了表情包: ${m.sticker.desc}]`;
+          if (m.isVoice) {
+            content = `(发送了一条语音): ${m.text.replace("[语音消息] ", "")}`;
           }
-        }
-        if (m.isForward && m.forwardData) {
-          const fwd = m.forwardData;
-          content += ` [转发了${fwd.type === "post" ? "帖子" : "评论"}: "${fwd.content.slice(0, 50)}..."]`;
-        }
-        return `${senderName}: ${content}`;
-      })
-      .join("\n");
+          if (m.sticker) {
+            if (!content || !content.trim()) {
+              content = `[发送了表情包: ${m.sticker.desc}]`;
+            }
+          }
+          if (m.isForward && m.forwardData) {
+            const fwd = m.forwardData;
+            content += ` [转发了${fwd.type === "post" ? "帖子" : "评论"}: "${fwd.content.slice(0, 50)}..."]`;
+          }
+          return `${senderName}: ${content}`;
+        })
+        .join("\n");
+    }
 
     const currentUserName = userName || "User";
     const cleanCharDesc = replacePlaceholders(
@@ -1956,79 +1960,90 @@ Requirements:
     );
 
     // --- 3. 构建 Prompt ---
-    // --- 3. 构建 Prompt ---
-    const stickerInst = getStickerInstruction(charStickers, stickersEnabled);
-    let styleInst = stylePrompts[chatStyle];
+    let prompt = "";
+    let systemPrompt = "";
 
-    const lastCharMsg = [...newHistory]
-      .reverse()
-      .find((m) => m.sender === "char");
-    if (lastCharMsg && lastCharMsg.style && lastCharMsg.style !== chatStyle) {
-      styleInst += `\n\n[FORMATTING OVERRIDE]: You have switched to a NEW writing style (${chatStyle}). IGNORE the formatting patterns of previous messages in history. You must strictly adhere to the new style defined above immediately.`;
-    }
-
-    // 核心修复：对 finalHint 进行占位符替换处理
-    if (finalHint) {
+    if (isDirectPrompt) {
+      // music_app 直接模式：轻量自包含 prompt，不走 history/sticker/style 等构建
       const processedHint = replacePlaceholders(
         finalHint,
         persona.name,
         userName || "你",
       );
-      styleInst += `\n[Special Instruction]: ${processedHint}`;
+      prompt = `${persona.name}和${effectiveUserName}正在一起听歌。${processedHint}\n请只回复内容，不超过30字，语言自然。`;
+      systemPrompt = `角色名：${persona.name}\n角色描述：${cleanCharDesc}\n[仅在听歌场景下回复，保持简短自然，不超过30字]`;
+    } else {
+      const stickerInst = getStickerInstruction(charStickers, stickersEnabled);
+      let styleInst = stylePrompts[chatStyle];
+
+      const lastCharMsg = [...newHistory]
+        .reverse()
+        .find((m) => m.sender === "char");
+      if (lastCharMsg && lastCharMsg.style && lastCharMsg.style !== chatStyle) {
+        styleInst += `\n\n[FORMATTING OVERRIDE]: You have switched to a NEW writing style (${chatStyle}). IGNORE the formatting patterns of previous messages in history. You must strictly adhere to the new style defined above immediately.`;
+      }
+
+      if (finalHint) {
+        const processedHint = replacePlaceholders(
+          finalHint,
+          persona.name,
+          userName || "你",
+        );
+        styleInst += `\n[Special Instruction]: ${processedHint}`;
+      }
+
+      const rawForwardContext = overrideContext || forwardContext;
+      const finalForwardSection = rawForwardContext
+        ? `\n**Forwarded Content Context**: ${replacePlaceholders(rawForwardContext, persona.name, userName || "你")}`
+        : "";
+
+      const modeInstruction =
+        interactionMode === "online"
+          ? `[Interaction Mode: ONLINE CHAT / MESSAGING]
+          - Context: You are chatting with {{USER_NAME}} via a smartphone/app.
+          - Style: Use short texts, emojis, and internet slang.
+          - Constraint: You are PHYSICALLY SEPARATED. Do not describe touch or physical presence.`
+          : `[Interaction Mode: REALITY / ACTION RP]
+          - Context: This scene takes place in the physical world (Real Life).
+          - Style: Use descriptive, sensory narrative (Visuals, Sounds, Smells).`;
+
+      prompt = prompts.chat
+        .replaceAll("{{NAME}}", persona.name)
+        .replaceAll("{{TIME}}", getCurrentTimeObj().toLocaleString())
+        .replaceAll("{{HISTORY}}", historyText)
+        .replaceAll(
+          "{{LAST_MSG}}",
+          newHistory.length > 0
+            ? JSON.stringify(newHistory[newHistory.length - 1])
+            : "Start conversation...",
+        )
+        .replaceAll("{{STYLE_INSTRUCTION}}", styleInst)
+        .replaceAll("{{STICKER_INSTRUCTION}}", stickerInst)
+        .replaceAll("{{USER_PERSONA}}", userPersona + "\n" + trackerContext)
+        .replaceAll("{{USER_NAME}}", effectiveUserName)
+        .replaceAll("{{MODE_INSTRUCTION}}", modeInstruction)
+        .replaceAll("{{FORWARD_CONTEXT}}", finalForwardSection);
+
+      systemPrompt = prompts.system
+        .replaceAll("{{NAME}}", persona.name)
+        .replaceAll(
+          "{{CHAR_DESCRIPTION}}",
+          cleanCharDesc + "\n" + charTrackerContext,
+        )
+        .replaceAll("{{USER_PERSONA}}", userPersona + "\n" + trackerContext)
+        .replaceAll("{{USER_NAME}}", effectiveUserName)
+        .replaceAll("{{CUSTOM_RULES}}", customRules)
+        .replaceAll("{{WORLD_INFO}}", cleanWorldInfo)
+        .replaceAll(
+          "{{LONG_MEMORY}}",
+          longMemory || "No long-term memory established yet.",
+        );
     }
-
-    const rawForwardContext = overrideContext || forwardContext;
-    // 核心修复：对 forwardContext 进行占位符替换处理
-    const finalForwardSection = rawForwardContext
-      ? `\n**Forwarded Content Context**: ${replacePlaceholders(rawForwardContext, persona.name, userName || "你")}`
-      : "";
-
-    const modeInstruction =
-      interactionMode === "online"
-        ? `[Interaction Mode: ONLINE CHAT / MESSAGING]
-        - Context: You are chatting with {{USER_NAME}} via a smartphone/app.
-        - Style: Use short texts, emojis, and internet slang.
-        - Constraint: You are PHYSICALLY SEPARATED. Do not describe touch or physical presence.`
-        : `[Interaction Mode: REALITY / ACTION RP]
-        - Context: This scene takes place in the physical world (Real Life).
-        - Style: Use descriptive, sensory narrative (Visuals, Sounds, Smells).`;
-
-    const prompt = prompts.chat
-      .replaceAll("{{NAME}}", persona.name)
-      .replaceAll("{{TIME}}", getCurrentTimeObj().toLocaleString())
-      .replaceAll("{{HISTORY}}", historyText)
-      .replaceAll(
-        "{{LAST_MSG}}",
-        newHistory.length > 0
-          ? JSON.stringify(newHistory[newHistory.length - 1])
-          : "Start conversation...",
-      )
-      .replaceAll("{{STYLE_INSTRUCTION}}", styleInst)
-      .replaceAll("{{STICKER_INSTRUCTION}}", stickerInst)
-      .replaceAll("{{USER_PERSONA}}", userPersona + "\n" + trackerContext)
-      .replaceAll("{{USER_NAME}}", effectiveUserName)
-      .replaceAll("{{MODE_INSTRUCTION}}", modeInstruction)
-      .replaceAll("{{FORWARD_CONTEXT}}", finalForwardSection);
-
-    const systemPrompt = prompts.system
-      .replaceAll("{{NAME}}", persona.name)
-      .replaceAll(
-        "{{CHAR_DESCRIPTION}}",
-        cleanCharDesc + "\n" + charTrackerContext,
-      )
-      .replaceAll("{{USER_PERSONA}}", userPersona + "\n" + trackerContext)
-      .replaceAll("{{USER_NAME}}", effectiveUserName)
-      .replaceAll("{{CUSTOM_RULES}}", customRules)
-      .replaceAll("{{WORLD_INFO}}", cleanWorldInfo)
-      .replaceAll(
-        "{{LONG_MEMORY}}",
-        longMemory || "No long-term memory established yet.",
-      );
 
     // --- 4. 调用 API ---
     try {
       const responseData = await generateContent(
-        { prompt, systemInstruction: systemPrompt, isJson: true },
+        { prompt, systemInstruction: systemPrompt, isJson: !isDirectPrompt },
         apiConfig,
         (err) => showToast("error", err),
         abortController.signal,
@@ -2036,6 +2051,27 @@ Requirements:
 
       if (responseData) {
         setForwardContext(null);
+
+        if (isDirectPrompt) {
+          // music_app 直接模式：AI 直接返回文本内容
+          const actualText =
+            typeof responseData === "string"
+              ? responseData
+              : responseData.text || String(responseData);
+          const aiMsg = {
+            sender: "char",
+            text: actualText,
+            time: formatTime(getCurrentTimeObj()),
+          };
+          if (isMusicSource) {
+            setMusicChatHistory((prev) => [...prev, aiMsg]);
+          } else {
+            setChatHistory((prev) => [...prev, aiMsg]);
+          }
+          setLoading((prev) => ({ ...prev, chat: false }));
+          abortControllerRef.current = null;
+          return;
+        }
 
         // 处理转账逻辑
         if (responseData.transfer_action) {

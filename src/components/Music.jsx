@@ -34,43 +34,59 @@ const _getAudioDB = () =>
   });
 
 const _saveAudioBlob = async (trackId, blob) => {
-  const db = await _getAudioDB();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(AUDIO_STORE, "readwrite");
-    const req = tx.objectStore(AUDIO_STORE).put(blob, String(trackId));
-    req.onsuccess = () => resolve();
-    req.onerror = (e) => reject(e);
-  });
+  try {
+    const db = await _getAudioDB();
+    if (!db.objectStoreNames.contains(AUDIO_STORE)) return;
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(AUDIO_STORE, "readwrite");
+      const req = tx.objectStore(AUDIO_STORE).put(blob, String(trackId));
+      req.onsuccess = () => resolve();
+      req.onerror = (e) => reject(e);
+    });
+  } catch {}
 };
 
 const _loadAudioBlob = async (trackId) => {
-  const db = await _getAudioDB();
-  return new Promise((resolve) => {
-    const tx = db.transaction(AUDIO_STORE, "readonly");
-    const req = tx.objectStore(AUDIO_STORE).get(String(trackId));
-    req.onsuccess = () => resolve(req.result || null);
-    req.onerror = () => resolve(null);
-  });
+  try {
+    const db = await _getAudioDB();
+    if (!db.objectStoreNames.contains(AUDIO_STORE)) return null;
+    return new Promise((resolve) => {
+      const tx = db.transaction(AUDIO_STORE, "readonly");
+      const req = tx.objectStore(AUDIO_STORE).get(String(trackId));
+      req.onsuccess = () => resolve(req.result || null);
+      req.onerror = () => resolve(null);
+    });
+  } catch {
+    return null;
+  }
 };
 
 const _saveCoverBlob = async (trackId, blob) => {
-  const db = await _getAudioDB();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(AUDIO_STORE, "readwrite");
-    const req = tx.objectStore(AUDIO_STORE).put(blob, `cover_${trackId}`);
-    req.onsuccess = () => resolve();
-    req.onerror = (e) => reject(e);
-  });
+  try {
+    const db = await _getAudioDB();
+    if (!db.objectStoreNames.contains(AUDIO_STORE)) return;
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(AUDIO_STORE, "readwrite");
+      const req = tx.objectStore(AUDIO_STORE).put(blob, `cover_${trackId}`);
+      req.onsuccess = () => resolve();
+      req.onerror = (e) => reject(e);
+    });
+  } catch {}
 };
 
 const _loadCoverBlob = async (trackId) => {
-  const db = await _getAudioDB();
-  return new Promise((resolve) => {
-    const tx = db.transaction(AUDIO_STORE, "readonly");
-    const req = tx.objectStore(AUDIO_STORE).get(`cover_${trackId}`);
-    req.onsuccess = () => resolve(req.result || null);
-    req.onerror = () => resolve(null);
-  });
+  try {
+    const db = await _getAudioDB();
+    if (!db.objectStoreNames.contains(AUDIO_STORE)) return null;
+    return new Promise((resolve) => {
+      const tx = db.transaction(AUDIO_STORE, "readonly");
+      const req = tx.objectStore(AUDIO_STORE).get(`cover_${trackId}`);
+      req.onsuccess = () => resolve(req.result || null);
+      req.onerror = () => resolve(null);
+    });
+  } catch {
+    return null;
+  }
 };
 
 // --- 1. 工具函数：解析 LRC ---
@@ -260,6 +276,11 @@ const MusicApp = ({
   const lrcScrollRef = useRef(null);
   const lastCommentTime = useRef(0);
   const lastTriggeredLrc = useRef("");
+  // 用 ref 保存最新的 lrc 和 activeIndex，避免 timeupdate 闭包 stale
+  const currentLrcRef = useRef(currentLrc);
+  const activeLrcIndexRef = useRef(activeLrcIndex);
+  useEffect(() => { currentLrcRef.current = currentLrc; }, [currentLrc]);
+  useEffect(() => { activeLrcIndexRef.current = activeLrcIndex; }, [activeLrcIndex]);
 
   // 1. 播放进度监听与 AI 点评触发
   useEffect(() => {
@@ -270,13 +291,15 @@ const MusicApp = ({
       const time = audio.currentTime;
       setCurrentTime(time);
 
-      if (currentLrc && currentLrc.length > 0) {
-        const index = currentLrc.findIndex((l, i) => {
-          const next = currentLrc[i + 1];
+      const lrc = currentLrcRef.current;
+      const activeIdx = activeLrcIndexRef.current;
+      if (lrc && lrc.length > 0) {
+        const index = lrc.findIndex((l, i) => {
+          const next = lrc[i + 1];
           return time >= l.time && (!next || time < next.time);
         });
 
-        if (index !== -1 && index !== activeLrcIndex) {
+        if (index !== -1 && index !== activeIdx) {
           setActiveLrcIndex(index);
           handleAiMusicInsight(index);
         }
@@ -295,25 +318,17 @@ const MusicApp = ({
       audio.removeEventListener("loadedmetadata", handleLoadedMetadata);
       audio.removeEventListener("ended", handleEnded);
     };
-  }, [currentLrc, activeLrcIndex, audioRef]);
+  }, [audioRef]);
 
   // 2. 歌词居中滚动
   useEffect(() => {
-    if (lrcScrollRef.current && activeLrcIndex !== -1) {
+    if (activeLrcIndex === -1) return;
+    const t = setTimeout(() => {
       const container = lrcScrollRef.current;
-      const activeLine = container.children[activeLrcIndex];
-      if (activeLine) {
-        const targetScrollTop =
-          activeLine.offsetTop -
-          container.offsetHeight / 2 +
-          activeLine.offsetHeight / 2;
-
-        container.scrollTo({
-          top: targetScrollTop,
-          behavior: "smooth",
-        });
-      }
-    }
+      const activeLine = container?.children[activeLrcIndex];
+      activeLine?.scrollIntoView({ block: "center", behavior: "smooth" });
+    }, 0);
+    return () => clearTimeout(t);
   }, [activeLrcIndex]);
 
   // 3. 气泡同步 — 监听独立的 musicChatHistory（不污染主聊天）
@@ -361,12 +376,12 @@ const MusicApp = ({
 
   const currentAudioUrl = useMemo(() => {
     if (!currentTrack) return null;
-    return audioUrlMap[currentTrack.id] || null;
+    return audioUrlMap[String(currentTrack.id)] || null;
   }, [currentTrack, audioUrlMap]);
 
   const currentCoverUrl = useMemo(() => {
     if (!currentTrack) return null;
-    return coverUrlMap[currentTrack.id] || null;
+    return coverUrlMap[String(currentTrack.id)] || null;
   }, [currentTrack, coverUrlMap]);
 
   const playlistCoverUrl = useMemo(
@@ -406,16 +421,16 @@ const MusicApp = ({
     if (!contextLines || contextLines === lastTriggeredLrc.current) return;
     lastCommentTime.current = now;
     lastTriggeredLrc.current = contextLines;
-    const musicPrompt = `[SYSTEM_NOTE: {{char}}和{{user}}正在一起听一首叫做《${currentTrack?.title}》的歌曲。当前歌词："${contextLines}"。请遵循以下尺度：1.审美优先，点评意境或旋律氛围。2.严禁强行将歌曲映射为 {{user}} 的过往经历或内心秘密，如"这首歌像你""你就是这样""你为什么喜欢这种歌，是不是因为你也想...""你听这首歌是因为在歌词里看到了自己吧"等言论，需要避免。3.适度表达 {{char}} 自己的听感。4.不一定非要谈论歌曲本身，也可根据情况保持自然的日常交流。5.不超过 30 字。]`;
-    triggerAIResponse(null, musicPrompt, null, { source: "music_app" });
+    const musicPrompt = `{{char}}和{{user}}正在一起听《${currentTrack?.title}》。当前歌词："${contextLines}"。只回复内容，不超过30字，保持自然。`;
+    triggerAIResponse(null, musicPrompt, null, { source: "music_app", directPrompt: true });
   };
 
   // 用户在音乐界面主动回复
   const handleUserReply = () => {
     const content = replyContent.trim();
     if (!content) return;
-    const musicContext = `[{{char}}和{{user}}正在一起听一首叫做《${currentTrack?.title}》的歌曲。当前歌词：${currentLrc[activeLrcIndex]?.text || "..."}]`;
-    triggerAIResponse(content, "", musicContext, { source: "music_app" });
+    const musicContext = `[{{char}}和{{user}}正在一起听《${currentTrack?.title}》。当前歌词：${currentLrc[activeLrcIndex]?.text || "..."}]`;
+    triggerAIResponse(content, "", musicContext, { source: "music_app", directPrompt: true });
     setReplyContent("");
     setShowQuickReply(false);
   };
@@ -425,9 +440,10 @@ const MusicApp = ({
     if (!file) return;
 
     if (type === "audio") {
-      await _saveAudioBlob(String(trackId), file);
+      // 立即生成 URL 更新 UI（不等 IDB）
       const objectUrl = URL.createObjectURL(file);
-      setAudioUrlMap((prev) => ({ ...prev, [trackId]: objectUrl }));
+      const strId = String(trackId);
+      setAudioUrlMap((prev) => ({ ...prev, [strId]: objectUrl }));
       setPlaylistTracks((prev) =>
         prev.map((t) =>
           t.id === trackId
@@ -435,10 +451,15 @@ const MusicApp = ({
             : t,
         ),
       );
+      // 后台写入 IDB，带超时保护
+      _saveAudioBlob(strId, file).catch(() => {});
+      showToast("success", "存储成功");
     } else if (type === "cover") {
-      await _saveCoverBlob(String(trackId), file);
       const objectUrl = URL.createObjectURL(file);
-      setCoverUrlMap((prev) => ({ ...prev, [trackId]: objectUrl }));
+      const strId = String(trackId);
+      setCoverUrlMap((prev) => ({ ...prev, [strId]: objectUrl }));
+      _saveCoverBlob(strId, file).catch(() => {});
+      showToast("success", "存储成功");
     } else if (type === "lrc") {
       const text = await file.text();
       setPlaylistTracks((prev) =>
@@ -446,19 +467,23 @@ const MusicApp = ({
           nt.id === trackId ? { ...nt, lrcText: text } : nt,
         ),
       );
+      showToast("success", "歌词已保存");
     }
-
-    showToast("success", "存储成功");
   };
 
   // 删除歌曲时清理 IndexedDB 中的 Blob
   const handleDeleteTrackAudio = async (trackId) => {
-    const db = await _getAudioDB();
-    const tx = db.transaction(AUDIO_STORE, "readwrite");
-    tx.objectStore(AUDIO_STORE).delete(String(trackId));
-    tx.objectStore(AUDIO_STORE).delete(`cover_${trackId}`);
-    if (audioUrlMap[trackId]) URL.revokeObjectURL(audioUrlMap[trackId]);
-    if (coverUrlMap[trackId]) URL.revokeObjectURL(coverUrlMap[trackId]);
+    const strId = String(trackId);
+    try {
+      const db = await _getAudioDB();
+      if (db.objectStoreNames.contains(AUDIO_STORE)) {
+        const tx = db.transaction(AUDIO_STORE, "readwrite");
+        tx.objectStore(AUDIO_STORE).delete(strId);
+        tx.objectStore(AUDIO_STORE).delete(`cover_${strId}`);
+      }
+    } catch {}
+    if (audioUrlMap[strId]) URL.revokeObjectURL(audioUrlMap[strId]);
+    if (coverUrlMap[strId]) URL.revokeObjectURL(coverUrlMap[strId]);
   };
 
   return (
@@ -608,8 +633,8 @@ const MusicApp = ({
             />
             <div className="space-y-2 pb-24">
               {playlistTracks.map((track, index) => {
-                const trackAudioUrl = audioUrlMap[track.id];
-                const trackCoverUrl = coverUrlMap[track.id];
+                const trackAudioUrl = audioUrlMap[String(track.id)];
+                const trackCoverUrl = coverUrlMap[String(track.id)];
                 return (
                   <div
                     key={track.id}
