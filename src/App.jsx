@@ -1481,10 +1481,12 @@ const App = () => {
       .replaceAll("{{HISTORY}}", historyText);
 
     try {
+      const abortController = new AbortController();
       const data = await generateContent(
         { prompt, systemInstruction: getFinalSystemPrompt() },
         apiConfig,
         (err) => {},
+        abortController.signal,
       );
 
       if (data) {
@@ -1510,7 +1512,7 @@ const App = () => {
         }
       }
     } catch (e) {
-      // 静默处理
+      console.error("triggerAppEvents error:", e);
     }
   };
 
@@ -2185,7 +2187,7 @@ Requirements:
           }
 
           // 惊喜逻辑2：概率触发app事件更新（位置/日记/浏览器/账单）
-          if (Math.random() < 0.1) {
+          if (Math.random() < 0.5) {
             setTimeout(() => {
               triggerAppEvents();
             }, 5000);
