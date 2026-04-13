@@ -119,8 +119,6 @@ import {
   ArrowRightToLine,
 } from "lucide-react";
 
-// --- 常量定义 ---
-
 // --- helpers moved to ./utils/appHelpers.jsx ---
 import {
   echoesDB,
@@ -147,6 +145,8 @@ import {
   safeJSONParse,
   toggleFullScreen,
   APP_LIST,
+  PLACEHOLDER_IMG_BASE64,
+  IMG_TAG_START,
 } from "./utils/appHelpers.jsx";
 
 const App = () => {
@@ -2130,7 +2130,11 @@ Requirements:
 
           // 惊喜逻辑：概率触发发帖
           if (forumData.isInitialized && Math.random() < 0.1) {
-            setTimeout(() => generateChatEventPost(true), 5000);
+            setTimeout(() => {
+              if (window.__forumGenerateChatEventPost) {
+                window.__forumGenerateChatEventPost(true);
+              }
+            }, 5000);
           }
 
           // 定时检查档案更新与总结

@@ -18,7 +18,7 @@ import {
 import AppWindow from "./AppWindow";
 import useStickyState from "../hooks/useStickyState";
 // 假设这些工具函数在 utils/helpers.js，请根据实际情况调整引用
-import { replacePlaceholders, formatTime } from "../utils/helpers";
+import { replacePlaceholders, formatTime, getTimeBasedGuidance } from "../utils/helpers";
 
 const Forum = ({
   isOpen,
@@ -42,6 +42,7 @@ const Forum = ({
   setMsgCountSinceSummary,
   setForwardContext,
   setActiveApp, // 用于跳转到 Chat
+  onChatEventPost, // 聊天事件触发发帖的回调
 }) => {
   // --- 内部状态管理 ---
   const [forumData, setForumData] = useStickyState(
@@ -58,6 +59,10 @@ const Forum = ({
   const [showForumSettings, setShowForumSettings] = useState(false);
   const [showPostModal, setShowPostModal] = useState(false);
   const [postTab, setPostTab] = useState("me"); // 'me' or 'char'
+
+  // 聊天事件触发发帖的弹窗状态
+  const [showChatEventModal, setShowChatEventModal] = useState(false);
+  const [chatEventPostData, setChatEventPostData] = useState(null); // 存储 AI 生成的发帖内容
   const [replyIdentity, setReplyIdentity] = useState("me"); // 'me' or 'smurf'
   const [forumGuidance, setForumGuidance] = useState("");
 
@@ -404,6 +409,84 @@ ${recentHistory}
       setLoading((prev) => ({ ...prev, forum_char: false }));
     }
   };
+
+  // 聊天事件触发发帖：AI 分析聊天历史后自动发帖
+  const generateChatEventPost = async (showModal = true) => {
+    if (!persona) return;
+    setLoading((prev) => ({ ...prev, chat_event_post: true }));
+
+    const currentUserName = userName || "User";
+    const charNick = forumSettings.charNick || persona.name || "匿名用户";
+    const cleanWorldInfo = worldInfoString || "";
+
+    const prompt = prompts.forum_chat_event
+      .replaceAll("{{NAME}}", persona.name)
+      .replaceAll(
+        "{{CHAR_DESCRIPTION}}",
+        userPersona + "\n" + charTrackerContext,
+      )
+      .replaceAll("{{WORLD_INFO}}", cleanWorldInfo)
+      .replaceAll("{{HISTORY}}", getContextString(15))
+      .replaceAll("{{USER_NAME}}", currentUserName);
+
+    try {
+      const data = await generateContent(
+        { prompt, systemInstruction: getFormattedSystemPrompt() },
+        apiConfig,
+        (err) => showToast("error", err),
+      );
+
+      if (data && data.shouldPost && data.title && data.content) {
+        const newPost = {
+          id: `char_${Date.now()}`,
+          author: charNick,
+          authorType: "char",
+          title: data.title,
+          content: data.content,
+          time: "刚刚",
+          replyCount: (data.replies || []).length,
+          views: Math.floor(Math.random() * 100) + 50,
+          isUserCreated: false,
+          replies: (data.replies || []).map((r, idx) => ({
+            id: `r_${Date.now()}_${idx}`,
+            author: r.author,
+            content: r.content,
+            isCharacter: r.isCharacter || false,
+            isUser: false,
+          })),
+        };
+
+        // 添加新帖子到论坛数据
+        setForumData((prev) => ({
+          ...prev,
+          posts: [newPost, ...prev.posts],
+        }));
+
+        // 设置弹窗数据并通知 App
+        setChatEventPostData(newPost);
+        if (showModal) {
+          setShowChatEventModal(true);
+        }
+        if (onChatEventPost) {
+          onChatEventPost(newPost);
+        }
+      }
+    } finally {
+      setLoading((prev) => ({ ...prev, chat_event_post: false }));
+    }
+  };
+
+  // 暴露 generateChatEventPost 给外部调用（通过 ref）
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      window.__forumGenerateChatEventPost = generateChatEventPost;
+    }
+    return () => {
+      if (typeof window !== "undefined") {
+        delete window.__forumGenerateChatEventPost;
+      }
+    };
+  }, [forumData, forumSettings, persona, userName, userPersona, charTrackerContext, worldInfoString]);
 
   // --- UI 事件处理 ---
 
@@ -1061,6 +1144,96 @@ ${recentHistory}
                   className="w-full h-48 text-sm resize-none outline-none bg-transparent custom-scrollbar leading-relaxed placeholder:text-gray-300"
                 />
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 弹窗：聊天事件自动发帖提醒 */}
+      {showChatEventModal && chatEventPostData && (
+        <div className="absolute inset-0 z-[70] bg-black/60 flex items-center justify-center p-6 animate-in fade-in">
+          <div className="bg-white w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-4">
+            {/* 头部 */}
+            <div className="bg-gradient-to-r from-[#7A2A3A] to-[#963448] px-5 py-4 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Sparkle size={16} className="text-white/80" />
+                <span className="text-white font-bold text-sm">角色发帖啦</span>
+              </div>
+              <button
+                onClick={() => setShowChatEventModal(false)}
+                className="text-white/60 hover:text-white transition-colors"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* 帖子内容预览 */}
+            <div className="p-5 space-y-4">
+              <div className="flex items-center gap-3 pb-3 border-b border-gray-100">
+                <div className="w-10 h-10 rounded-full bg-[#7A2A3A]/10 flex items-center justify-center">
+                  <span className="text-[#7A2A3A] font-bold text-sm">
+                    {chatEventPostData.author?.charAt(0) || "匿"}
+                  </span>
+                </div>
+                <div>
+                  <div className="font-bold text-sm text-gray-900">
+                    {chatEventPostData.author}
+                  </div>
+                  <div className="text-xs text-gray-400">刚刚</div>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="font-bold text-base text-gray-900 mb-2">
+                  {chatEventPostData.title}
+                </h3>
+                <p className="text-sm text-gray-600 leading-relaxed line-clamp-3">
+                  {chatEventPostData.content}
+                </p>
+              </div>
+
+              {/* 初始评论预览 */}
+              {chatEventPostData.replies && chatEventPostData.replies.length > 0 && (
+                <div className="bg-gray-50 rounded-xl p-3 space-y-2">
+                  <div className="text-xs text-gray-400 font-bold mb-2">
+                    网友热评
+                  </div>
+                  {chatEventPostData.replies.slice(0, 2).map((reply, idx) => (
+                    <div key={reply.id || idx} className="flex gap-2">
+                      <span className="text-xs font-bold text-[#7A2A3A] shrink-0">
+                        {reply.author}:
+                      </span>
+                      <span className="text-xs text-gray-600 line-clamp-1">
+                        {reply.content}
+                      </span>
+                    </div>
+                  ))}
+                  {chatEventPostData.replies.length > 2 && (
+                    <div className="text-xs text-gray-400">
+                      还有 {chatEventPostData.replies.length - 2} 条评论...
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* 底部按钮 */}
+            <div className="px-5 pb-5 flex gap-3">
+              <button
+                onClick={() => {
+                  setShowChatEventModal(false);
+                  setActiveApp("forum");
+                }}
+                className="flex-1 py-3 bg-gray-100 text-gray-700 rounded-xl text-sm font-bold hover:bg-gray-200 transition-colors"
+              >
+                去看看
+              </button>
+              <button
+                onClick={() => setShowChatEventModal(false)}
+                className="flex-1 py-3 bg-[#7A2A3A] text-white rounded-xl text-sm font-bold hover:bg-[#963448] transition-colors shadow-md"
+              >
+                知道了
+              </button>
             </div>
           </div>
         </div>
