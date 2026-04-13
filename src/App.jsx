@@ -2178,10 +2178,19 @@ Requirements:
             }, 5000);
           }
 
-          // 惊喜逻辑2：AI分析聊天内容，触发智能家/日记/浏览器/账单更新
+          // 惊喜逻辑2：每10轮触发app事件更新（位置/日记/浏览器/账单）
           setTimeout(() => {
-            triggerAppEvents();
-          }, 6000);
+            const fullConversation = [...newHistory, ...finalizedMsgs];
+            let userTurnCount = 0;
+            let lastSender = null;
+            for (const msg of fullConversation) {
+              if (msg.sender === "me" && lastSender !== "me") userTurnCount++;
+              lastSender = msg.sender;
+            }
+            if (userTurnCount > 0 && userTurnCount % 10 === 0) {
+              triggerAppEvents();
+            }
+          }, 5000);
 
           // 定时检查档案更新与总结
           setTimeout(() => {
