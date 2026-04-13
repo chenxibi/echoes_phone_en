@@ -1430,7 +1430,7 @@ const App = () => {
     const prompt = promptTemplate
       .replaceAll("{{NAME}}", p.name)
       .replaceAll("{{TIME}}", getCurrentTimeObj().toLocaleString())
-      .replaceAll("{{HISTORY}}", getContextString(chatHistory, contextLimit))
+      .replaceAll("{{HISTORY}}", getContextString(chatHistory, effectiveUserName, p, null, contextLimit))
       .replaceAll("{{USER_PERSONA}}", userPersona + "\n" + trackerContext)
       .replaceAll("{{USER_NAME}}", effectiveUserName);
 
@@ -1474,7 +1474,7 @@ const App = () => {
     if (!persona) return;
     const charName = persona.name || "Character";
     const effectiveUserName = userName || "你";
-    const historyText = getContextString(chatHistory, 10);
+    const historyText = getContextString(chatHistory, effectiveUserName, persona, null, 10);
 
     const prompt = prompts.trigger_events
       .replaceAll("{{NAME}}", charName)
@@ -1490,27 +1490,41 @@ const App = () => {
       );
 
       if (data) {
+        // 在异步调用前保存所有需要的值，避免闭包问题
+        const savedPersonaName = persona?.name || "角色";
+        const savedCharName = charName;
+        const savedUserName = effectiveUserName;
+        const savedSmartWatchLocations = [...smartWatchLocations];
+        const savedSmartWatchLogs = [...smartWatchLogs];
+        const savedWorldBook = worldBook;
+        const savedCharTrackerContext = charTrackerContext;
+        const savedUserPersona = userPersona;
+        const savedTrackerContext = trackerContext;
+        const savedCustomRules = customRules;
+        const savedInputKey = inputKey;
+
         // 位置移动触发 → 更新智能家，生成完成后弹窗
         if (data.triggerLocation) {
           setTimeout(() => {
             const doUpdate = async () => {
               setLoading((prev) => ({ ...prev, sw_update: true }));
               const prompt = prompts.smartwatch_update
-                .replaceAll("{{NAME}}", persona.name)
+                .replaceAll("{{NAME}}", savedPersonaName)
                 .replaceAll("{{TIME}}", getCurrentTimeObj().toLocaleString())
-                .replaceAll("{{HISTORY}}", getContextString(chatHistory, 5))
-                .replaceAll("{{LOCATIONS_LIST}}", smartWatchLocations.map((l) => `ID: ${l.id}, Name: ${l.name}`).join("\n"))
-                .replaceAll("{{LAST_LOG}}", smartWatchLogs.length > 0 ? JSON.stringify(smartWatchLogs[0]) : "None");
+                .replaceAll("{{HISTORY}}", getContextString(chatHistory, savedUserName, null, null, 5))
+                .replaceAll("{{LOCATIONS_LIST}}", savedSmartWatchLocations.map((l) => `ID: ${l.id}, Name: ${l.name}`).join("\n"))
+                .replaceAll("{{LAST_LOG}}", savedSmartWatchLogs.length > 0 ? JSON.stringify(savedSmartWatchLogs[0]) : "None");
               const systemPrompt = prompts.system
-                .replaceAll("{{NAME}}", persona.name)
-                .replaceAll("{{CHAR_DESCRIPTION}}", inputKey + "\n" + charTrackerContext)
-                .replaceAll("{{USER_PERSONA}}", userPersona + "\n" + trackerContext)
-                .replaceAll("{{USER_NAME}}", userName || "你")
-                .replaceAll("{{CUSTOM_RULES}}", customRules)
-                .replaceAll("{{WORLD_INFO}}", getWorldInfoString(worldBook));
+                .replaceAll("{{NAME}}", savedPersonaName)
+                .replaceAll("{{CHAR_DESCRIPTION}}", savedInputKey + "\n" + savedCharTrackerContext)
+                .replaceAll("{{USER_PERSONA}}", savedUserPersona + "\n" + savedTrackerContext)
+                .replaceAll("{{USER_NAME}}", savedUserName)
+                .replaceAll("{{CUSTOM_RULES}}", savedCustomRules)
+                .replaceAll("{{WORLD_INFO}}", getWorldInfoString(savedWorldBook));
               try {
-                await generateContent({ prompt, systemInstruction: systemPrompt }, apiConfig, (err) => {}, new AbortController().signal);
-                if (typeof showToast === "function") showToast("info", `${charName}的实时位置更新了`);
+                const abortCtrl = new AbortController();
+                await generateContent({ prompt, systemInstruction: systemPrompt }, apiConfig, (err) => {}, abortCtrl.signal);
+                if (typeof showToast === "function") showToast("info", `${savedCharName}的实时位置更新了`);
               } finally {
                 setLoading((prev) => ({ ...prev, sw_update: false }));
               }
@@ -1523,7 +1537,7 @@ const App = () => {
           setTimeout(() => {
             const doDiary = async () => {
               await runGenerator("diary", setDiaries, prompts.diary);
-              if (typeof showToast === "function") showToast("info", `${charName}写了一篇日记`);
+              if (typeof showToast === "function") showToast("info", `${savedCharName}写了一篇日记`);
             };
             doDiary();
           }, 2000);
@@ -1533,7 +1547,7 @@ const App = () => {
           setTimeout(() => {
             const doBrowser = async () => {
               await runGenerator("browser", setBrowserHistory, prompts.browser);
-              if (typeof showToast === "function") showToast("info", `${charName}的浏览记录更新了`);
+              if (typeof showToast === "function") showToast("info", `${savedCharName}的浏览记录更新了`);
             };
             doBrowser();
           }, 3000);
@@ -1543,7 +1557,7 @@ const App = () => {
           setTimeout(() => {
             const doReceipt = async () => {
               await runGenerator("receipt", setReceipts, prompts.receipt);
-              if (typeof showToast === "function") showToast("info", `${charName}的账单更新了`);
+              if (typeof showToast === "function") showToast("info", `${savedCharName}的账单更新了`);
             };
             doReceipt();
           }, 4000);
@@ -2214,7 +2228,7 @@ Requirements:
           setMessageQueue(finalizedMsgs);
 
           // 惊喜逻辑：概率触发发帖
-          if (forumData.isInitialized && Math.random() < 0.1) {
+          if (forumData.isInitialized && Math.random() < 0.9) {
             const charName = persona?.name || "角色";
             if (typeof showToast === "function") showToast("info", `${charName}在生活圈发布了一条帖子`);
             setTimeout(() => {
@@ -2225,7 +2239,7 @@ Requirements:
           }
 
           // 惊喜逻辑2：概率触发app事件更新（位置/日记/浏览器/账单）
-          if (Math.random() < 0.5) {
+          if (Math.random() < 0.1) {
             setTimeout(() => {
               triggerAppEvents();
             }, 5000);
@@ -2698,7 +2712,7 @@ Requirements:
     const prompt = prompts.smartwatch_update
       .replaceAll("{{NAME}}", persona.name)
       .replaceAll("{{USER_NAME}}", effectiveUserName)
-      .replaceAll("{{HISTORY}}", getContextString(chatHistory, 5))
+      .replaceAll("{{HISTORY}}", getContextString(chatHistory, effectiveUserName, null, null, 5))
       .replaceAll("{{LOCATIONS_LIST}}", locList)
       .replaceAll("{{LAST_LOG}}", lastLog);
 
