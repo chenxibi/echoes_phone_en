@@ -2379,7 +2379,7 @@ ${charFactsList || "None"}
           // 判断内容 (处理文本、语音、图片、位置等不同类型)
           let content = m.text || "";
           if (m.isVoice) content = "[语音]";
-          if (m.isLocation) content = `[位置: ${m.location.name}]`;
+          if (m.isLocation) content = `[位置: ${m.location.name}, 地址: ${m.location.address}]`;
           // 如果没有文本也没有特殊类型，可能是空
           if (!content) content = "[图片/表情]";
 
