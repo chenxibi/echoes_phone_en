@@ -1484,25 +1484,29 @@ const App = () => {
       const data = await generateContent(
         { prompt, systemInstruction: getFinalSystemPrompt() },
         apiConfig,
-        (err) => {}, // 静默处理，不弹toast避免打扰
+        (err) => {},
       );
 
       if (data) {
         // 位置移动触发 → 更新智能家
         if (data.triggerLocation) {
-          setTimeout(() => generateSmartWatchUpdate(), 3000);
+          if (typeof showToast === "function") showToast("info", `${charName}的实时位置更新了`);
+          setTimeout(() => generateSmartWatchUpdate(), 1000);
         }
         // 重要事件触发 → 写日记
         if (data.triggerDiary) {
-          setTimeout(() => generateDiary(), 4000);
+          if (typeof showToast === "function") showToast("info", `${charName}写了一篇日记`);
+          setTimeout(() => generateDiary(), 2000);
         }
         // 浏览器搜索触发 → 更新浏览器历史
         if (data.triggerBrowser) {
-          setTimeout(() => generateBrowser(), 5000);
+          if (typeof showToast === "function") showToast("info", `${charName}的浏览记录更新了`);
+          setTimeout(() => generateBrowser(), 3000);
         }
         // 购物触发 → 更新账单
         if (data.triggerReceipt) {
-          setTimeout(() => generateReceipt(), 6000);
+          if (typeof showToast === "function") showToast("info", `${charName}的账单更新了`);
+          setTimeout(() => generateReceipt(), 4000);
         }
       }
     } catch (e) {
@@ -2171,6 +2175,8 @@ Requirements:
 
           // 惊喜逻辑：概率触发发帖
           if (forumData.isInitialized && Math.random() < 0.1) {
+            const charName = persona?.name || "角色";
+            if (typeof showToast === "function") showToast("info", `${charName}在生活圈发布了一条帖子`);
             setTimeout(() => {
               if (window.__forumGenerateChatEventPost) {
                 window.__forumGenerateChatEventPost(true);
