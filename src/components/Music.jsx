@@ -316,7 +316,7 @@ const MusicApp = ({
     if (!contextLines || contextLines === lastTriggeredLrc.current) return;
     lastCommentTime.current = now;
     lastTriggeredLrc.current = contextLines;
-    const musicPrompt = `[SYSTEM_NOTE: {{char}}and{{user}}are now listening together to "${currentTrack?.title}". Current lyrics: “${contextLines}”。Follow the guidelines below：1.审美优先，:00评意境或旋律氛围。2.严禁强行将歌曲映射为 \${user} 的过往经历或内心秘密，如“这首歌像You”“You就是这样”“You为什么喜欢这种歌，是不是因为You也想...”“You听这首歌是因为在Lyrics里看到了自己吧”等言论，需要避免。3.适度表达 \${char} 自己的听感。4.不一定非要谈论歌曲本身，也可根据情况保持自然的常交流。5.不超过 30 字。]`;
+    const musicPrompt = `[SYSTEM_NOTE: {{char}}and{{user}}are now listening together to "${currentTrack?.title}". Current lyrics: “${contextLines}”。Follow the guidelines below: 1. Prioritize aesthetics - comment on the mood, imagery, or vibe of the melody. 2. STRICTLY FORBIDDEN to force-map the song onto \${user}'s past experiences or inner secrets, e.g. 'this song is like you', 'you're exactly like this', 'why do you like this song' - avoid all such statements. 3. Moderately express \${char}'s own listening impressions. 4. You don't have to talk about the song itself - maintain natural casual conversation when appropriate. 5. Keep it under 30 words.]`;
     triggerAIResponse(null, musicPrompt);
   };
 

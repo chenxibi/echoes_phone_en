@@ -102,14 +102,14 @@ export const safeJSONParse = (text) => {
     clean = clean.replace(/(\:\s*)"/g, "$1" + TEMP_Q);
     clean = clean.replace(/"\s*(?=[,\}\]])/g, TEMP_Q);
 
-    clean = clean.replace(/([，。！？…、\.,!\?])\s*"/g, "$1”");
-    clean = clean.replace(/"(?=\s*[，。！？…、\.,!\?])/g, "”");
+    clean = clean.replace(/([，。！？…、\.,!\?])\s*"/g, "$1"");
+    clean = clean.replace(/"(?=\s*[，。！？…、\.,!\?])/g, """);
 
-    clean = clean.replace(/([\u4e00-\u9fa5])"([\u4e00-\u9fa5])/g, "$1“$2");
+    clean = clean.replace(/([\u4e00-\u9fa5])"([\u4e00-\u9fa5])/g, "$1"$2");
 
-    clean = clean.replace(/"(?=[\u4e00-\u9fa5])/g, "“");
+    clean = clean.replace(/"(?=[\u4e00-\u9fa5])/g, """);
 
-    clean = clean.replace(/([\u4e00-\u9fa5])"(?!\s*[:,\}\]])/g, "$1”");
+    clean = clean.replace(/([\u4e00-\u9fa5])"(?!\s*[:,\}\]])/g, "$1"");
 
     clean = clean.replace(/"/g, '\\"');
 
@@ -120,13 +120,13 @@ export const safeJSONParse = (text) => {
     const repairedText = jsonrepair(clean);
     return JSON.parse(repairedText);
   } catch (e) {
-    console.error("[Echoes] JSON 解析Failed:", e);
-    console.log("[Echoes] 问题文本:", text);
+    console.error("[Echoes] JSON parse failed:", e);
+    console.log("[Echoes] Problem text:", text);
     try {
       const simpleRepair = jsonrepair(text);
       return JSON.parse(simpleRepair);
     } catch (err2) {
-      throw new Error(`格式解析Failed: ${e.message.slice(0, 30)}...`);
+      throw new Error(`Format parse failed: ${e.message.slice(0, 30)}...`);
     }
   }
 };
@@ -172,7 +172,7 @@ export const formatTime = (date) =>
     hour12: false,
   });
 export const formatDate = (date) =>
-  date.toLocaleDateString("zh-CN", {
+  date.toLocaleDateString("en-US", {
     month: "long",
     day: "numeric",
     weekday: "short",
@@ -371,7 +371,7 @@ export const generateContent = async (params, apiConfig, onError, signal) => {
       content = data.choices[0].message?.content;
       console.log("[Echoes] Content extracted:", content);
     } else {
-      throw new Error("未配置 API 信息。请在Settings中Enter Base URL 和 Key。");
+      throw new Error("API not configured. Please enter Base URL and Key in Settings.");
     }
   } catch (error) {
     if (error.name === "AbortError" || error.name === "TimeoutError") {
@@ -388,7 +388,7 @@ export const generateContent = async (params, apiConfig, onError, signal) => {
   }
 
   if ((!content || !String(content).trim()) && onError) {
-    onError("API BackContent为空 (或仅含空白符)");
+    onError("API returned empty content (or whitespace only)");
     return null;
   }
 
@@ -398,7 +398,7 @@ export const generateContent = async (params, apiConfig, onError, signal) => {
     } catch (e) {
       console.error("[Echoes] SafeJSONParse failed:", e);
       if (onError)
-        onError(`解析Failed: ${e.message}\nContent: ${content.substring(0, 20)}...`);
+        onError(`Parse failed: ${e.message}\nContent: ${content.substring(0, 20)}...`);
       return null;
     }
   }
@@ -468,7 +468,7 @@ export const cleanCharacterJson = (jsonContent) => {
         name: entry.comment || entry.keys?.[0] || entry.name || `Entry`,
         content: entry.content,
         enabled: entry.enabled !== false,
-        group: entry.group || name || "默认min组",
+        group: entry.group || name || "default",
       }))
       .filter((e) => e.content);
 
@@ -627,7 +627,7 @@ export const GhostButton = ({ loading, onClick, className = "" }) => {
         }
         ${className} // 允许从外部传入定位样式 (absolute ...)
       `}
-      title="AI 代写/扩写"
+      title="AI Ghostwrite"
     >
       {loading ? (
         <RefreshCw size={16} strokeWidth={1} className="animate-spin" />
@@ -645,13 +645,13 @@ export const StickerEditorModal = ({ sticker, onSave, onDelete, onClose }) => {
   return (
     <div className="fixed inset-0 z-[100] bg-black/50 flex items-center justify-center p-4 animate-in fade-in">
       <div className="bg-white w-full max-w-sm rounded-2xl p-4 shadow-2xl flex flex-col gap-4">
-        <h3 className="text-sm font-bold text-gray-700">EditSticker</h3>
+        <h3 className="text-sm font-bold text-gray-700">Edit Sticker</h3>
         <div className="aspect-square w-32 mx-auto bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
           <img src={sticker.url} className="w-full h-full object-cover" />
         </div>
         <div>
           <label className="text-[10px] font-bold uppercase text-gray-400">
-            Description (角色将根据此Description选用)
+            Description (character will choose stickers based on this)
           </label>
           <textarea
             className="w-full h-20 p-2 text-xs border border-gray-200 rounded-lg mt-1 resize-none focus:border-black outline-none"
@@ -717,7 +717,7 @@ export const CreationAssistantModal = ({
         <div className="bg-gradient-to-r from-[#7A2A3A] to-[#5a1a2a] p-4 text-white">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-bold flex items-center gap-2">
-              <WandSparkles size={20} /> Create助手
+              <WandSparkles size={20} /> Creation Assistant
             </h3>
             <button
               onClick={onClose} // 使用 props.onClose
@@ -727,7 +727,7 @@ export const CreationAssistantModal = ({
             </button>
           </div>
           <p className="text-xs text-white/70 mt-1">
-            Enter简短Description，AI将为You生成完整角色卡
+            Enter a brief description, and AI will generate a full character card for you
           </p>
         </div>
 
@@ -738,13 +738,13 @@ export const CreationAssistantModal = ({
               {/* Enter区域 */}
               <div>
                 <label className="text-[10px] font-bold uppercase text-gray-400 mb-2 block">
-                  角色Description
+                  Character Description
                 </label>
                 <textarea
                   value={inputVal} // 使用 props.inputVal
                   onChange={(e) => setInputVal(e.target.value)} // 使用 props.setInputVal
                   placeholder={
-                    "Description角色特:00，如“阳光开朗的青梅竹马”\n也可以直接Enter喜欢的IP角色名字，如“Jason Todd - 红头罩”"
+                    "Describe the character, e.g. 'A cheerful childhood friend'\nOr enter an IP character name, e.g. 'Jason Todd - Red Hood'"
                   }
                   className="w-full h-32 p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm resize-none outline-none focus:border-[#7A2A3A] transition-colors"
                   autoFocus // 加上这个体验更好
@@ -762,12 +762,12 @@ export const CreationAssistantModal = ({
                 {isGenerating ? (
                   <>
                     <RefreshCw className="animate-spin" size={16} />
-                    生成中，Please wait...
+                    Generating, please wait...
                   </>
                 ) : (
                   <>
                     <WandSparkles size={16} />
-                    生成角色卡
+                    Generate Character Card
                   </>
                 )}
               </button>
@@ -783,7 +783,7 @@ export const CreationAssistantModal = ({
                   </div>
                   <div className="flex-grow">
                     <label className="text-[9px] font-bold uppercase text-gray-400 block mb-1">
-                      角色Name
+                      Character Name
                     </label>
                     <input
                       value={previewData.name || ""}
@@ -807,7 +807,7 @@ export const CreationAssistantModal = ({
                         <FileText size={10} /> Core Settings (Raw Prompt)
                       </label>
                       <span className="text-[9px] text-gray-300">
-                        将存入系统设定
+                        Saved to system settings
                       </span>
                     </div>
                     <textarea
@@ -819,7 +819,7 @@ export const CreationAssistantModal = ({
                         }))
                       }
                       className="w-full h-48 p-3 bg-gray-50 border border-gray-200 rounded-xl text-xs resize-y outline-none focus:border-[#7A2A3A] focus:bg-white transition-all leading-relaxed"
-                      placeholder="此处显示角色的人设详情..."
+                      placeholder="Character persona details will appear here..."
                     />
                   </div>
 
@@ -827,10 +827,10 @@ export const CreationAssistantModal = ({
                   <div>
                     <div className="flex justify-between items-center mb-1">
                       <label className="text-[10px] font-bold uppercase text-gray-400 flex items-center gap-1">
-                        <MessageCircle size={10} /> 开场白 (First Message)
+                        <MessageCircle size={10} /> First Message
                       </label>
                       <span className="text-[9px] text-gray-300">
-                        仅用于展示/Copy
+                        For display/copy only
                       </span>
                     </div>
                     <textarea
@@ -842,7 +842,7 @@ export const CreationAssistantModal = ({
                         }))
                       }
                       className="w-full h-24 p-3 bg-blue-50/50 border border-blue-100 rounded-xl text-xs resize-y outline-none focus:border-blue-400 focus:bg-white transition-all leading-relaxed text-gray-700"
-                      placeholder="此处显示角色的第一句开场白..."
+                      placeholder="Character's opening message will appear here..."
                     />
                   </div>
                 </div>
@@ -854,7 +854,7 @@ export const CreationAssistantModal = ({
                   onClick={() => setPreviewData(null)} // 使用 props
                   className="flex-1 py-2.5 bg-gray-100 text-gray-600 rounded-xl text-sm font-bold hover:bg-gray-200 transition-colors"
                 >
-                  重新生成
+                  Regenerate
                 </button>
                 <button
                   onClick={() => {
@@ -869,14 +869,14 @@ export const CreationAssistantModal = ({
                   }}
                   className="flex-1 py-2.5 bg-gray-100 text-gray-600 rounded-xl text-sm font-bold hover:bg-gray-200 transition-colors"
                 >
-                  ExportJSON
+                  Export JSON
                 </button>
                 <button
                   onClick={onApply} // 使用 props
                   className="flex-1 py-2.5 bg-[#7A2A3A] text-white rounded-xl text-sm font-bold hover:bg-[#5a1a2a] transition-colors flex items-center justify-center gap-2"
                 >
                   <ArrowRight size={16} />
-                  应用角色
+                  Apply Character
                 </button>
               </div>
             </>
@@ -891,7 +891,7 @@ export const StatusPanel = ({ statusHistory, onClose, onDelete }) => (
   <div className="flex flex-col h-full pt-4">
     <div className="flex-grow overflow-y-auto custom-scrollbar space-y-6 px-1">
       {statusHistory.length === 0 && (
-        <p className="text-center text-gray-400 text-xs py-10">NoneStatus记录</p>
+        <p className="text-center text-gray-400 text-xs py-10">No status records</p>
       )}
       {[...statusHistory].reverse().map((entry, i) => {
         // [new] 计算原始索引：因为列表倒序了，所以要反算回原始数组的索引
@@ -916,7 +916,7 @@ export const StatusPanel = ({ statusHistory, onClose, onDelete }) => (
             <div className="grid grid-cols-1 gap-4">
               <div>
                 <div className="flex items-center gap-2 text-[10px] font-bold uppercase text-gray-400 mb-1">
-                  <Shirt size={10} /> 服装
+                  <Shirt size={10} /> Outfit
                 </div>
                 <div className="text-xs text-gray-700 bg-white/50 p-2 rounded-lg">
                   {entry.status.outfit || "N/A"}
@@ -924,7 +924,7 @@ export const StatusPanel = ({ statusHistory, onClose, onDelete }) => (
               </div>
               <div>
                 <div className="flex items-center gap-2 text-[10px] font-bold uppercase text-gray-400 mb-1">
-                  <Eye size={10} /> 行为
+                  <Eye size={10} /> Action
                 </div>
                 <div className="text-xs text-gray-700 bg-white/50 p-2 rounded-lg">
                   {entry.status.action || "N/A"}
@@ -932,7 +932,7 @@ export const StatusPanel = ({ statusHistory, onClose, onDelete }) => (
               </div>
               <div>
                 <div className="flex items-center gap-2 text-[10px] font-bold uppercase text-blue-400 mb-1">
-                  <Heart size={10} /> 心声
+                  <Heart size={10} /> Inner Voice
                 </div>
                 <div className="text-xs text-blue-900 bg-blue-50/50 p-2 rounded-lg italic">
                   "{entry.status.thought || "..."}"
@@ -940,7 +940,7 @@ export const StatusPanel = ({ statusHistory, onClose, onDelete }) => (
               </div>
               <div>
                 <div className="flex items-center gap-2 text-[10px] font-bold uppercase text-red-400 mb-1">
-                  <Ghost size={10} /> 坏心思
+                  <Ghost size={10} /> Dark Desire
                 </div>
                 <div className="text-xs text-red-900 bg-red-50/50 p-2 rounded-lg italic">
                   "{entry.status.desire || "..."}"
@@ -958,7 +958,7 @@ export const VoiceMessageBubble = ({ msg, isMe }) => {
   const [showTranscript, setShowTranscript] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
 
-  const cleanText = msg.text.replace("[语音Message] ", "");
+  const cleanText = msg.text.replace("[Voice message] ", "");
   const duration = Math.min(60, Math.max(2, Math.ceil(cleanText.length / 3)));
 
   const handleClick = () => {
@@ -1089,7 +1089,7 @@ export const TransferBubble = ({ msg, isMe, onInteract }) => {
       {/* 3. 底部：Status栏 */}
       <div className="flex justify-between items-center border-t border-white/20 pt-2">
         <span className="text-xs font-bold opacity-90">
-          {isPending ? "等待Confirm" : isAccepted ? "DoneAccept" : "DoneReturn"}
+          {isPending ? "Awaiting Confirmation" : isAccepted ? "Accepted" : "Returned"}
         </span>
 
         {/* 交互按钮 */}
