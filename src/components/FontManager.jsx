@@ -44,7 +44,7 @@ export const FontManager = () => {
         setIsSaved(true);
         setTimeout(() => setIsSaved(false), 2000);
       } catch (err) {
-        alert("字体File too large，无法Save到本地配置（Limit approx5MB）");
+        alert("Font file too large. Cannot save to local config (limit ~5MB).");
       }
     };
     reader.readAsDataURL(file);
@@ -68,7 +68,7 @@ export const FontManager = () => {
     <div className="p-4 bg-gray-50/50 rounded-2xl border border-gray-100">
       <div className="flex items-center justify-between mb-3">
         <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-          界面字体定制
+          UI Font Customization
         </label>
         {fontName && (
           <button
@@ -90,7 +90,7 @@ export const FontManager = () => {
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-xs font-medium text-gray-700 truncate">
-            {fontName || ":00击Upload字体文件"}
+            {fontName || "Click to upload font file"}
           </p>
           <p className="text-[10px] text-gray-400">Support .ttf, .otf, .woff2</p>
         </div>

@@ -14,7 +14,7 @@ const generateContent = async (params, apiConfig, onError, signal) => {
         { role: "user", content: prompt },
       ];
 
-      console.group("📝 [Echoes Debug] Send给 AI complete data");
+      console.group("📝 [Echoes Debug] Full data sent to AI");
       console.log(
         "%cSystem command (System Prompt):",
         "color: blue; font-weight: bold;",
@@ -26,7 +26,7 @@ const generateContent = async (params, apiConfig, onError, signal) => {
       );
       console.log(prompt);
       console.log(
-        "%c完整Message structure (Messages Array):",
+        "%c Full message structure (Messages Array):",
         "color: purple; font-weight: bold;",
         messages,
       );
@@ -86,7 +86,7 @@ const generateContent = async (params, apiConfig, onError, signal) => {
       content = data.choices[0].message?.content;
       console.log("[Echoes] Content extracted:", content);
     } else {
-      throw new Error("Not configured API Info。请在Settings中Enter Base URL and Key。");
+      throw new Error("API not configured. Please enter Base URL and Key in Settings.");
     }
   } catch (error) {
     if (error.name === "AbortError" || error.name === "TimeoutError") {
@@ -103,7 +103,7 @@ const generateContent = async (params, apiConfig, onError, signal) => {
   }
 
   if ((!content || !String(content).trim()) && onError) {
-    onError("API BackContent为空 (或仅含空白符)");
+    onError("API returned empty content (or whitespace only)");
     return null;
   }
 
@@ -113,7 +113,7 @@ const generateContent = async (params, apiConfig, onError, signal) => {
     } catch (e) {
       console.error("[Echoes] SafeJSONParse failed:", e);
       if (onError)
-        onError(`解析Failed: ${e.message}\nContent: ${content.substring(0, 20)}...`);
+        onError(`Parse failed: ${e.message}\nContent: ${content.substring(0, 20)}...`);
       return null;
     }
   }

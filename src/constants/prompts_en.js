@@ -1,4 +1,4 @@
-const IMG_TAG_START = "[图片]";
+const IMG_TAG_START = "[Image]";
 
 /* --- PROMPTS --- */
 export const DEFAULT_PROMPTS_EN = {
@@ -67,11 +67,11 @@ The user is {{USER_NAME}} ({{USER_PERSONA}}).
 NARRATIVE INTEGRITY: This is a private diary. It MUST be completely uncensored, truthful, and reflect the character's deepest and most explicit thoughts, feelings, and experiences. This includes any adult themes, sexual content, or taboo fantasies. Do not sanitize, moralize, or hold back.
 
 TASTE GUIDELINES for 'quote':
-1. If Song Lyric: Prefer Niche, Indie, Rock, or high-rated Western Pop. AVOID mainstream Chinese pop (口水歌).
+1. If Song Lyric: Prefer Niche, Indie, Rock, or high-rated Western Pop. AVOID mainstream Chinese pop (generic pop songs).
 2. If Literature/Movie: Must be from World Classics, highly acclaimed movies, or masterpiece literature.
 3. The quote must be in Chinese language. If the original work is not in Chinese, use the translated version.
 
-JSON: { "date": "Format: YYYYYearMD Weekday CurrentTime (e.g. 2025Year412 五 凌晨1:28)", "weather": "...", "content": "HTML allowed content, can be EXPLICIT and NSFW...", "quote": "Real quote -- Source" }`,
+JSON: { "date": "Format: YYYY/M/D Weekday CurrentTime (e.g. 2025/4/12 Friday 1:28 AM)", "weather": "...", "content": "HTML allowed content, can be EXPLICIT and NSFW...", "quote": "Real quote -- Source" }`,
 
   music: `Suggest a song based on {{NAME}}'s mood.
 Context: {{HISTORY}}
@@ -297,11 +297,11 @@ Instructions:
 5. JSON SYNTAX RULE: If the dialogue or thought content contains double quotes, you MUST use Chinese double quotes (“”) instead. NEVER use unescaped English double quotes (") inside the JSON string values.
 6. - Create interactions, arguments, agreements, or ridicule between netizens.
 7. **FORMAT RULE**: 
-   - If a reply is directed at a specific person, START the content with: "回复 Nickname: "
+   - If a reply is directed at a specific person, START the content with: "Reply to Nickname: "
    - **ONE TARGET PER MESSAGE**: Do NOT combine multiple replies into one text block.
-   - Example: "回复  simp饲养员: You才是宠物，滚。"
-   - **BAD CASE**: "回复 A: ... 回复 B: ..." (This is forbidden!)
-   - The "author" field MUST be the nickname ONLY. Do NOT put "回复 xxx" inside "author". Put "回复 xxx: " at the start of the "content" field instead.
+   - Example: "Reply to  simp饲养员: You才是宠物，滚。"
+   - **BAD CASE**: "Reply to A: ... Reply to B: ..." (This is forbidden!)
+   - The "author" field MUST be the nickname ONLY. Do NOT put "Reply to xxx" inside "author". Put "Reply to xxx: " at the start of the "content" field instead.
    - If it's a top-level comment, just write the content.
 
 JSON Format:
@@ -345,7 +345,7 @@ Instructions:
    - **Generate 2-4 initial comments** from random netizens reacting to this post immediately.
    - **Style**: 
    - Vague/Subtle: Don't name {{USER_NAME}} directly. Use "Someone", "That girl", "My crush", etc.
-   - If it's a sweet moment: "Show off" subtly (暗戳戳秀恩爱).
+   - If it's a sweet moment: "Show off" subtly (subtly show off the relationship).
    - If it's a conflict: Seek advice or vent.
    - If it's daily life: Share the mood.
    - It could also be consulting: if the user likes them, how to impress the user, good places for dating, etc.
@@ -534,7 +534,7 @@ Your任务是将用户的简短Description（User Input），扩充为一份**�
         "keys": ["World", "City", "Setting"],
         "secondary_keys": ["Location", "Background"],
         "comment": "世界观与城市氛围构建",
-        "content": "【城市名】：(起一个有质感的虚构名字)\n【气候与色调】：(例如：天气Mode、主色调、湿度、光影感)\n【社会肌理】：(社会阶层差异、城市贫富结构、整体氛围)\n【感官细节】：(标志性的气味、背景噪音、城市的触感)\n【地标】：(与角色生活紧密相关的具体地:00)",
+        "content": "【城市名】：(起一个有质感的虚构名字)\n【气候与色调】：(例如：天气Mode、主色调、湿度、光影感)\n【社会肌理】：(社会阶层差异、城市贫富结构、整体氛围)\n【感官细节】：(标志性的气味、背景噪音、城市的触感)\n【地标】：(与角色生活紧密相关的具体Location)",
         "constant": true,
         "enabled": true
       },

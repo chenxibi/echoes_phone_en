@@ -120,7 +120,7 @@ const HomeScreen = ({
             className="bg-white/80 backdrop-blur-md border border-red-100 text-red-500 px-10 py-4 rounded-3xl font-bold flex items-center gap-3 shadow-xl active:scale-95 transition-all"
           >
             <LogOut size={20} />
-            Sign Out系统
+            Sign Out
           </button>
           <p className="mt-4 text-gray-300 text-[10px] font-mono tracking-widest uppercase">
             System Control

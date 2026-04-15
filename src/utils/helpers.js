@@ -60,13 +60,13 @@ export const safeJSONParse = (text) => {
     const repairedText = jsonrepair(clean);
     return JSON.parse(repairedText);
   } catch (e) {
-    console.error("[Echoes] JSON 解析Failed:", e);
-    console.log("[Echoes] 问题文本:", text);
+    console.error("[Echoes] JSON parse failed:", e);
+    console.log("[Echoes] Problem text:", text);
     try {
       const simpleRepair = jsonrepair(text);
       return JSON.parse(simpleRepair);
     } catch (err2) {
-      throw new Error(`格式解析Failed: ${e.message.slice(0, 30)}...`);
+      throw new Error(`Format parse failed: ${e.message.slice(0, 30)}...`);
     }
   }
 };
@@ -121,7 +121,7 @@ export const formatDate = (date) =>
 export const replacePlaceholders = (text, charName, userName) => {
   if (!text) return "";
   return text
-    .replace(/\{\{char\}\}/gi, charName) // gi 表示全局+忽略大小写
+    .replace(/\{\{char\}\}/gi, charName) // gi 表示global + case-insensitive
     .replace(/\{\{user\}\}/gi, userName);
 };
 
@@ -220,16 +220,16 @@ export const getFormattedMessageText = (m, userName, persona, chatStyle) => {
   let content = m.text || "";
 
   if (m.isVoice) {
-    content = `(Send了一条语音): ${m.text.replace("[语音Message] ", "")}`;
+    content = `(Sent a voice message): ${m.text.replace("[Voice message] ", "")}`;
   }
   if (m.sticker) {
     if (!content || !content.trim()) {
-      content = `[Send了Sticker: ${m.sticker.desc}]`;
+      content = `[Sent sticker: ${m.sticker.desc}]`;
     }
   }
   if (m.isForward && m.forwardData) {
     const fwd = m.forwardData;
-    content += ` [转发了${
+    content += ` [Forwarded ${
       fwd.type === "post" ? "Post" : "Comment"
     }: "${fwd.content.slice(0, 50)}..."]`;
   }
@@ -301,14 +301,14 @@ export const cleanCharacterJson = (jsonContent) => {
     const innerData = rawObj.data || {};
 
     // 2. 智能提取 Description
-    // 逻辑：如果 innerDesc 包含"同上" 或 长度明显短于 outerDesc，就使用 outerDesc
+    // 逻辑：如果 innerDesc 包含"same as above" 或 长度明显短于 outerDesc，就使用 outerDesc
     const outerDesc = outerData.description || outerData.persona || "";
     const innerDesc = innerData.description || innerData.persona || "";
 
     let finalDesc = innerDesc;
     if (
       !innerDesc ||
-      innerDesc.includes("同上") ||
+      innerDesc.includes("same as above") ||
       innerDesc.includes("same as") ||
       (outerDesc.length > innerDesc.length && outerDesc.length > 50)
     ) {
@@ -351,7 +351,7 @@ export const cleanCharacterJson = (jsonContent) => {
         name: entry.comment || entry.keys?.[0] || entry.name || `Entry`,
         content: entry.content,
         enabled: entry.enabled !== false,
-        group: entry.group || name || "默认min组",
+        group: entry.group || name || "default",
       }))
       .filter((e) => e.content);
 

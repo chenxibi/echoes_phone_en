@@ -643,8 +643,8 @@ const App = () => {
     try {
       const result = await generateContent(
         {
-          prompt: `用户Description: "${creationInput}"
-        
+          prompt: `User description: "${creationInput}"
+
           Based on the above brief description, generate a complete, detailed character card. Make sure all details are logically supported.`,
           systemInstruction: CHARACTER_CREATION_PROMPT,
           isJson: true,
@@ -907,7 +907,7 @@ const App = () => {
     setCharStickers((prev) =>
       prev.map((s) => ({
         ...s,
-        group: s.group || "狗MaleDiary",
+        group: s.group || "Default",
         enabled: s.enabled !== undefined ? s.enabled : true,
       })),
     );
@@ -1021,7 +1021,7 @@ const App = () => {
   };
 
   const addStickerGroup = async () => {
-    const name = await customPrompt("Enter new Sticker库 name:", "", "New Library");
+    const name = await customPrompt("Enter new sticker group name:", "", "New Library");
     if (!name || name.trim() === "") return;
 
     // 检查是否Done存在
@@ -1049,7 +1049,7 @@ const App = () => {
     if (
       await customConfirm(
         `Confirm delete library "${groupName}"" and all its stickers?`,
-        "Delete Sticker库",
+        "Delete sticker group",
       )
     ) {
       setCharStickers((prev) => prev.filter((s) => s.group !== groupName));
@@ -1058,7 +1058,7 @@ const App = () => {
 
   // [new] Rename Sticker库
   const renameStickerGroup = async (oldName) => {
-    const newName = await customPrompt("Rename Sticker库:", oldName);
+    const newName = await customPrompt("Rename sticker group:", oldName);
     if (!newName || newName.trim() === "" || newName === oldName) return;
 
     setCharStickers((prev) =>
@@ -1175,8 +1175,8 @@ const App = () => {
     if (file) {
       // 替换 window.prompt
       const desc = await customPrompt(
-        "EnterSticker的Description (AI将根据Description决定何时Send):",
-        "开心",
+        "Enter sticker description (AI decides when to send based on this):",
+        "happy",
         "Add Sticker",
       );
       if (!desc) {
@@ -1209,8 +1209,8 @@ const App = () => {
 
         showToast("success", "Sticker added successfully");
       } catch (err) {
-        console.error("StickerUpload failed详情:", err);
-        showToast("error", "Sticker processing failed: " + (err.message || "未知Error"));
+        console.error("Sticker upload error:", err);
+        showToast("error", "Sticker processing failed: " + (err.message || "Unknown error"));
       }
     }
     // 5. Reset input value 允许重复Upload同一文件
@@ -1287,7 +1287,7 @@ const App = () => {
           // 简单校验一下格式
           if (
             await customConfirm(
-              `Confirm覆盖Current的聊天记录吗？\nFile contains ${data.history.length}  messages.\n(Recommend backing up current record first)`,
+              `Overwrite current chat history?\nFile contains ${data.history.length}  messages.\n(Recommend backing up current record first)`,
               "Import backup",
               true,
             )
@@ -1338,7 +1338,7 @@ const App = () => {
           if (newDefault) showToast("info", `Model auto-switched to: ${newDefault}`);
         }
       } else {
-        showToast("success", "连接Success (未能解析Model list)");
+        showToast("success", "Connected (could not parse model list)");
       }
     } catch (e) {
       console.error("Fetch Models Failed", e);
@@ -1524,7 +1524,7 @@ const App = () => {
               try {
                 const abortCtrl = new AbortController();
                 await generateContent({ prompt, systemInstruction: systemPrompt }, apiConfig, (err) => {}, abortCtrl.signal);
-                if (typeof showToast === "function") showToast("info", `${savedCharName}的实时Locationupdated`);
+                if (typeof showToast === "function") showToast("info", `${savedCharName}'s live location updated`);
               } finally {
                 setLoading((prev) => ({ ...prev, sw_update: false }));
               }
@@ -1537,7 +1537,7 @@ const App = () => {
           setTimeout(() => {
             const doDiary = async () => {
               await runGenerator("diary", setDiaries, prompts.diary);
-              if (typeof showToast === "function") showToast("info", `${savedCharName}写了一篇Diary`);
+              if (typeof showToast === "function") showToast("info", `${savedCharName} wrote a new diary entry`);
             };
             doDiary();
           }, 2000);
@@ -1547,7 +1547,7 @@ const App = () => {
           setTimeout(() => {
             const doBrowser = async () => {
               await runGenerator("browser", setBrowserHistory, prompts.browser);
-              if (typeof showToast === "function") showToast("info", `${savedCharName}的Browser Historyupdated`);
+              if (typeof showToast === "function") showToast("info", `${savedCharName}'s browser history updated`);
             };
             doBrowser();
           }, 3000);
@@ -1557,7 +1557,7 @@ const App = () => {
           setTimeout(() => {
             const doReceipt = async () => {
               await runGenerator("receipt", setReceipts, prompts.receipt);
-              if (typeof showToast === "function") showToast("info", `${savedCharName}的Receiptsupdated`);
+              if (typeof showToast === "function") showToast("info", `${savedCharName}'s receipts updated`);
             };
             doReceipt();
           }, 4000);
@@ -1573,7 +1573,7 @@ const App = () => {
       name: "Char",
       enName: null,
       title: "Connected Soul",
-      bio: "手动Mode，所有设定需手动填入。",
+      bio: "Manual mode. All settings must be entered manually.",
       mbti: null,
       tags: [],
     };
@@ -1694,7 +1694,7 @@ const App = () => {
   const handleSendFakeImage = async () => {
     // 1. 加上 async
     const desc = await customPrompt(
-      "EnterImage description：", // Notice语
+      "Enter image description:", // Notice语
       "", // 默认值为空
       "Send Image", // Title
     );
@@ -1746,7 +1746,7 @@ const App = () => {
     if (isGhostwriting) return;
 
     if (!apiConfig?.key) {
-      alert("Please first在Settings中配置 API Key");
+      alert("Please configure API Key in Settings first");
       return;
     }
     if (!persona) return;
@@ -1775,7 +1775,7 @@ const App = () => {
           // 处理语音
           if (m.isVoice) {
             content = `(Sent a Voice Message): ${m.text.replace(
-              "[语音Message] ",
+              "[Voice message] ",
               "",
             )}`;
           }
@@ -1822,7 +1822,7 @@ ${longMemory || "None."}
 [Literary Style Requirements] Literary Style: Warm, Plain, and Grounded.
 1. Narrative Voice: Adopt a calm, leisurely, and kind observer's perspective. Tell the story slowly with warmth, avoiding dramatic or judgmental tones. Maintain a third-person perspective for {{char}} (referring to them by Name/He/She), and a first-person perspective for {{user}} (addressing {{user}} as 'I' or 'me').
 2. Diction ("白描/Bai Miao"): Use simple, unadorned spoken language. Avoid flowery adjectives. Rely on precise verbs and nouns to create a clean, "fresh water" texture.
-3. Atmosphere: Focus on the "smoke and fire" of daily life. Deeply engage the senses—describe the specific smell of food, the texture of objects, and ambient sounds to make the scene tangible.
+3. Atmosphere: Focus on the "smoke and fire" of daily life. Deeply engage the senses-describe the specific smell of food, the texture of objects, and ambient sounds to make the scene tangible.
 4. Emotional Restraint: Do NOT state emotions directly. Reveal deep feelings solely through subtle physical actions, micro-expressions, and environmental details. Keep the emotional temperature constant and gentle.
 5. Rhythm: Mimic the bouncy, elastic rhythm of natural speech. Use short, crisp sentences mixed with relaxed narration.
 6. Output Structure: This must be a unified, cohesive narrative stream. Output the entire response as **ONE SINGLE, CONTINUOUS** message (IMPORTANT). At least 300 Chinese characters.`;
@@ -1907,7 +1907,7 @@ Requirements:
     const stickerId = sticker?.id;
 
     if (type === "voice") {
-      displayText = `[语音Message] ${content}`;
+      displayText = `[Voice message] ${content}`;
     } else if (type === "sticker") {
       displayText = `[Sticker] ${sticker?.desc || "Image"}`;
     } else if (type === "transfer") {
@@ -2014,16 +2014,16 @@ Requirements:
         let content = m.text || "";
 
         if (m.isVoice) {
-          content = `(Send了一语音): ${m.text.replace("[语音Message] ", "")}`;
+          content = `(Sent a voice message): ${m.text.replace("[Voice message] ", "")}`;
         }
         if (m.sticker) {
           if (!content || !content.trim()) {
-            content = `[Send了Sticker: ${m.sticker.desc}]`;
+            content = `[Sent sticker: ${m.sticker.desc}]`;
           }
         }
         if (m.isForward && m.forwardData) {
           const fwd = m.forwardData;
-          content += ` [转发了${fwd.type === "post" ? "Post" : "Comment"}: "${fwd.content.slice(0, 50)}..."]`;
+          content += ` [Forwarded ${fwd.type === "post" ? "Post" : "Comment"}: "${fwd.content.slice(0, 50)}..."]`;
         }
         return `${senderName}: ${content}`;
       })
@@ -2230,7 +2230,7 @@ Requirements:
           // 惊喜逻辑：概率触发Post
           if (forumData.isInitialized && Math.random() < 0.9) {
             const charName = persona?.name || "Character";
-            if (typeof showToast === "function") showToast("info", `${charName}在FeedPost了一Post`);
+            if (typeof showToast === "function") showToast("info", `${charName} posted on Feed`);
             setTimeout(() => {
               if (window.__forumGenerateChatEventPost) {
                 window.__forumGenerateChatEventPost(true);
@@ -2348,21 +2348,21 @@ Requirements:
           };
         }
       } catch (e) {
-        console.error("解析TransferEditFailed", e);
+        console.error("Parse transfer edit failed", e);
       }
     }
 
     newHistory[index].text = editContent;
     setChatHistory(newHistory);
     setEditIndex(null);
-    showToast("success", "Done修改");
+    showToast("success", "Changes saved");
   };
 
   // 5. 带Confirm的Delete
   const handleDeleteWithConfirm = async (index) => {
     const msgToDelete = chatHistory[index];
 
-    if (await customConfirm("Confirm要Delete这 messages?", "DeleteMessage")) {
+    if (await customConfirm("Delete this message?", "Delete message")) {
       if (msgToDelete && msgToDelete.id) {
         rollbackTrackerData(msgToDelete.id);
       }
@@ -2387,7 +2387,7 @@ Requirements:
 
     if (
       await customConfirm(
-        `Confirm要Delete选中的 ${selectedMsgs.size}  messages?`,
+        `Delete selected ${selectedMsgs.size}  messages?`,
         "Batch delete",
       )
     ) {
@@ -2480,14 +2480,14 @@ ${charFactsList || "None"}
 
       // --- [核心修改] 处理最近 5 聊天记录 ---
       const historyText = chatHistory
-        .slice(-5) // 取最后 5 
+        .slice(-5) // 取最后 5
         .map((m) => {
           // 判断Send者
           const sender = m.sender === "me" ? effectiveUserName : charName;
           // 判断Content (处理文本、语音、Image、Location等不同类型)
           let content = m.text || "";
-          if (m.isVoice) content = "[语音]";
-          if (m.isLocation) content = `[Location: ${m.location.name}, 地址: ${m.location.address}]`;
+          if (m.isVoice) content = "[Voice]";
+          if (m.isLocation) content = `[Location: ${m.location.name}, Address: ${m.location.address}]`;
           // 如果没有文本也没有特殊类型，可能是空
           if (!content) content = "[Image/Sticker]";
 
@@ -2502,7 +2502,7 @@ User Draft: "${draft || "A random interesting place"}"
 
 Requirements:
 1. Name: A realistic or atmospheric name fitting the draft (e.g., "La Crêperie").
-2. Address: A detailed, realistic address (e.g., "上海市静安区南京西路1601号...").
+2. Address: A detailed, realistic address (e.g., "1601 W Nanjing Rd, Jing'an District, Shanghai...").
 3. Output Format: JSON ONLY. { "name": "...", "address": "..." }
 `;
 
@@ -2604,7 +2604,7 @@ Requirements:
         .replaceAll("{{NAME}}", persona.name)
         .replaceAll("{{USER_NAME}}", effectiveUserName);
 
-      // 第一发请求：生成地:00
+      // 第一发请求：生成Location
       const step1Data = await generateContent(
         { prompt: genPrompt, systemInstruction: systemPrompt },
         apiConfig,
@@ -2621,7 +2621,7 @@ Requirements:
         (img) => `ID: ${img.id}, Desc: ${img.desc}, Keywords: ${img.keywords}`,
       ).join("\n");
 
-      // 准备刚才生成的地:00字符串
+      // 准备刚才生成的Location字符串
       const generatedLocsStr = JSON.stringify(step1Data.locations);
 
       const matchPrompt = prompts.smartwatch_step2_match
@@ -2724,7 +2724,7 @@ Requirements:
       );
 
       if (data) {
-        const effectiveUserName = userName || "那人";
+        const effectiveUserName = userName || "that person";
 
         let jsonString = JSON.stringify(data);
 
@@ -2785,7 +2785,7 @@ Requirements:
 
   /* --- MAIN RENDER --- */
 
-  // 挑选最关键的几数据作为“准备就绪”的判断依据
+  // 挑选最关键的几数据作为"准备就绪"的判断依据
   const isDataReady =
     personaLoaded &&
     chatHistoryLoaded &&
@@ -2961,13 +2961,13 @@ Requirements:
               <button
                 onClick={() => {
                   console.log(
-                    ":00击前 showCreationAssistant:",
+                    "Before click showCreationAssistant:",
                     showCreationAssistant,
                   );
                   setShowCreationAssistant(true);
                   setTimeout(() => {
                     console.log(
-                      ":00击后 showCreationAssistant:",
+                      "After click showCreationAssistant:",
                       showCreationAssistant,
                     );
                   }, 100);
@@ -3307,7 +3307,7 @@ Requirements:
                     </button>
                   </div>
                 ) : (
-                  /* 2. 查看Mode (View Mode) - Done修改为显示 Raw Prompt */
+                  /* 2. 查看Mode (View Mode) - Changes saved为显示 Raw Prompt */
                   <>
                     <div className="text-center">
                       <h2 className="text-3xl text-gray-900">{persona.name}</h2>
@@ -3936,7 +3936,7 @@ Requirements:
                                 if (msg.isLocation) {
                                   return (
                                     <LocationBubble
-                                      name={msg.location?.name || "地:00"}
+                                      name={msg.location?.name || "Location"}
                                       address={msg.location?.address || ""}
                                     />
                                   );
@@ -4207,7 +4207,7 @@ Requirements:
                         {/* Bulk按钮 - 改为透明灰色Style */}
                         <button
                           onClick={async () => {
-                            const input = await customPrompt("EnterLink进行Bulk Import", "", "Bulk Import");
+                            const input = await customPrompt("Enter link for bulk import", "", "Bulk Import");
                             if (input) handleBulkImport(input, "user", "My");
                           }}
                           className="text-[10px] text-gray-600 hover:text-gray-400 px-2 py-1 rounded-full cursor-pointer transition-colors flex items-center gap-1"
@@ -4276,7 +4276,7 @@ Requirements:
                       Cancel
                     </button>
                     <span className="text-xs font-bold text-gray-500">
-                      Selected {selectedMsgs.size} 
+                      Selected {selectedMsgs.size}
                     </span>
                     <button
                       onClick={handleBatchDelete}
@@ -4408,7 +4408,7 @@ Requirements:
                               isVoiceMode
                                 ? "Voice..."
                                 : chatStyle === "novel" && !chatInput
-                                  ? ":00击右侧按钮可AI代写..."
+                                  ? "Click right button for AI assist..."
                                   : "Send message..."
                             }
                             rows={1}
@@ -4560,7 +4560,7 @@ Requirements:
                     ? "bg-black text-white shadow-md"
                     : "bg-gray-100 text-gray-500 hover:bg-gray-200"
                 }`}
-                title="SwitchDiary/经历"
+                title="Switch Diary/Events"
               >
                 {/* 如果显示经历，图标变成Diary本(表示:00它可以回Diary)；反之亦然 */}
                 {showEventsInDiary ? (
@@ -4984,7 +4984,7 @@ Requirements:
                       smartWatchLogs.length > 0 && (
                         <div className="absolute bottom-4 left-0 right-0 text-center">
                           <span className="bg-black/70 backdrop-blur text-white text-[10px] px-3 py-1 rounded-full">
-                            📍 Current位于: {smartWatchLogs[0].locationName}
+                            📍 Currently at: {smartWatchLogs[0].locationName}
                           </span>
                         </div>
                       )}
@@ -5109,7 +5109,7 @@ Requirements:
                 ) : (
                   <Globe size={14} />
                 )}{" "}
-                Refresh记录
+                Refresh log
               </button>
 
               {browserHistory.map((session, i) => (
@@ -5286,7 +5286,7 @@ Requirements:
                 <input
                   id="loc-name-input"
                   className="w-full bg-gray-50 border border-gray-200 rounded-lg p-2.5 pr-9 text-sm focus:border-[#7A2A3A] focus:outline-none transition-colors" // pr-9 留出按钮Location
-                  placeholder="可Enter地:00类型如“餐厅”并:00击右侧按钮"
+                  placeholder="Enter location type e.g. restaurant, then click the button"
                 />
                 {/* [复用] Location弹窗里的代写按钮 */}
                 <GhostButton
@@ -5517,8 +5517,8 @@ const StickerGroup = ({
             {/* [修改] 组内Upload按钮 - 对应CurrentGroup */}
             <label
               className="
-                    aspect-square border border-dashed border-gray-300 rounded-xl 
-                    flex flex-col items-center justify-center cursor-pointer 
+                    aspect-square border border-dashed border-gray-300 rounded-xl
+                    flex flex-col items-center justify-center cursor-pointer
                     text-gray-400 hover:text-[#7A2A3A] hover:border-[#7A2A3A] hover:bg-white
                     transition-all duration-300 relative
                 "

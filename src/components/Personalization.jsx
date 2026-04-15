@@ -13,7 +13,7 @@ const PersonalizationPanel = ({
   inputUrl,
   setInputUrl,
 
-  // --- 图标定制 Props ---
+  // --- Icon Customization Props ---
   appList, // App list (从App.jsx传入，确保两边数据一致)
   customIcons, // Current的Custom图标Status { appId: base64Str }
   handleAppIconUpload, // Upload处理函数
@@ -21,20 +21,20 @@ const PersonalizationPanel = ({
 }) => {
   return (
     <div className="space-y-8 pt-4 pb-20 px-1">
-      {/* ---------------- SECTION 1: 显示与排版 ---------------- */}
+      {/* ---------------- SECTION 1: Display & Layout ---------------- */}
       <section>
         <h3 className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-3 border-b border-gray-200/50 pb-1 flex items-center gap-2">
-          <Monitor size={10} /> 显示与排版
+          <Monitor size={10} /> Display & Layout
         </h3>
 
-        {/* 沉浸Mode */}
+        {/* Immersive Mode */}
         <div className="glass-card p-4 rounded-xl mb-4 flex items-center justify-between">
           <div>
             <label className="block text-xs font-bold text-gray-700 mb-1">
-              沉浸Mode
+              Immersive Mode
             </label>
             <p className="text-[10px] text-gray-400">
-              隐藏Browser地址栏与Status栏
+              Hide browser address bar and status bar
             </p>
           </div>
           <button
@@ -57,7 +57,7 @@ const PersonalizationPanel = ({
             <div className="flex items-center gap-2">
               <Type size={12} className="text-gray-500" />
               <label className="text-xs font-bold text-gray-700">
-                系统字体
+                System Font
               </label>
             </div>
             <button
@@ -72,26 +72,26 @@ const PersonalizationPanel = ({
             <input
               value={inputUrl}
               onChange={(e) => setInputUrl(e.target.value)}
-              placeholder="Paste字体Link (例如 https://...)"
+              placeholder="Paste font URL (e.g. https://...)"
               className="flex-grow p-2 bg-gray-50 border border-gray-200 rounded-lg text-xs outline-none focus:border-black placeholder:text-gray-300"
             />
             <button
               onClick={handleFontUrlSubmit}
               className="px-3 bg-black text-white rounded-lg text-xs font-bold whitespace-nowrap"
             >
-              应用
+              Apply
             </button>
           </div>
           <p className="text-[9px] text-gray-400 truncate">
-            Current使用: {fontName || "Default font"}
+            Currently using: {fontName || "Default font"}
           </p>
         </div>
       </section>
 
-      {/* ---------------- SECTION 2: 图标定制 ---------------- */}
+      {/* ---------------- SECTION 2: Icon Customization ---------------- */}
       <section>
         <h3 className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-3 border-b border-gray-200/50 pb-1 flex items-center gap-2">
-          <Asterisk size={10} /> 图标定制
+          <Asterisk size={10} /> Icon Customization
         </h3>
 
         <div className="grid grid-cols-4 gap-y-6 gap-x-2">
@@ -138,7 +138,7 @@ const PersonalizationPanel = ({
                       onClick={() => handleResetIcon(app.id)}
                       className="text-[9px] text-red-400 hover:text-red-600 mt-1 flex items-center gap-0.5 scale-90"
                     >
-                      <RotateCcw size={8} /> 还原
+                      <RotateCcw size={8} /> Reset
                     </button>
                   )}
                 </div>

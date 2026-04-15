@@ -316,14 +316,14 @@ const MusicApp = ({
     if (!contextLines || contextLines === lastTriggeredLrc.current) return;
     lastCommentTime.current = now;
     lastTriggeredLrc.current = contextLines;
-    const musicPrompt = `[SYSTEM_NOTE: {{char}}and{{user}}Now...Listen Together一首叫做《${currentTrack?.title}》的歌曲。CurrentLyrics：“${contextLines}”。请遵循以下尺度：1.审美优先，:00评意境或旋律氛围。2.严禁强行将歌曲映射为 \${user} 的过往经历或内心秘密，如“这首歌像You”“You就是这样”“You为什么喜欢这种歌，是不是因为You也想...”“You听这首歌是因为在Lyrics里看到了自己吧”等言论，需要避免。3.适度表达 \${char} 自己的听感。4.不一定非要谈论歌曲本身，也可根据情况保持自然的常交流。5.不超过 30 字。]`;
+    const musicPrompt = `[SYSTEM_NOTE: {{char}}and{{user}}are now listening together to "${currentTrack?.title}". Current lyrics: “${contextLines}”。Follow the guidelines below：1.审美优先，:00评意境或旋律氛围。2.严禁强行将歌曲映射为 \${user} 的过往经历或内心秘密，如“这首歌像You”“You就是这样”“You为什么喜欢这种歌，是不是因为You也想...”“You听这首歌是因为在Lyrics里看到了自己吧”等言论，需要避免。3.适度表达 \${char} 自己的听感。4.不一定非要谈论歌曲本身，也可根据情况保持自然的常交流。5.不超过 30 字。]`;
     triggerAIResponse(null, musicPrompt);
   };
 
   const handleUserReply = () => {
     const content = replyContent.trim();
     if (!content) return;
-    const musicContext = `[{{char}}and{{user}}Now...Listen Together一首叫做《${currentTrack?.title}》的歌曲。CurrentLyrics：${currentLrc[activeLrcIndex]?.text || "..."}]`;
+    const musicContext = `[{{char}}and{{user}}are now listening together to "${currentTrack?.title}". Current lyrics: ${currentLrc[activeLrcIndex]?.text || "..."}]`;
     triggerAIResponse(content, "", musicContext, { source: "music_app" });
     setReplyContent("");
     setShowQuickReply(false);
@@ -489,7 +489,7 @@ const MusicApp = ({
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-gray-500 font-bold text-sm">
-                  PlaylistCover（可Upload）
+                  Playlist Cover (optional)
                 </div>
               )}
               <input

@@ -67,7 +67,7 @@ const WorldBook = ({
   };
 
   const renameWorldBookGroup = async (oldName) => {
-    const newName = await customPrompt(`Rename Group "${oldName}" 为:`, oldName);
+    const newName = await customPrompt(`Rename group "${oldName}" to:`, oldName);
     if (newName && newName !== oldName) {
       setWorldBook((prev) =>
         prev.map((w) => (w.group === oldName ? { ...w, group: newName } : w)),
@@ -76,7 +76,7 @@ const WorldBook = ({
   };
 
   const deleteWorldBookGroup = async (groupName) => {
-    if (await customConfirm(`Delete Group "${groupName}"  and all its entries?`, "Deletemin组")) {
+    if (await customConfirm(`Delete Group "${groupName}"  and all its entries?`, "Delete group")) {
       setWorldBook((prev) => prev.filter((w) => w.group !== groupName));
     }
   };

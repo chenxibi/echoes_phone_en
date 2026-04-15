@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import { Banknote } from "lucide-react"; // AssumeYou用的是 lucide
+import { Banknote } from "lucide-react"; // assuming lucide-react
 import mapBg from "../map_bg.png";
 
 export const VoiceMessageBubble = ({ msg, isMe }) => {
   const [showTranscript, setShowTranscript] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
 
-  const cleanText = msg.text.replace("[语音Message] ", "");
+  const cleanText = msg.text.replace("[Voice message] ", "");
   const duration = Math.min(60, Math.max(2, Math.ceil(cleanText.length / 3)));
 
   const handleClick = () => {
