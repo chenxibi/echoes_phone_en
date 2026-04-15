@@ -44,7 +44,7 @@ const HomeScreen = ({
       onDragOver={(e) => e.preventDefault()}
       onDrop={handleDrop}
     >
-      {/* 页面 1：App 与 黑胶组件 */}
+      {/* Page 1：App 与 黑胶组件 */}
       {currentPage === 0 && (
         <div className="w-full h-full p-8">
           {/* 2x2 黑胶挂件 (固定或拖拽) */}
@@ -112,7 +112,7 @@ const HomeScreen = ({
         </div>
       )}
 
-      {/* 页面 2：系统操作 */}
+      {/* Page 2：系统操作 */}
       {currentPage === 1 && (
         <div className="w-full h-full flex flex-col items-center justify-center p-10 animate-in fade-in zoom-in duration-300">
           <button
@@ -128,7 +128,7 @@ const HomeScreen = ({
         </div>
       )}
 
-      {/* 底部页面指示器 */}
+      {/* 底部Page指示器 */}
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-3">
         {[0, 1].map((i) => (
           <div

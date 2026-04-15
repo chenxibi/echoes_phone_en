@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 
 const SettingsPanel = ({
-  // --- 连接配置参数 ---
+  // --- Connection Settings参数 ---
   apiConfig,
   setApiConfig,
   connectionStatus,
@@ -42,7 +42,7 @@ const SettingsPanel = ({
   triggerSummary,
   isSummarizing,
 
-  // --- 聊天设置参数 ---
+  // --- 聊天Settings参数 ---
   chatStyle,
   setChatStyle,
   interactionMode,
@@ -183,7 +183,7 @@ const SettingsPanel = ({
             </div>
           </div>
 
-          {/* 测试连接按钮 (紧跟连接配置) */}
+          {/* Test ConnectionButton (紧跟Connection Settings) */}
           <div className="pt-2">
             <button
               onClick={testConnection}
@@ -306,7 +306,7 @@ const SettingsPanel = ({
                 </div>
               </div>
 
-              {/* 记忆文本与手动按钮 */}
+              {/* 记忆文本与手动Button */}
               <div>
                 <div className="flex justify-between items-end mb-2">
                   <label className="text-[10px] uppercase font-bold text-gray-400">
@@ -344,7 +344,7 @@ const SettingsPanel = ({
                 Chat Settings
               </h3>
               <div className="glass-card p-4 rounded-xl space-y-4">
-                {/* 风格 */}
+                {/* Style */}
                 <div>
                   <label className="block text-[10px] font-bold uppercase text-gray-500 mb-2">
                     Style
@@ -427,7 +427,7 @@ const SettingsPanel = ({
                       Sticker Library
                     </label>
                     {/* Add Single Button */}
-                    {/* 上传按钮 */}
+                    {/* 上传Button */}
                     <button
                       onClick={() => stickerInputRef.current.click()}
                       className="flex items-center justify-center gap-1 p-0 text-[10px] text-gray-400 hover:text-[#7A2A3A] transition-colors"
@@ -437,7 +437,7 @@ const SettingsPanel = ({
                       <span>Upload</span>
                     </button>
 
-                    {/* 批量导入按钮 */}
+                    {/* 批量导入Button */}
                     <button
                       onClick={async () => {
                         const input = await customPrompt("Enter sticker URL to import", "", "Bulk Import");
@@ -504,7 +504,7 @@ const SettingsPanel = ({
                 Export chat history to a file, or restore from a file.
               </p>
               <div className="flex gap-3">
-                {/* 导出按钮 */}
+                {/* 导出Button */}
                 <button
                   onClick={onExportChat}
                   className="flex-1 py-3 bg-black text-white rounded-xl text-xs font-bold hover:bg-gray-800 transition-colors flex items-center justify-center gap-2 shadow-md"
@@ -513,7 +513,7 @@ const SettingsPanel = ({
                   Export
                 </button>
 
-                {/* 导入按钮 (关联隐藏的 input) */}
+                {/* 导入Button (关联隐藏的 input) */}
                 <label className="flex-1 py-3 bg-white border border-gray-200 text-gray-700 rounded-xl text-xs font-bold hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-sm">
                   <Upload size={14} />
                   Import
@@ -648,7 +648,7 @@ const StickerGroup = ({
           </span>
         </div>
 
-        {/* 右侧：操作按钮组 */}
+        {/* 右侧：操作Button组 */}
         <div className="flex items-center gap-2">
           {/* 改名 */}
           <button
@@ -722,7 +722,7 @@ const StickerGroup = ({
               </div>
             ))}
 
-            {/* [修改] 组内上传按钮 - 对应当前分组 */}
+            {/* [修改] 组内上传Button - 对应当前分组 */}
             <label
               className="
                     aspect-square border border-dashed border-gray-300 rounded-xl 
@@ -738,7 +738,7 @@ const StickerGroup = ({
                 accept="image/*"
                 // 关键点：调用 handleStickerUpload 时，传入当前的 group 名字
                 onChange={(e) => handleStickerUpload(e, "char", group)}
-                // 点击时清空，确保能连续上传同一张图
+                // 点击时Clear，确保能连续上传同一张图
                 onClick={(e) => (e.target.value = null)}
               />
             </label>

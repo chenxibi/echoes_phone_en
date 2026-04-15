@@ -302,7 +302,7 @@ const App = () => {
 
   // [新增] 重置图标
   const handleResetIcon = async (appId) => {
-    if (await customConfirm("确定Reset icon吗？", "恢复图标")) {
+    if (await customConfirm("ConfirmReset icon吗？", "恢复图标")) {
       setCustomIcons((prev) => {
         const newState = { ...prev };
         delete newState[appId];
@@ -416,10 +416,10 @@ const App = () => {
   );
 
   // Settings
-  const prompts = DEFAULT_PROMPTS;
+  const prompts = DEFAULT_PROMPTS_EN;
   // const [prompts, setPrompts] = useStickyState(DEFAULT_PROMPTS,"echoes_prompts");
   const [customRules, setCustomRules, customRulesLoaded] = useStickyState(
-    "无特殊规则",
+    "No special rules",
     "echoes_custom_rules",
   );
   const [chatStyle, setChatStyle, chatStyleLoaded] = useStickyState(
@@ -826,7 +826,7 @@ const App = () => {
   // --- TRACKER HANDLERS ---
 
   const handleDeleteTrackerItem = async (type, id) => {
-    if (!(await customConfirm("确定Delete这记录吗？"))) return;
+    if (!(await customConfirm("ConfirmDelete这记录吗？"))) return;
 
     // 修复点：兼容 "fact" (User Facts) 和 "userFact"
     if (type === "userFact" || type === "fact") {
@@ -867,7 +867,7 @@ const App = () => {
 
   // DeleteStatus Log函数
   const handleDeleteStatus = async (index) => {
-    if (await customConfirm("确定Delete这Status Log？")) {
+    if (await customConfirm("ConfirmDelete这Status Log？")) {
       const newHistory = [...statusHistory];
       newHistory.splice(index, 1);
       setStatusHistory(newHistory);
@@ -979,11 +979,11 @@ const App = () => {
     return Array.from(groups);
   };
 
-  // 2. 移动Lore Book目到新Group
+  // 2. MoveLore Book目到新Group
   const moveWorldBookEntry = async (id, newGroup) => {
     let finalGroup = newGroup;
     if (newGroup === "NEW_GROUP_TRIGGER") {
-      const name = await customPrompt("Enter新Group名称:", "", "新建Group");
+      const name = await customPrompt("Enter新Group名称:", "", "NewGroup");
       if (!name) return;
       finalGroup = name;
     }
@@ -995,9 +995,9 @@ const App = () => {
     );
   };
 
-  // 重命名Lore BookGroup
+  // RenameLore BookGroup
   const renameWorldBookGroup = async (oldName) => {
-    const newName = await customPrompt("重命名Group:", oldName);
+    const newName = await customPrompt("RenameGroup:", oldName);
     if (!newName || newName.trim() === "" || newName === oldName) return;
 
     setWorldBook((prev) =>
@@ -1011,7 +1011,7 @@ const App = () => {
   const deleteWorldBookGroup = async (groupName) => {
     if (
       await customConfirm(
-        `确定DeleteGroup "${groupName}" 下的所有目吗？`,
+        `ConfirmDeleteGroup "${groupName}" 下的所有目吗？`,
         "DeleteGroup",
       )
     ) {
@@ -1021,7 +1021,7 @@ const App = () => {
   };
 
   const addStickerGroup = async () => {
-    const name = await customPrompt("Enter新Sticker库名称:", "", "新建库");
+    const name = await customPrompt("Enter新Sticker库名称:", "", "New库");
     if (!name || name.trim() === "") return;
 
     // 检查是否Done存在
@@ -1048,7 +1048,7 @@ const App = () => {
   const deleteStickerGroup = async (groupName) => {
     if (
       await customConfirm(
-        `确定Delete库 "${groupName}" 及其中所有Sticker吗？`,
+        `ConfirmDelete库 "${groupName}" 及其中所有Sticker吗？`,
         "DeleteSticker库",
       )
     ) {
@@ -1056,9 +1056,9 @@ const App = () => {
     }
   };
 
-  // [新增] 重命名Sticker库
+  // [新增] RenameSticker库
   const renameStickerGroup = async (oldName) => {
-    const newName = await customPrompt("重命名Sticker库:", oldName);
+    const newName = await customPrompt("RenameSticker库:", oldName);
     if (!newName || newName.trim() === "" || newName === oldName) return;
 
     setCharStickers((prev) =>
@@ -1189,14 +1189,14 @@ const App = () => {
         // 2. 压缩图片
         const compressedBase64 = await compressImage(file);
 
-        // 3. [关键修改] 确定Group：如果有传入 targetGroup 就用它，否则用默认值
+        // 3. [关键修改] ConfirmGroup：如果有传入 targetGroup 就用它，否则用默认值
         const finalGroup = targetGroup || "Custom";
 
         const newSticker = {
           id: `s${Date.now()}`,
           url: compressedBase64,
           desc: desc,
-          group: finalGroup, // [使用确定的Group]
+          group: finalGroup, // [使用Confirm的Group]
           enabled: true,
         };
 
@@ -1234,7 +1234,7 @@ const App = () => {
 
   // DeleteSticker
   const handleDeleteSticker = async (id) => {
-    if (await customConfirm("确定Delete这Sticker吗？")) {
+    if (await customConfirm("ConfirmDelete这Sticker吗？")) {
       if (editingSticker?.source === "user") {
         setUserStickers((prev) => prev.filter((s) => s.id !== id));
       } else {
@@ -1503,7 +1503,7 @@ const App = () => {
         const savedCustomRules = customRules;
         const savedInputKey = inputKey;
 
-        // 位置移动触发 → 更新LiveTracker，生成Done后弹窗
+        // 位置Move触发 → 更新LiveTracker，生成Done后弹窗
         if (data.triggerLocation) {
           setTimeout(() => {
             const doUpdate = async () => {
@@ -1542,7 +1542,7 @@ const App = () => {
             doDiary();
           }, 2000);
         }
-        // Browser搜索触发 → 更新Browser历史，生成Done后弹窗
+        // BrowserSearch触发 → 更新Browser历史，生成Done后弹窗
         if (data.triggerBrowser) {
           setTimeout(() => {
             const doBrowser = async () => {
@@ -1625,7 +1625,7 @@ const App = () => {
     if (
       !(await customConfirm(
         // 替换 window.confirm
-        "确定要Sign Out吗？这将彻底清除当前角色的所有本地数据，无法恢复。",
+        "Confirm要Sign Out吗？这将彻底清除当前角色的所有本地数据，无法恢复。",
         "清除数据",
       ))
     ) {
@@ -1726,7 +1726,7 @@ const App = () => {
       effectiveUserName,
     );
 
-    // 2. 替换系统模板中的所有大项占位符
+    // 2. 替换系统模板中的所有大items占位符
     return prompts.system
       .replaceAll("{{NAME}}", persona.name)
       .replaceAll(
@@ -1913,7 +1913,7 @@ Requirements:
     } else if (type === "transfer") {
       // [新增] 文本回退显示包含备注
       const note = extraData?.note ? ` (${extraData.note})` : "";
-      displayText = `[转账] ¥${content}${note}`;
+      displayText = `[Transfer] ¥${content}${note}`;
     } else if (type === "location") {
       displayText = `[位置] ${extraData?.name || content}`;
     } else {
@@ -1925,7 +1925,7 @@ Requirements:
       text: displayText,
       isVoice: type === "voice",
 
-      // [新增] 转账数据结构更新
+      // [新增] Transfer数据结构更新
       isTransfer: type === "transfer",
       transfer:
         type === "transfer"
@@ -2123,7 +2123,7 @@ Requirements:
       if (responseData) {
         setForwardContext(null);
 
-        // 处理转账逻辑
+        // 处理Transfer逻辑
         if (responseData.transfer_action) {
           const lastUserTransferIndex = [...newHistory]
             .reverse()
@@ -2200,7 +2200,7 @@ Requirements:
             }
           }
 
-          // 处理 AI 发起的转账
+          // 处理 AI 发起的Transfer
           if (responseData.transfer && responseData.transfer.amount) {
             if (newMsgs.length > 0 && newMsgs[newMsgs.length - 1].status) {
               delete newMsgs[newMsgs.length - 1].status;
@@ -2209,7 +2209,7 @@ Requirements:
             const reason = responseData.transfer.reason || "";
             newMsgs.push({
               sender: "char",
-              text: `[转账] ¥${amount}${reason ? ` (${reason})` : ""}`,
+              text: `[Transfer] ¥${amount}${reason ? ` (${reason})` : ""}`,
               isTransfer: true,
               transfer: { amount, status: "pending", note: reason },
               time: formatTime(getCurrentTimeObj()),
@@ -2348,7 +2348,7 @@ Requirements:
           };
         }
       } catch (e) {
-        console.error("解析转账EditFailed", e);
+        console.error("解析TransferEditFailed", e);
       }
     }
 
@@ -2362,7 +2362,7 @@ Requirements:
   const handleDeleteWithConfirm = async (index) => {
     const msgToDelete = chatHistory[index];
 
-    if (await customConfirm("确定要Delete这 messages?", "Delete消息")) {
+    if (await customConfirm("Confirm要Delete这 messages?", "Delete消息")) {
       if (msgToDelete && msgToDelete.id) {
         rollbackTrackerData(msgToDelete.id);
       }
@@ -2387,7 +2387,7 @@ Requirements:
 
     if (
       await customConfirm(
-        `确定要Delete选中的 ${selectedMsgs.size}  messages?`,
+        `Confirm要Delete选中的 ${selectedMsgs.size}  messages?`,
         "批量Delete",
       )
     ) {
@@ -3844,7 +3844,7 @@ Requirements:
                               </div>
                             </div>
                           ) : (
-                            // 正常显示模式：绑定长按事件 (使得转账也能长按Delete)
+                            // 正常显示模式：绑定长按事件 (使得Transfer也能长按Delete)
                             <div
                               className={
                                 isMultiSelectMode ? "pointer-events-none" : ""
@@ -3873,7 +3873,7 @@ Requirements:
                             >
                               {/* === 内容分发逻辑 === */}
                               {(() => {
-                                // A. 转账渲染 (放在最优先)
+                                // A. Transfer渲染 (放在最优先)
                                 if (msg.isTransfer) {
                                   return (
                                     <TransferBubble
@@ -3984,7 +3984,7 @@ Requirements:
                             </div>
                           )}
 
-                          {/* --- 长按弹出的菜单 (现在对转账也生效) --- */}
+                          {/* --- 长按弹出的菜单 (现在对Transfer也生效) --- */}
                           {!isMultiSelectMode && activeMenuIndex === i && (
                             <div
                               className="absolute top-full mt-2 z-[120] flex flex-col items-center animate-in fade-in zoom-in-95 duration-200"
@@ -3998,7 +3998,7 @@ Requirements:
                                 <button
                                   onClick={(e) => {
                                     e.stopPropagation();
-                                    handleCopy(msg.text); // 转账消息也有 text，完全可以Copy
+                                    handleCopy(msg.text); // Transfer消息也有 text，完全可以Copy
                                   }}
                                   className="flex flex-col items-center gap-1 p-2 hover:bg-white/20 rounded-lg min-w-[40px]"
                                 >
@@ -4011,7 +4011,7 @@ Requirements:
                                 <button
                                   onClick={(e) => {
                                     e.stopPropagation();
-                                    startEdit(i, msg.text); // 转账消息也可以进入Edit模式
+                                    startEdit(i, msg.text); // Transfer消息也可以进入Edit模式
                                   }}
                                   className="flex flex-col items-center gap-1 p-2 hover:bg-white/20 rounded-lg min-w-[40px]"
                                 >
@@ -4324,7 +4324,7 @@ Requirements:
                           <div className="p-2 bg-gray-100 rounded-full">
                             <Banknote size={20} />
                           </div>
-                          <span className="text-[10px]">转账</span>
+                          <span className="text-[10px]">Transfer</span>
                         </button>
 
                         <button
@@ -5003,7 +5003,7 @@ Requirements:
                       onClick={() => setSwFilter("all")}
                       className="text-[9px] text-blue-500 flex items-center hover:underline"
                     >
-                      <X size={10} className="mr-1" /> 清除筛选
+                      <X size={10} className="mr-1" /> 清除Filter
                     </button>
                   )}
                 </div>
@@ -5109,7 +5109,7 @@ Requirements:
                 ) : (
                   <Globe size={14} />
                 )}{" "}
-                刷新记录
+                Refresh记录
               </button>
 
               {browserHistory.map((session, i) => (
@@ -5446,7 +5446,7 @@ const StickerGroup = ({
           <button
             onClick={() => renameStickerGroup(group)}
             className="text-gray-300 hover:text-blue-500 p-1 transition-colors"
-            title="重命名库"
+            title="Rename库"
           >
             <Edit2 size={12} />
           </button>

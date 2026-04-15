@@ -18,10 +18,10 @@ import useStickyState from "../hooks/useStickyState";
 // --- 辅助函数：获取所有分组 ---
 const getGroups = (data) => {
   const groups = Array.from(
-    new Set(data.map((item) => item.group || "未分组")),
+    new Set(data.map((item) => item.group || "Ungrouped")),
   );
   return groups.sort((a, b) =>
-    a === "未分组" ? 1 : b === "未分组" ? -1 : a.localeCompare(b),
+    a === "Ungrouped" ? 1 : b === "Ungrouped" ? -1 : a.localeCompare(b),
   );
 };
 
@@ -44,10 +44,10 @@ const WorldBook = ({
           const json = JSON.parse(ev.target.result);
           if (Array.isArray(json)) {
             setWorldBook(json);
-            showToast("success", "世界书导入成功");
+            showToast("success", "Lore Book imported");
           }
         } catch (err) {
-          showToast("error", "JSON 格式错误");
+          showToast("error", "Invalid JSON");
         }
       };
       reader.readAsText(file);
@@ -57,7 +57,7 @@ const WorldBook = ({
   const moveWorldBookEntry = async (entryId, targetGroup) => {
     let finalGroup = targetGroup;
     if (targetGroup === "NEW_GROUP_TRIGGER") {
-      const name = await customPrompt("请输入新分组名称:");
+      const name = await customPrompt("Enter new group name:");
       if (!name) return;
       finalGroup = name;
     }
@@ -67,7 +67,7 @@ const WorldBook = ({
   };
 
   const renameWorldBookGroup = async (oldName) => {
-    const newName = await customPrompt(`重命名分组 "${oldName}" 为:`, oldName);
+    const newName = await customPrompt(`Rename Group "${oldName}" 为:`, oldName);
     if (newName && newName !== oldName) {
       setWorldBook((prev) =>
         prev.map((w) => (w.group === oldName ? { ...w, group: newName } : w)),
@@ -76,7 +76,7 @@ const WorldBook = ({
   };
 
   const deleteWorldBookGroup = async (groupName) => {
-    if (await customConfirm(`确定删除分组 "${groupName}" 及其下的所有条目吗？`, "删除分组")) {
+    if (await customConfirm(`Delete Group "${groupName}"  and all its entries?`, "删除分组")) {
       setWorldBook((prev) => prev.filter((w) => w.group !== groupName));
     }
   };
@@ -88,13 +88,13 @@ const WorldBook = ({
   };
 
   return (
-    <AppWindow isOpen={isOpen} title="世界书" onClose={onClose}>
+    <AppWindow isOpen={isOpen} title="Lore Book" onClose={onClose}>
       <div className="space-y-6 pt-4 pb-20">
         {/* 操作栏 */}
         <div className="grid grid-cols-2 gap-3">
           <label className="py-3 bg-white border border-gray-200 rounded-xl text-xs font-bold text-gray-600 hover:bg-gray-50 hover:text-black transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm active:scale-95">
             <Upload size={14} />
-            导入JSON
+            Import JSON
             <input
               type="file"
               className="hidden"
@@ -105,13 +105,13 @@ const WorldBook = ({
           <button
             onClick={async () => {
               const name = await customPrompt(
-                "请输入新分组名称 (将创建一个空条目):",
+                "Enter group name (empty entry will be created):",
               );
               if (name) {
                 setWorldBook([
                   {
                     id: `wb_${Date.now()}`,
-                    name: "新条目",
+                    name: "New Entry",
                     content: "",
                     group: name,
                     enabled: true,
@@ -123,7 +123,7 @@ const WorldBook = ({
             className="py-3 bg-white border border-gray-200 rounded-xl text-xs font-bold text-gray-600 hover:bg-gray-50 hover:text-black transition-all flex items-center justify-center gap-2 shadow-sm active:scale-95"
           >
             <Plus size={14} />
-            新建分组
+            New Group
           </button>
         </div>
 
@@ -142,7 +142,7 @@ const WorldBook = ({
         ))}
         {worldBook.length === 0 && (
           <div className="text-center py-20 text-gray-300 text-xs">
-            世界书空空如也，请点击上方按钮创建
+            Lore Book is empty. Create an entry above.
           </div>
         )}
       </div>
@@ -204,7 +204,7 @@ const WorldBookGroup = ({
               setWorldBook((prev) => [
                 {
                   id: `wb_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
-                  name: "新条目",
+                  name: "New Entry",
                   content: "",
                   group: group,
                   enabled: true,
@@ -286,7 +286,7 @@ const WorldBookEntryItem = ({
   const handlePointerUp = () => clearTimeout(timer.current);
 
   const allGroups = Array.from(
-    new Set(worldBook.map((i) => i.group || "未分组")),
+    new Set(worldBook.map((i) => i.group || "Ungrouped")),
   );
 
   return (
@@ -356,7 +356,7 @@ const WorldBookEntryItem = ({
                   {g}
                 </option>
               ))}
-              <option value="NEW_GROUP_TRIGGER">+ 新建分组...</option>
+              <option value="NEW_GROUP_TRIGGER">+ New Group...</option>
             </select>
           </div>
 
@@ -385,7 +385,7 @@ const WorldBookEntryItem = ({
         <textarea
           className="w-full text-[10px] text-gray-500 bg-white/60 p-2 rounded-md resize-none h-24 outline-none border border-transparent focus:border-gray-100 animate-in fade-in"
           value={entry.content}
-          placeholder="输入世界书条目内容..."
+          placeholder="Enter lore entry content..."
           onChange={(e) =>
             setWorldBook((prev) =>
               prev.map((w) =>
