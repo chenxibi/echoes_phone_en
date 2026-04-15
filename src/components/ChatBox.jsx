@@ -6,7 +6,7 @@ export const VoiceMessageBubble = ({ msg, isMe }) => {
   const [showTranscript, setShowTranscript] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
 
-  const cleanText = msg.text.replace("[语音消息] ", "");
+  const cleanText = msg.text.replace("[语音Message] ", "");
   const duration = Math.min(60, Math.max(2, Math.ceil(cleanText.length / 3)));
 
   const handleClick = () => {
@@ -77,7 +77,7 @@ export const VoiceMessageBubble = ({ msg, isMe }) => {
           </div>
         </div>
 
-        {/* 语音转文字内容 */}
+        {/* 语音转文字Content */}
         {showTranscript && (
           <div
             className={`mt-3 text-xs leading-relaxed opacity-80 border-l-2 pl-2 pt-1 animate-in slide-in-from-top-1 duration-200 ${
@@ -112,7 +112,7 @@ export const TransferBubble = ({ msg, isMe, onInteract }) => {
       }`}
     >
       {/* 1. 顶部：图标与金额 */}
-      {/* 如果没有备注，底部留一点 margin (mb-3)，如果有备注，mb-1 紧凑一点 */}
+      {/* 如果没有Note，底部留一:00 margin (mb-3)，如果有Note，mb-1 紧凑一:00 */}
       <div className={`flex items-center gap-3 ${note ? "mb-1" : "mb-3"}`}>
         <div className="p-2.5 rounded-full shrink-0 bg-white/20 text-white">
           <Banknote size={24} />
@@ -127,14 +127,14 @@ export const TransferBubble = ({ msg, isMe, onInteract }) => {
         </div>
       </div>
 
-      {/* 2. 备注区域 (仅当有备注时显示) */}
+      {/* 2. Note区域 (仅当有Note时显示) */}
       {note && (
         <div className="text-xs opacity-80 mb-2 pl-[52px] leading-tight break-words font-medium">
           {note}
         </div>
       )}
 
-      {/* 3. 底部：状态栏 */}
+      {/* 3. 底部：Status栏 */}
       <div className="flex justify-between items-center border-t border-white/20 pt-2">
         <span className="text-xs font-bold opacity-90">
           {isPending ? "Awaiting" : isAccepted ? "Received" : "Refunded"}
@@ -170,9 +170,9 @@ export const TransferBubble = ({ msg, isMe, onInteract }) => {
 
 export const LocationBubble = ({ name, address }) => (
   <div className="flex flex-col bg-white border border-gray-200 rounded-lg overflow-hidden w-64 shadow-sm select-none">
-    {/* 上半部分：地图背景图 */}
+    {/* 上半部min：地图背景图 */}
     <div className="h-24 bg-gray-100 relative">
-      {/* 记得确保 mapBg 已经 import 进来了 */}
+      {/* 记得确保 mapBg Done经 import 进来了 */}
       <img
         src={mapBg}
         alt="Map"
@@ -180,7 +180,7 @@ export const LocationBubble = ({ name, address }) => (
         draggable="false"
       />
 
-      {/* 自定义 SVG 图标容器 - 绝对居中定位 */}
+      {/* Custom SVG 图标容器 - 绝对居中定位 */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -mt-3 drop-shadow-md">
         <svg
           viewBox="0 0 1024 1024"
@@ -194,7 +194,7 @@ export const LocationBubble = ({ name, address }) => (
       </div>
     </div>
 
-    {/* 下半部分：文字信息 */}
+    {/* 下半部min：文字信息 */}
     <div className="p-3 bg-white">
       <div className="text-sm font-medium text-gray-900 truncate leading-tight mb-1">
         {name}

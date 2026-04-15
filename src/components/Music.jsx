@@ -78,7 +78,7 @@ const VinylRecord = ({ isPlaying, coverUrl }) => (
   </div>
 );
 
-// --- 4. 组件：连接状态 ---
+// --- 4. 组件：连接Status ---
 const ConnectionHeader = ({
   isPlaying,
   userAvatar,
@@ -199,7 +199,7 @@ const MusicApp = ({
     [currentTrack?.lrcText],
   );
 
-  // 1. 播放进度监听与 AI 点评触发
+  // 1. 播放进度监听与 AI :00评触发
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
@@ -316,14 +316,14 @@ const MusicApp = ({
     if (!contextLines || contextLines === lastTriggeredLrc.current) return;
     lastCommentTime.current = now;
     lastTriggeredLrc.current = contextLines;
-    const musicPrompt = `[SYSTEM_NOTE: {{char}}和{{user}}正在Listen Together一首叫做《${currentTrack?.title}》的歌曲。当前Lyrics：“${contextLines}”。请遵循以下尺度：1.审美优先，点评意境或旋律氛围。2.严禁强行将歌曲映射为 \${user} 的过往经历或内心秘密，如“这首歌像你”“你就是这样”“你为什么喜欢这种歌，是不是因为你也想...”“你听这首歌是因为在Lyrics里看到了自己吧”等言论，需要避免。3.适度表达 \${char} 自己的听感。4.不一定非要谈论歌曲本身，也可根据情况保持自然的日常交流。5.不超过 30 字。]`;
+    const musicPrompt = `[SYSTEM_NOTE: {{char}}和{{user}}Now...Listen Together一首叫做《${currentTrack?.title}》的歌曲。CurrentLyrics：“${contextLines}”。请遵循以下尺度：1.审美优先，:00评意境或旋律氛围。2.严禁强行将歌曲映射为 \${user} 的过往经历或内心秘密，如“这首歌像你”“你就是这样”“你为什么喜欢这种歌，是不是因为你也想...”“你听这首歌是因为在Lyrics里看到了自己吧”等言论，需要避免。3.适度表达 \${char} 自己的听感。4.不一定非要谈论歌曲本身，也可根据情况保持自然的常交流。5.不超过 30 字。]`;
     triggerAIResponse(null, musicPrompt);
   };
 
   const handleUserReply = () => {
     const content = replyContent.trim();
     if (!content) return;
-    const musicContext = `[{{char}}和{{user}}正在Listen Together一首叫做《${currentTrack?.title}》的歌曲。当前Lyrics：${currentLrc[activeLrcIndex]?.text || "..."}]`;
+    const musicContext = `[{{char}}和{{user}}Now...Listen Together一首叫做《${currentTrack?.title}》的歌曲。CurrentLyrics：${currentLrc[activeLrcIndex]?.text || "..."}]`;
     triggerAIResponse(content, "", musicContext, { source: "music_app" });
     setReplyContent("");
     setShowQuickReply(false);

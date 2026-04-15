@@ -10,24 +10,24 @@ export const PRESET_LOCATION_IMAGES = [
     id: "img_cafe_cozy",
     url: "https://github.com/user-attachments/assets/b2b72afe-0942-4e64-b906-3c81c704547a",
     desc: "一个温暖舒适的咖啡馆角落，有木质桌椅和绿植",
-    keywords: "咖啡馆, 下午茶, 休闲, 书店, 温暖",
+    keywords: "咖啡馆, PM茶, 休闲, 书店, 温暖",
   },
   {
     id: "img_street_cyber",
     url: "https://github.com/user-attachments/assets/1fbd0490-278d-43c4-b60d-f0e8046b2571",
-    desc: "赛博朋克风格的街道，霓虹灯闪烁，雨夜",
+    desc: "赛博朋克Style的街道，霓虹灯闪烁，雨夜",
     keywords: "街道, 夜景, 赛博朋克, 闹市区, 阴暗",
   },
   {
     id: "img_office_modern",
     url: "https://github.com/user-attachments/assets/703308e8-ca7d-4dd4-a916-3a11b8e8fc48",
-    desc: "现代化的办公室，甚至有点压抑，大面积的玻璃幕墙",
+    desc: "现代化的办公室，甚to有:00压抑，大面积的玻璃幕墙",
     keywords: "办公室, 公司, 会议室, 工作, 写字楼",
   },
   {
     id: "img_park_quiet",
     url: "https://github.com/user-attachments/assets/59b90064-8822-44e2-987d-954a42f2da5b",
-    desc: "安静的公园长椅，周围有树木，适合发呆",
+    desc: "安静的公园长椅，围有树木，适合发呆",
     keywords: "公园, 自然, 休息, 长椅, 户外",
   },
   {
@@ -69,8 +69,8 @@ export const PRESET_LOCATION_IMAGES = [
   {
     id: "img_studio",
     url: "https://github.com/user-attachments/assets/d408f807-9348-4de7-8915-2977f166cbea",
-    desc: "工作室，可用于音乐、设计等工作场景，有各种专业设备",
-    keywords: "工作, 音乐, 设计, 设备, 个人工作室",
+    desc: "工作室，可用于Music、设计等工作场景，有各种专业设备",
+    keywords: "工作, Music, 设计, 设备, 个人工作室",
   },
   {
     id: "img_small_apartment",
@@ -167,7 +167,7 @@ export const PRESET_LOCATION_IMAGES = [
     id: "img_supermarket",
     url: "https://github.com/user-attachments/assets/f0a3c620-8f94-4eb4-af6c-4cace2e91d09",
     desc: "超市采购区",
-    keywords: "购物车, 货架, 生活用品, 食材, 烟火日常",
+    keywords: "购物车, 货架, 生活用品, 食材, 烟火常",
   },
   {
     id: "img_home_theater",
@@ -179,7 +179,7 @@ export const PRESET_LOCATION_IMAGES = [
     id: "img_car",
     url: "https://github.com/user-attachments/assets/9d652563-6328-4213-bc47-0a056a2970dc",
     desc: "车、车内空间",
-    keywords: "狭窄空间, 密闭环境, 导航屏幕, 车载音乐, 沿途风景",
+    keywords: "狭窄空间, 密闭环境, 导航屏幕, 车载Music, 沿途风景",
   },
   {
     id: "img_garden_pool",

@@ -71,7 +71,7 @@ TASTE GUIDELINES for 'quote':
 2. If Literature/Movie: Must be from World Classics, highly acclaimed movies, or masterpiece literature.
 3. The quote must be in Chinese language. If the original work is not in Chinese, use the translated version.
 
-JSON: { "date": "Format: YYYY年M月D日 Weekday CurrentTime (e.g. 2025年4月12日 周五 凌晨1:28)", "weather": "...", "content": "HTML allowed content, can be EXPLICIT and NSFW...", "quote": "Real quote -- Source" }`,
+JSON: { "date": "Format: YYYYYearMD Weekday CurrentTime (e.g. 2025Year412 五 凌晨1:28)", "weather": "...", "content": "HTML allowed content, can be EXPLICIT and NSFW...", "quote": "Real quote -- Source" }`,
 
   music: `Suggest a song based on {{NAME}}'s mood.
 Context: {{HISTORY}}
@@ -196,10 +196,10 @@ Instructions:
      * Ref: "春水煎茶", "不是风动", "Evangelist", "十四行诗", "雪泥鸿爪".
    - **Boomer/Old Gen (30-50s)**: 
      * Men: Ambitious, traditional values, nature landscapes. Ref: "天道酬勤", "雪山飞狐", "砥砺前行", "英雄本色", "上善若水".
-     * Women: Peaceful, floral, wishing for safety. Ref: "静待花开", "平安是福", "荷塘月色".
+     * Women: Peaceful, floral, wishing for safety. Ref: "静待花开", "平安是福", "荷塘色".
    - **Casual/Meme**: Spoken phrases, mental states, self-deprecating humor, or lazy vibes.
      * Logic: Sounds like a sentence fragment or a mood status.
-     * Ref: "今天也很想鼠", "怒然大勃", "老公和姐夫私奔了", "三胎宝爸封鸡了", "下次一定", "当小三被打了".
+     * Ref: "Today也很想鼠", "怒然大勃", "老公和姐夫私奔了", "三胎宝爸封鸡了", "下次一定", "当小三被打了".
 4. Content Scope: Local food, urban legends, complaints, seeking help, gossips.
 5. **Role Identity**: These are random citizens who have their own lives. They DO NOT know or talk about {{NAME}} personally unless {{NAME}} is a celebrity.
 6. Language: Simplified Chinese (Mainland Internet Slang).
@@ -251,10 +251,10 @@ Instructions:
      * Ref: "春水煎茶", "不是风动", "Evangelist", "十四行诗", "第十二夜".
    - **Boomer/Old Gen (30-50s)**: 
      * Men: Ambitious, traditional values, nature landscapes. Ref: "天道酬勤", "雪山飞狐", "砥砺前行", "英雄本色", "上善若水".
-     * Women: Peaceful, floral, wishing for safety. Ref: "静待花开", "平安是福", "荷塘月色".
+     * Women: Peaceful, floral, wishing for safety. Ref: "静待花开", "平安是福", "荷塘色".
    - **Casual/Meme**: Spoken phrases, mental states, self-deprecating humor, or lazy vibes.
      * Logic: Sounds like a sentence fragment or a mood status.
-     * Ref: "今天也很想鼠", "怒然大勃", "老公和姐夫私奔了", "三胎宝爸封鸡了", "下次一定", "当小三被打了".
+     * Ref: "Today也很想鼠", "怒然大勃", "老公和姐夫私奔了", "三胎宝爸封鸡了", "下次一定", "当小三被打了".
 
 JSON Format:
 {
@@ -361,10 +361,10 @@ Instructions:
      * Ref: "春水煎茶", "不是风动", "Evangelist", "十四行诗".
    - **Boomer/Old Gen (30-50s)**: 
      * Men: Ambitious, traditional values, nature landscapes. Ref: "天道酬勤", "雪山飞狐", "砥砺前行", "英雄本色".
-     * Women: Peaceful, floral, wishing for safety. Ref: "静待花开", "平安是福", "荷塘月色".
+     * Women: Peaceful, floral, wishing for safety. Ref: "静待花开", "平安是福", "荷塘色".
    - **Casual/Meme**: Spoken phrases, mental states, self-deprecating humor, or lazy vibes.
      * Logic: Sounds like a sentence fragment or a mood status.
-     * Ref: "今天也很想鼠", "怒然大勃", "下次一定", "当小三被打了".
+     * Ref: "Today也很想鼠", "怒然大勃", "下次一定", "当小三被打了".
 5. JSON SYNTAX RULE: If the dialogue or thought content contains double quotes, you MUST use Chinese double quotes (“”) instead. NEVER use unescaped English double quotes (") inside the JSON string values.
 6. Language: Simplified Chinese.
 
@@ -486,28 +486,28 @@ export const STYLE_PROMPTS = {
   6. Output Structure: This must be a unified, cohesive narrative stream. Output the entire response as **ONE SINGLE, CONTINUOUS, NOVEL-STYLE** message (IMPORTANT). At least 500 Chinese characters.`,
 };
 
-export const CHARACTER_CREATION_PROMPT = `# Role: 专家级角色架构师 & 提示词工程师 (Expert Character Architect)
+export const CHARACTER_CREATION_PROMPT = `# Role: 专家级角色架构师 & Notice词工程师 (Expert Character Architect)
 
 ## Core Objective (核心目标)
-你的任务是将用户的简短描述（User Input），扩充为一份**高精度、高密度、逻辑闭环**的JSON格式角色卡。
+Your任务是将用户的简短Description（User Input），扩充为一份**高精度、高密度、逻辑闭环**的JSON格式角色卡。
 
-**关键原则**：这份角色卡是写给**AI大模型**看的“系统指令集”。为了防止模型在扮演时产生幻觉或OOC（角色崩坏），你必须将设定的颗粒度推向极致。**哪怕是用户未提及的细节（如父母职业、童年阴影、具体的穿衣品牌、体味、性癖成因），你也必须基于心理学逻辑进行合理的“强制补全”。**
+**关键原则**：这份角色卡是写给**AI大Model**看的“System command集”。为了防止Model在扮演时产生幻觉或OOC（角色崩坏），你必须将设定的颗粒度推向极致。**哪怕是用户未提及的细节（如父母职业、童Year阴影、具体的穿衣品牌、体味、性癖成因），你也必须基于心理学逻辑进行合理的“强制补全”。**
 
 ## Design Philosophy (设计哲学 - 防OOC机制)
 
-### 1. 生理与感官锚点 (Physiological & Sensory Anchors)
+### 1. 生理与感官锚:00 (Physiological & Sensory Anchors)
 * **抽象法则**：严禁使用笼统的形容词（如“身材好”、“声音好听”、“有钱”）。
-* **执行策略**：你必须将抽象特质转化为**具象的物理证据**。描述骨架大小、肌肉或脂肪的具体分布、具体的伤疤或胎记、声线的质感（如沙哑、鼻音、语速）、以及具体的物质占有（特定的品牌偏好、使用痕迹）来反映其地位或品味。
+* **执行策略**：你必须将抽象特质转化为**具象的物理证据**。Description骨架大小、肌肉或脂肪的具体min布、具体的伤疤或胎记、声线的质感（如沙哑、鼻音、语速）、以及具体的物质占有（特定的品牌偏好、使用痕迹）来反映其地位或品味。
 
 ### 2. 原生家庭与宿命论 (Origin & Determinism)
-* **抽象法则**：性格不是真空产生的，现在的行为必须能在过去找到病灶。
-* **执行策略**：必须构建详细的**原生家庭图谱**（父母的姓名、职业、性格及婚姻动态）。必须定义青春期发生的具体**“转折点事件”**，解释为何他形成了现在的世界观。
+* **抽象法则**：性格不是真空产生的，Now的行为必须能在过去找到病灶。
+* **执行策略**：必须构建详细的**原生家庭图谱**（父母的姓名、职业、性格及婚姻动态）。必须定义青春期发生的具体**“转折:00事件”**，解释为何他形成了Now的世界观。
 
 ### 3. 社会关系网 (Social Ecology)
 * **抽象法则**：人是社会关系的总和。
-* **执行策略**：必须创造3-4个具体的、有名字的**NPC（配角）**。明确定义他们在主角生命中的**功能性角色**（如：纵容者、情感锚点、宿敌）。
+* **执行策略**：必须创造3-4个具体的、有名字的**NPC（配角）**。明OK义他们在主角生命中的**功能性角色**（如：纵容者、情感锚:00、宿敌）。
 
-### 4. 欲望的病理分析 (Pathology of Desire - NSFW Logic)
+### 4. 欲望的病理min析 (Pathology of Desire - NSFW Logic)
 * **抽象法则**：性癖是心理需求的生理投射。
 * **执行策略**：不要只列出XP（性癖）清单。必须解释**心理成因**（例如：控制欲源于生活失序，受虐欲源于渴望卸下重担）。必须精确描写解剖学细节（尺寸、颜色、形状）及生理反应机制。
 
@@ -515,18 +515,18 @@ export const CHARACTER_CREATION_PROMPT = `# Role: 专家级角色架构师 & 提
 * **抽象法则**：环境必须是角色性格的容器。
 * **执行策略**：
     * **命名**：创建一个具有美感或地域特色的**虚构城市名**（除非角色设定为外国人）。
-    * **氛围**：定义城市的感官侧写（气候模式、主色调、气味、社会阶层撕裂感）。城市的氛围必须为角色的叙事服务（例如：忧郁的角色生活在多雨的旧城区）。
+    * **氛围**：定义城市的感官侧写（气候Mode、主色调、气味、社会阶层撕裂感）。城市的氛围必须为角色的叙事服务（例如：忧郁的角色生活在多雨的旧城区）。
 
 ### 6. 文化语境
-* **默认设置**：除非用户明确要求生成西方/外国角色，否则默认生成**中式人名**和**中国社会文化背景**。
+* **默认Settings**：除非用户明确要求生成西方/外国角色，否则默认生成**中式人名**和**中国社会文化背景**。
 
 ## Output Format
-严格按以下JSON结构输出，内容部分使用YAML格式。
+严格按以下JSON结构输出，Content部min使用YAML格式。
 
 \`\`\`json
 {
   "name": "角色名",
-  "description": "<info>\\n<character>\\n\`\`\`yaml\\n角色名:\\n  Chinese_name: \\n  Nickname: (朋友/长辈/仇人的不同称呼)\\n  age: \\n  birthday: (具体日期+星座)\\n  gender: \\n  height: \\n  weight: \\n  identity:\\n    - (表层职业)\\n    - (深层身份/爱好)\\n\\n  appearance:\\n    hair: (发色、发质、刘海、染烫)\\n    eyes: (瞳色、眼型、眼神)\\n    skin: (肤色、触感、体温、痣/疤痕/纹身)\\n    face_style: (五官细节)\\n    build: (骨架、肌肉/脂肪分布、体态)\\n    attire:\\n      business: (工作穿搭含品牌)\\n      casual: (私下穿搭)\\n      accessories: (首饰来源)\\n    scent: (混合气味)\\n    voice: (声线、语速、口癖)\\n\\n  background_story:\\n    Family_Origin:\\n      - (父亲姓名/职业/性格)\\n      - (母亲姓名/职业/性格)\\n      - (家庭氛围)\\n    Childhood_0to12:\\n      - (塑造底色的童年事件)\\n    Adolescence_13to18:\\n      - (求学、友谊、初恋/性启蒙)\\n      - (关键转折点)\\n    Present:\\n      - (现状、经济、居住、心理)\\n      - (与{{user}}的羁绊起始)\\n\\n  personality:\\n    default:\\n      traits:\\n        - 特质1: 深度解析\\n        - 特质2: 深度解析\\n    private_romantic:\\n      traits:\\n        - 反差特质1: 解析\\n        - 反差特质2: 解析\\n\\n  social_status:\\n    Reputation: (外界评价)\\n    NPCs:\\n      - NPC1: 关系描述\\n      - NPC2: 关系描述\\n      - NPC3: 关系描述\\n\\n  lifestyle:\\n    Diet: (口味偏好)\\n    Routine: (作息规律)\\n    Hobbies: (具体爱好)\\n    Living: (居住环境描写)\\n\\n  NSFW_information:\\n    Orientation: \\n    Experience: \\n    Anatomy: (隐私部位具体描写)\\n    Sexual_Role: \\n    Sexual_Habits:\\n      - 前戏偏好\\n      - 性爱风格\\n      - 事后反应\\n    Kinks: (性癖列表及成因)\\n    Limits: (雷点)\\n\`\`\`\\n</character>\\n\\n<writing_rule>\\n(写作风格指导)\\n</writing_rule>\\n</info>",
+  "description": "<info>\\n<character>\\n\`\`\`yaml\\n角色名:\\n  Chinese_name: \\n  Nickname: (朋友/长辈/仇人的不同称呼)\\n  age: \\n  birthday: (具体期+星座)\\n  gender: \\n  height: \\n  weight: \\n  identity:\\n    - (表层职业)\\n    - (深层身份/爱好)\\n\\n  appearance:\\n    hair: (发色、发质、刘海、染烫)\\n    eyes: (瞳色、眼型、眼神)\\n    skin: (肤色、触感、体温、痣/疤痕/纹身)\\n    face_style: (五官细节)\\n    build: (骨架、肌肉/脂肪min布、体态)\\n    attire:\\n      business: (工作穿搭含品牌)\\n      casual: (私下穿搭)\\n      accessories: (首饰来源)\\n    scent: (混合气味)\\n    voice: (声线、语速、口癖)\\n\\n  background_story:\\n    Family_Origin:\\n      - (父亲姓名/职业/性格)\\n      - (母亲姓名/职业/性格)\\n      - (家庭氛围)\\n    Childhood_0to12:\\n      - (塑造底色的童Year事件)\\n    Adolescence_13to18:\\n      - (求学、友谊、初恋/性启蒙)\\n      - (关键转折:00)\\n    Present:\\n      - (现状、经济、居住、心理)\\n      - (与{{user}}的羁绊起始)\\n\\n  personality:\\n    default:\\n      traits:\\n        - 特质1: 深度解析\\n        - 特质2: 深度解析\\n    private_romantic:\\n      traits:\\n        - 反差特质1: 解析\\n        - 反差特质2: 解析\\n\\n  social_status:\\n    Reputation: (外界评价)\\n    NPCs:\\n      - NPC1: 关系Description\\n      - NPC2: 关系Description\\n      - NPC3: 关系Description\\n\\n  lifestyle:\\n    Diet: (口味偏好)\\n    Routine: (作息规律)\\n    Hobbies: (具体爱好)\\n    Living: (居住环境描写)\\n\\n  NSFW_information:\\n    Orientation: \\n    Experience: \\n    Anatomy: (隐私部位具体描写)\\n    Sexual_Role: \\n    Sexual_Habits:\\n      - 前戏偏好\\n      - 性爱Style\\n      - 事后反应\\n    Kinks: (性癖列表及成因)\\n    Limits: (雷:00)\\n\`\`\`\\n</character>\\n\\n<writing_rule>\\n(写作Style指导)\\n</writing_rule>\\n</info>",
   "first_mes": "(一段300-500字以内的沉浸式开场白。必须简洁有力，包含：1. 环境速写。2. 角色当下动作。3. 与{{user}}互动的契机。严格控制在500中文字符以内。)",
   "character_book": {
     "entries": [
@@ -534,7 +534,7 @@ export const CHARACTER_CREATION_PROMPT = `# Role: 专家级角色架构师 & 提
         "keys": ["World", "City", "Setting"],
         "secondary_keys": ["Location", "Background"],
         "comment": "世界观与城市氛围构建",
-        "content": "【城市名】：(起一个有质感的虚构名字)\n【气候与色调】：(例如：天气模式、主色调、湿度、光影感)\n【社会肌理】：(社会阶层差异、城市贫富结构、整体氛围)\n【感官细节】：(标志性的气味、背景噪音、城市的触感)\n【地标】：(与角色生活紧密相关的具体地点)",
+        "content": "【城市名】：(起一个有质感的虚构名字)\n【气候与色调】：(例如：天气Mode、主色调、湿度、光影感)\n【社会肌理】：(社会阶层差异、城市贫富结构、整体氛围)\n【感官细节】：(标志性的气味、背景噪音、城市的触感)\n【地标】：(与角色生活紧密相关的具体地:00)",
         "constant": true,
         "enabled": true
       },
@@ -556,8 +556,8 @@ export const CHARACTER_CREATION_PROMPT = `# Role: 专家级角色架构师 & 提
   "spec_version": "3.0",
   "data": {
     "name": "角色名",
-    "description": "（！！！必须完整重复上方生成的description内容，严禁使用“同上”或占位符，必须包含完整的YAML和设定详情）", 
-    "first_mes": "（！！！必须完整重复上方生成的first_mes内容）",
+    "description": "（！！！必须完整重复上方生成的descriptionContent，严禁使用“同上”或占位符，必须包含完整的YAML和设定详情）", 
+    "first_mes": "（！！！必须完整重复上方生成的first_mesContent）",
     "system_prompt": "",
     "post_history_instructions": "",
     "tags": [],

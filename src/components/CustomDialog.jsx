@@ -5,7 +5,7 @@ const CustomDialog = ({ config, onClose }) => {
   const [inputValue, setInputValue] = useState(config.defaultValue || "");
   const inputRef = useRef(null);
 
-  // 自动聚焦输入框
+  // 自动聚焦Enter框
   useEffect(() => {
     if (config.type === "prompt" && inputRef.current) {
       inputRef.current.focus();
@@ -34,7 +34,7 @@ const CustomDialog = ({ config, onClose }) => {
   return (
     <div className="fixed inset-0 z-[200] bg-black/40 backdrop-blur-sm flex items-center justify-center p-6 animate-in fade-in duration-200">
       <div className="bg-white/90 backdrop-blur-xl w-full max-w-xs rounded-2xl shadow-2xl p-5 border border-white/50 animate-in zoom-in-95 duration-200 flex flex-col gap-4">
-        {/* 标题与内容 */}
+        {/* Title与Content */}
         <div className="text-center space-y-2">
           {config.title && (
             <h3 className="text-base font-bold text-gray-800">
@@ -48,7 +48,7 @@ const CustomDialog = ({ config, onClose }) => {
           )}
         </div>
 
-        {/* 输入框 (仅 Prompt 模式) */}
+        {/* Enter框 (仅 Prompt Mode) */}
         {config.type === "prompt" && (
           <input
             ref={inputRef}
@@ -56,7 +56,7 @@ const CustomDialog = ({ config, onClose }) => {
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             className="w-full p-3 bg-gray-100/50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:border-[#7A2A3A] outline-none transition-all text-center font-medium"
-            placeholder="请输入..."
+            placeholder="Enter..."
             onKeyDown={(e) => e.key === "Enter" && handleConfirm()}
           />
         )}
@@ -68,7 +68,7 @@ const CustomDialog = ({ config, onClose }) => {
               onClick={handleCancel}
               className="flex-1 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-xl text-xs font-bold transition-colors"
             >
-              取消
+              Cancel
             </button>
           )}
           <button
@@ -79,7 +79,7 @@ const CustomDialog = ({ config, onClose }) => {
                 : "bg-[#2C2C2C] hover:bg-black text-white"
             }`}
           >
-            {config.confirmText || "确定"}
+            {config.confirmText || "OK"}
           </button>
         </div>
       </div>

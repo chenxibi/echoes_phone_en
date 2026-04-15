@@ -11,7 +11,7 @@ const AppWindow = ({ isOpen, title, children, onClose, isChat, actions }) => {
           className="flex items-center text-gray-600 hover:text-black transition-colors"
         >
           <ChevronLeft size={22} strokeWidth={1.5} />
-          <span className="text-sm font-medium ml-0.5">返回</span>
+          <span className="text-sm font-medium ml-0.5">Back</span>
         </button>
         <span className="text-sm font-bold text-gray-800">{title}</span>
         <div className="flex items-center gap-2">

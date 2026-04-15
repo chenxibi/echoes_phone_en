@@ -80,7 +80,7 @@ const SmartWatch = ({
   getContextString,
   showToast,
 }) => {
-  // --- 持久化状态 ---
+  // --- 持久化Status ---
   const [smartWatchLocations, setSmartWatchLocations] = useStickyState(
     [],
     "echoes_sw_locations",
@@ -90,7 +90,7 @@ const SmartWatch = ({
     "echoes_sw_logs",
   );
 
-  // --- UI 交互状态 ---
+  // --- UI 交互Status ---
   const [swFilter, setSwFilter] = useState("all");
   const [isEditingMap, setIsEditingMap] = useState(false);
   const [loading, setLoading] = useState({

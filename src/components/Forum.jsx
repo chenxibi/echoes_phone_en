@@ -38,11 +38,11 @@ const Forum = ({
   userPersona,
   charTrackerContext, // 角色追踪上下文
   trackerContext, // 用户追踪上下文
-  setChatHistory, // 用于转发消息
+  setChatHistory, // 用于转Send message
   setMsgCountSinceSummary,
   setForwardContext,
   setActiveApp, // 用于跳转到 Chat
-  onChatEventPost, // 聊天事件触发发帖的回调
+  onChatEventPost, // 聊天事件触发Post的回调
 }) => {
   // --- 内部Status管理 ---
   const [forumData, setForumData] = useStickyState(
@@ -60,9 +60,9 @@ const Forum = ({
   const [showPostModal, setShowPostModal] = useState(false);
   const [postTab, setPostTab] = useState("me"); // 'me' or 'char'
 
-  // 聊天事件触发发帖的弹窗Status
+  // 聊天事件触发Post的弹窗Status
   const [showChatEventModal, setShowChatEventModal] = useState(false);
-  const [chatEventPostData, setChatEventPostData] = useState(null); // 存储 AI 生成的发帖Content
+  const [chatEventPostData, setChatEventPostData] = useState(null); // 存储 AI 生成的PostContent
   const [replyIdentity, setReplyIdentity] = useState("me"); // 'me' or 'smurf'
   const [forumGuidance, setForumGuidance] = useState("");
 
@@ -370,7 +370,7 @@ ${recentHistory}
       await generateForumReplies(post.id, "Auto");
     }
     setLoading((prev) => ({ ...prev, forum_refresh_all: false }));
-    showToast("success", "动态更新完毕");
+    showToast("success", "动态Update完毕");
   };
 
   const generateCharacterPost = async () => {
@@ -410,7 +410,7 @@ ${recentHistory}
     }
   };
 
-  // 聊天事件触发发帖：AI 分析聊天历史后自动发帖
+  // 聊天事件触发Post：AI min析聊天历史后自动Post
   const generateChatEventPost = async (showModal = true) => {
     if (!persona) return;
     setLoading((prev) => ({ ...prev, chat_event_post: true }));
@@ -456,7 +456,7 @@ ${recentHistory}
           })),
         };
 
-        // 添加新Post到论坛数据
+        // Add新Post到Feed数据
         setForumData((prev) => ({
           ...prev,
           posts: [newPost, ...prev.posts],
@@ -544,7 +544,7 @@ ${recentHistory}
   };
 
   const handleDeletePost = async (postId) => {
-    if (await customConfirm("确定彻底Delete这篇Post吗？", "DeletePost")) {
+    if (await customConfirm("OK彻底Delete这篇Post吗？", "DeletePost")) {
       setForumData((prev) => ({
         ...prev,
         posts: prev.posts.filter((p) => p.id !== postId),
@@ -555,7 +555,7 @@ ${recentHistory}
   };
 
   const handleDeleteReply = async (threadId, replyId) => {
-    if (await customConfirm("确定Delete这条Comment？")) {
+    if (await customConfirm("OKDelete这条Comment？")) {
       setForumData((prev) => ({
         ...prev,
         posts: prev.posts.map((p) => {
@@ -571,7 +571,7 @@ ${recentHistory}
   const handleForwardToChat = (item, type = "post", parentTitle = "") => {
     const content =
       type === "post"
-        ? `【转发Post】\n标题：${item.title}\nAuthor：${item.author}\nContent：${item.content}`
+        ? `【转发Post】\nTitle：${item.title}\nAuthor：${item.author}\nContent：${item.content}`
         : `【转发Comment】\n来源Post：${parentTitle}\nComment人：${item.author}\nContent：${item.content}`;
 
     const newMsg = {
@@ -634,7 +634,7 @@ ${recentHistory}
   return (
     <AppWindow
       isOpen={isOpen}
-      title={activeThreadId ? "Post详情" : forumData.name || "本地论坛"}
+      title={activeThreadId ? "Post详情" : forumData.name || "本地Feed"}
       onClose={() => {
         if (activeThreadId) setActiveThreadId(null);
         else onClose();
@@ -994,7 +994,7 @@ ${recentHistory}
             </p>
             <div>
               <label className="text-[10px] font-bold uppercase text-gray-500 mb-1 block">
-                我的Nickname
+                MyNickname
               </label>
               <input
                 value={forumSettings.userNick}
@@ -1005,7 +1005,7 @@ ${recentHistory}
                 placeholder="RealMe"
               />
               <label className="text-[10px] font-bold uppercase text-gray-400 mb-1 block">
-                我的Alt Account
+                MyAlt Account
               </label>
               <input
                 value={forumSettings.smurfNick}
@@ -1043,14 +1043,14 @@ ${recentHistory}
                 onClick={() => updateForumSettings(forumSettings)}
                 className="flex-1 py-2 bg-black text-white rounded-lg text-xs font-bold"
               >
-                Save并更新
+                Save并Update
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* 弹窗：发帖 */}
+      {/* 弹窗：Post */}
       {showPostModal && (
         <div className="absolute inset-0 z-50 bg-[#F2F2F7] flex flex-col animate-in slide-in-from-bottom-10">
           <div className="h-14 px-4 flex items-center justify-between bg-white border-b border-gray-200/50">
@@ -1127,7 +1127,7 @@ ${recentHistory}
                       [postTab]: { ...p[postTab], title: val },
                     }));
                   }}
-                  placeholder="添加标题"
+                  placeholder="AddTitle"
                   className="w-full text-base font-bold outline-none bg-transparent placeholder:text-gray-300"
                 />
                 <div className="h-[1px] bg-gray-100 w-full"></div>
@@ -1140,7 +1140,7 @@ ${recentHistory}
                       [postTab]: { ...p[postTab], content: val },
                     }));
                   }}
-                  placeholder="分享你的新鲜事..."
+                  placeholder="min享Your新鲜事..."
                   className="w-full h-48 text-sm resize-none outline-none bg-transparent custom-scrollbar leading-relaxed placeholder:text-gray-300"
                 />
               </div>
@@ -1149,7 +1149,7 @@ ${recentHistory}
         </div>
       )}
 
-      {/* 弹窗：聊天事件自动发帖提醒 */}
+      {/* 弹窗：聊天事件自动Post提醒 */}
       {showChatEventModal && chatEventPostData && (
         <div className="absolute inset-0 z-[70] bg-black/60 flex items-center justify-center p-6 animate-in fade-in">
           <div className="bg-white w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-4">
@@ -1167,7 +1167,7 @@ ${recentHistory}
               </button>
             </div>
 
-            {/* PostContent预览 */}
+            {/* PostContentPreview */}
             <div className="p-5 space-y-4">
               <div className="flex items-center gap-3 pb-3 border-b border-gray-100">
                 <div className="w-10 h-10 rounded-full bg-[#7A2A3A]/10 flex items-center justify-center">
@@ -1192,7 +1192,7 @@ ${recentHistory}
                 </p>
               </div>
 
-              {/* 初始Comment预览 */}
+              {/* 初始CommentPreview */}
               {chatEventPostData.replies && chatEventPostData.replies.length > 0 && (
                 <div className="bg-gray-50 rounded-xl p-3 space-y-2">
                   <div className="text-xs text-gray-400 font-bold mb-2">

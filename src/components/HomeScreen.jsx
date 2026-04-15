@@ -112,7 +112,7 @@ const HomeScreen = ({
         </div>
       )}
 
-      {/* Page 2：系统操作 */}
+      {/* Page 2：系统Actions */}
       {currentPage === 1 && (
         <div className="w-full h-full flex flex-col items-center justify-center p-10 animate-in fade-in zoom-in duration-300">
           <button

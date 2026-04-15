@@ -2,11 +2,11 @@ import React from "react";
 import { Upload, RotateCcw, Asterisk, Type, Monitor, Grid } from "lucide-react";
 
 const PersonalizationPanel = ({
-  // --- 显示设置 Props ---
+  // --- 显示Settings Props ---
   isFullscreen,
   toggleFullScreen,
 
-  // --- 字体设置 Props ---
+  // --- 字体Settings Props ---
   fontName,
   handleResetFont,
   handleFontUrlSubmit,
@@ -15,9 +15,9 @@ const PersonalizationPanel = ({
 
   // --- 图标定制 Props ---
   appList, // 应用列表 (从App.jsx传入，确保两边数据一致)
-  customIcons, // 当前的自定义图标状态 { appId: base64Str }
-  handleAppIconUpload, // 上传处理函数
-  handleResetIcon, // 重置处理函数
+  customIcons, // Current的Custom图标Status { appId: base64Str }
+  handleAppIconUpload, // Upload处理函数
+  handleResetIcon, // Reset处理函数
 }) => {
   return (
     <div className="space-y-8 pt-4 pb-20 px-1">
@@ -27,14 +27,14 @@ const PersonalizationPanel = ({
           <Monitor size={10} /> 显示与排版
         </h3>
 
-        {/* 沉浸模式 */}
+        {/* 沉浸Mode */}
         <div className="glass-card p-4 rounded-xl mb-4 flex items-center justify-between">
           <div>
             <label className="block text-xs font-bold text-gray-700 mb-1">
-              沉浸模式
+              沉浸Mode
             </label>
             <p className="text-[10px] text-gray-400">
-              隐藏浏览器地址栏与状态栏
+              隐藏Browser地址栏与Status栏
             </p>
           </div>
           <button
@@ -51,7 +51,7 @@ const PersonalizationPanel = ({
           </button>
         </div>
 
-        {/* 字体设置 */}
+        {/* 字体Settings */}
         <div className="glass-card p-4 rounded-xl space-y-3">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-2">
@@ -64,7 +64,7 @@ const PersonalizationPanel = ({
               onClick={handleResetFont}
               className="text-[10px] text-red-500 hover:underline flex items-center gap-1"
             >
-              <RotateCcw size={8} /> 恢复默认
+              <RotateCcw size={8} /> Reset to default
             </button>
           </div>
 
@@ -72,7 +72,7 @@ const PersonalizationPanel = ({
             <input
               value={inputUrl}
               onChange={(e) => setInputUrl(e.target.value)}
-              placeholder="粘贴字体链接 (例如 https://...)"
+              placeholder="Paste字体Link (例如 https://...)"
               className="flex-grow p-2 bg-gray-50 border border-gray-200 rounded-lg text-xs outline-none focus:border-black placeholder:text-gray-300"
             />
             <button
@@ -83,7 +83,7 @@ const PersonalizationPanel = ({
             </button>
           </div>
           <p className="text-[9px] text-gray-400 truncate">
-            当前使用: {fontName || "默认字体"}
+            Current使用: {fontName || "Default font"}
           </p>
         </div>
       </section>
@@ -102,7 +102,7 @@ const PersonalizationPanel = ({
             return (
               <div key={app.id} className="flex flex-col items-center gap-2">
                 <div className="w-12 h-12 rounded-[16px] bg-white border border-gray-200 flex items-center justify-center overflow-hidden relative group cursor-pointer shadow-sm">
-                  {/* 显示当前图标 (自定义 或 默认) */}
+                  {/* 显示Current图标 (Custom 或 默认) */}
                   {customIcons[app.id] ? (
                     <img
                       src={customIcons[app.id]}
@@ -115,7 +115,7 @@ const PersonalizationPanel = ({
                     Icon && <Icon size={20} className="text-gray-400" />
                   )}
 
-                  {/* 悬停上传遮罩 */}
+                  {/* 悬停Upload遮罩 */}
                   <label className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity cursor-pointer">
                     <Upload size={16} className="text-white" />
                     <input
@@ -132,7 +132,7 @@ const PersonalizationPanel = ({
                     {app.label}
                   </span>
 
-                  {/* 仅在有自定义图标时显示“还原”按钮 */}
+                  {/* 仅在有Custom图标时显示“还原”按钮 */}
                   {customIcons[app.id] && (
                     <button
                       onClick={() => handleResetIcon(app.id)}

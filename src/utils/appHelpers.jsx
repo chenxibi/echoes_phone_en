@@ -55,7 +55,7 @@ export const APP_LIST = [
 
 /* --- UTILS --- */
 
-// 解析批量链接文本
+// 解析批量Link文本
 export const parseStickerLinks = (text) => {
   if (!text) return [];
   return text
@@ -65,7 +65,7 @@ export const parseStickerLinks = (text) => {
       const parts = line.split(/[:：]/);
       if (parts.length >= 2) {
         const desc = parts[0].trim();
-        // 后面可能还有冒号（如 https://），所以合并剩余部分
+        // 后面可能还有冒号（如 https://），所以合并剩余部min
         const url = parts.slice(1).join(":").trim();
         if (desc && url.startsWith("http")) {
           return {
@@ -87,7 +87,7 @@ export const safeJSONParse = (text) => {
   try {
     let clean = text;
 
-    // 1. 只去掉最外层的 markdown 代码块标记，不碰内部的内容
+    // 1. 只去掉最外层的 markdown 代码块标记，不碰内部的Content
     clean = clean.replace(/^```json\s*/gi, "").replace(/\s*```\s*$/gi, "");
 
     // 2. 找到第一个 { 的位置，从那里开始匹配
@@ -120,20 +120,20 @@ export const safeJSONParse = (text) => {
     const repairedText = jsonrepair(clean);
     return JSON.parse(repairedText);
   } catch (e) {
-    console.error("[Echoes] JSON 解析失败:", e);
+    console.error("[Echoes] JSON 解析Failed:", e);
     console.log("[Echoes] 问题文本:", text);
     try {
       const simpleRepair = jsonrepair(text);
       return JSON.parse(simpleRepair);
     } catch (err2) {
-      throw new Error(`格式解析失败: ${e.message.slice(0, 30)}...`);
+      throw new Error(`格式解析Failed: ${e.message.slice(0, 30)}...`);
     }
   }
 };
 
 export const compressImage = (file, maxWidth = 500, quality = 0.7) => {
   return new Promise((resolve, reject) => {
-    // 如果是 GIF，直接返回原始 DataURL，不经过 Canvas 压缩以保留动图
+    // 如果是 GIF，直接Back原始 DataURL，不经过 Canvas 压缩以保留动图
     if (file.type === "image/gif") {
       const reader = new FileReader();
       reader.onload = (e) => resolve(e.target.result);
@@ -246,7 +246,7 @@ export const useStickyState = (defaultValue, key) => {
           try {
             data = JSON.parse(localData);
             await echoesDB.setItem(key, data);
-            // 迁移成功后可选：localStorage.removeItem(key);
+            // 迁移Success后可选：localStorage.removeItem(key);
           } catch (e) {
             console.error(`Migration error for ${key}`, e);
           }
@@ -298,19 +298,19 @@ export const generateContent = async (params, apiConfig, onError, signal) => {
         { role: "user", content: prompt },
       ];
 
-      console.group("📝 [Echoes Debug] 发送给 AI 的完整数据");
+      console.group("📝 [Echoes Debug] Send给 AI 的完整数据");
       console.log(
-        "%c系统指令 (System Prompt):",
+        "%cSystem command (System Prompt):",
         "color: blue; font-weight: bold;",
       );
       console.log(systemInstruction);
       console.log(
-        "%c用户指令 (User Prompt):",
+        "%cUser command (User Prompt):",
         "color: green; font-weight: bold;",
       );
       console.log(prompt);
       console.log(
-        "%c完整消息结构 (Messages Array):",
+        "%c完整Message structure (Messages Array):",
         "color: purple; font-weight: bold;",
         messages,
       );
@@ -371,13 +371,13 @@ export const generateContent = async (params, apiConfig, onError, signal) => {
       content = data.choices[0].message?.content;
       console.log("[Echoes] Content extracted:", content);
     } else {
-      throw new Error("未配置 API 信息。请在设置中输入 Base URL 和 Key。");
+      throw new Error("未配置 API 信息。请在Settings中Enter Base URL 和 Key。");
     }
   } catch (error) {
     if (error.name === "AbortError" || error.name === "TimeoutError") {
       console.log("[Echoes] Generation aborted or timed out");
       // Only show toast if it's a timeout, abort is manual
-      if (error.name === "TimeoutError" && onError) onError("请求超时 (360s)");
+      if (error.name === "TimeoutError" && onError) onError("Request timeout (360s)");
       return null;
     }
 
@@ -388,7 +388,7 @@ export const generateContent = async (params, apiConfig, onError, signal) => {
   }
 
   if ((!content || !String(content).trim()) && onError) {
-    onError("API 返回内容为空 (或仅含空白符)");
+    onError("API BackContent为空 (或仅含空白符)");
     return null;
   }
 
@@ -398,7 +398,7 @@ export const generateContent = async (params, apiConfig, onError, signal) => {
     } catch (e) {
       console.error("[Echoes] SafeJSONParse failed:", e);
       if (onError)
-        onError(`解析失败: ${e.message}\n内容: ${content.substring(0, 20)}...`);
+        onError(`解析Failed: ${e.message}\nContent: ${content.substring(0, 20)}...`);
       return null;
     }
   }
@@ -406,14 +406,14 @@ export const generateContent = async (params, apiConfig, onError, signal) => {
   return content;
 };
 
-/* --- UTILS --- 部分的 cleanCharacterJson 函数替换为： */
+/* --- UTILS --- 部min的 cleanCharacterJson 函数Replace with： */
 
 export const cleanCharacterJson = (jsonContent) => {
   try {
     const rawObj =
       typeof jsonContent === "string" ? JSON.parse(jsonContent) : jsonContent;
 
-    // 1. 分别获取外层和内层数据
+    // 1. min别获取外层和内层数据
     const outerData = rawObj;
     const innerData = rawObj.data || {};
 
@@ -436,7 +436,7 @@ export const cleanCharacterJson = (jsonContent) => {
     const name = innerData.name || outerData.name || "Unknown";
 
     // 4. 清洗 Description (处理 XML 标签)
-    // 很多时候 Prompt 会生成 <character> 包裹的内容，这里提取出来
+    // 很多时候 Prompt 会生成 <character> 包裹的Content，这里提取出来
     let richDescription = finalDesc;
     const charTagMatch = finalDesc.match(/<character>([\s\S]*?)<\/character>/i);
     if (charTagMatch) richDescription = charTagMatch[1].trim();
@@ -449,8 +449,8 @@ export const cleanCharacterJson = (jsonContent) => {
     // 5. 组合最终文本 Key
     let cleanText = `Name: ${name}\n\nDescription:\n${richDescription}`;
 
-    // 6. 处理 WorldBook (世界书)
-    // 同样优先取有内容的那一边
+    // 6. 处理 WorldBook (Lore Book)
+    // 同样优先取有Content的那一边
     let rawEntries = [];
     if (
       innerData.character_book &&
@@ -468,7 +468,7 @@ export const cleanCharacterJson = (jsonContent) => {
         name: entry.comment || entry.keys?.[0] || entry.name || `Entry`,
         content: entry.content,
         enabled: entry.enabled !== false,
-        group: entry.group || name || "默认分组",
+        group: entry.group || name || "默认min组",
       }))
       .filter((e) => e.content);
 
@@ -491,7 +491,7 @@ export const cleanCharacterJson = (jsonContent) => {
 };
 
 /* --- SUB-COMPONENTS --- */
-export const CollapsibleThought = ({ text, label = "查看心声" }) => {
+export const CollapsibleThought = ({ text, label = "View thoughts" }) => {
   const [isOpen, setIsOpen] = useState(false);
   if (!text) return null;
 
@@ -502,7 +502,7 @@ export const CollapsibleThought = ({ text, label = "查看心声" }) => {
         className="flex items-center gap-1 text-[10px] uppercase font-bold text-gray-400 hover:text-[#7A2A3A] transition-colors mb-2"
       >
         {isOpen ? <ChevronUp size={12} /> : <MessageSquare size={12} />}
-        {isOpen ? "收起" : label}
+        {isOpen ? "Collapse" : label}
       </button>
 
       {isOpen && (
@@ -552,16 +552,16 @@ export const MinimalCard = ({ item, type = "fact", onDelete, onEdit }) => {
         </h4>
 
         <div className="shrink-0 text-gray-300 group-hover:text-gray-400 transition-colors flex gap-1 items-center">
-          {/* [新增] 这里的编辑按钮 */}
+          {/* [新增] 这里的Edit按钮 */}
           {onEdit && !isCompleted && (
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                // 关键点：这里把 item.content 传回去，外面的 handleEditTrackerItem 才能拿到旧文本显示在输入框里
+                // 关键:00：这里把 item.content 传回去，外面的 handleEditTrackerItem 才能拿到旧文本显示在Enter框里
                 onEdit(item.id, item.content);
               }}
               className="opacity-0 group-hover:opacity-100 transition-opacity hover:text-black p-1"
-              title="编辑"
+              title="Edit"
             >
               <Edit2 size={12} />
             </button>
@@ -602,7 +602,7 @@ export const MinimalCard = ({ item, type = "fact", onDelete, onEdit }) => {
           <button
             onClick={() => onDelete && onDelete(item.id)}
             className="p-1 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-            title="删除"
+            title="Delete"
           >
             <Trash2 size={10} />
           </button>
@@ -645,13 +645,13 @@ export const StickerEditorModal = ({ sticker, onSave, onDelete, onClose }) => {
   return (
     <div className="fixed inset-0 z-[100] bg-black/50 flex items-center justify-center p-4 animate-in fade-in">
       <div className="bg-white w-full max-w-sm rounded-2xl p-4 shadow-2xl flex flex-col gap-4">
-        <h3 className="text-sm font-bold text-gray-700">编辑表情包</h3>
+        <h3 className="text-sm font-bold text-gray-700">EditSticker</h3>
         <div className="aspect-square w-32 mx-auto bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
           <img src={sticker.url} className="w-full h-full object-cover" />
         </div>
         <div>
           <label className="text-[10px] font-bold uppercase text-gray-400">
-            描述 (角色将根据此描述选用)
+            Description (角色将根据此Description选用)
           </label>
           <textarea
             className="w-full h-20 p-2 text-xs border border-gray-200 rounded-lg mt-1 resize-none focus:border-black outline-none"
@@ -664,19 +664,19 @@ export const StickerEditorModal = ({ sticker, onSave, onDelete, onClose }) => {
             onClick={() => onDelete(sticker.id)}
             className="flex-1 py-2 bg-red-50 text-red-500 rounded-lg text-xs font-bold hover:bg-red-100"
           >
-            删除
+            Delete
           </button>
           <button
             onClick={onClose}
             className="flex-1 py-2 bg-gray-100 text-gray-600 rounded-lg text-xs font-bold"
           >
-            取消
+            Cancel
           </button>
           <button
             onClick={() => onSave(sticker.id, desc)}
             className="flex-1 py-2 bg-black text-white rounded-lg text-xs font-bold"
           >
-            保存
+            Save
           </button>
         </div>
       </div>
@@ -696,7 +696,7 @@ export const toggleFullScreen = () => {
   }
 };
 
-// 1. 把它移到 App 外面，并添加 props 参数解构
+// 1. 把它移到 App 外面，并Add props 参数解构
 export const CreationAssistantModal = ({
   isOpen,
   onClose,
@@ -708,7 +708,7 @@ export const CreationAssistantModal = ({
   setPreviewData,
   onApply,
 }) => {
-  if (!isOpen) return null; // 如果没打开，直接不渲染
+  if (!isOpen) return null; // 如果没Open，直接不渲染
 
   return (
     <div className="fixed inset-0 z-[100] bg-black/50 flex items-center justify-center p-4 animate-in fade-in">
@@ -717,7 +717,7 @@ export const CreationAssistantModal = ({
         <div className="bg-gradient-to-r from-[#7A2A3A] to-[#5a1a2a] p-4 text-white">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-bold flex items-center gap-2">
-              <WandSparkles size={20} /> 创作助手
+              <WandSparkles size={20} /> Create助手
             </h3>
             <button
               onClick={onClose} // 使用 props.onClose
@@ -727,7 +727,7 @@ export const CreationAssistantModal = ({
             </button>
           </div>
           <p className="text-xs text-white/70 mt-1">
-            输入简短描述，AI将为你生成完整角色卡
+            Enter简短Description，AI将为你生成完整角色卡
           </p>
         </div>
 
@@ -735,23 +735,23 @@ export const CreationAssistantModal = ({
         <div className="p-4 space-y-4">
           {!previewData ? (
             <>
-              {/* 输入区域 */}
+              {/* Enter区域 */}
               <div>
                 <label className="text-[10px] font-bold uppercase text-gray-400 mb-2 block">
-                  角色描述
+                  角色Description
                 </label>
                 <textarea
                   value={inputVal} // 使用 props.inputVal
                   onChange={(e) => setInputVal(e.target.value)} // 使用 props.setInputVal
                   placeholder={
-                    "描述角色特点，如“阳光开朗的青梅竹马”\n也可以直接输入喜欢的IP角色名字，如“Jason Todd - 红头罩”"
+                    "Description角色特:00，如“阳光开朗的青梅竹马”\n也可以直接Enter喜欢的IP角色名字，如“Jason Todd - 红头罩”"
                   }
                   className="w-full h-32 p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm resize-none outline-none focus:border-[#7A2A3A] transition-colors"
                   autoFocus // 加上这个体验更好
                 />
               </div>
 
-              {/* ... (省略中间的 Tag 提示区域，保持原样) ... */}
+              {/* ... (省略中间的 Tag Notice区域，保持原样) ... */}
 
               {/* 生成按钮 */}
               <button
@@ -762,7 +762,7 @@ export const CreationAssistantModal = ({
                 {isGenerating ? (
                   <>
                     <RefreshCw className="animate-spin" size={16} />
-                    生成中，请稍候...
+                    生成中，Please wait...
                   </>
                 ) : (
                   <>
@@ -774,16 +774,16 @@ export const CreationAssistantModal = ({
             </>
           ) : (
             <>
-              {/* === 预览与编辑区域 (纯展示与编辑，无额外逻辑) === */}
+              {/* === Preview与Edit区域 (纯展示与Edit，无额外逻辑) === */}
               <div className="flex flex-col gap-3 h-[60vh] overflow-hidden">
-                {/* 1. 顶部：头像与名字编辑 */}
+                {/* 1. 顶部：头像与名字Edit */}
                 <div className="flex items-center gap-3 shrink-0 bg-gray-50 p-3 rounded-xl border border-gray-100">
                   <div className="w-12 h-12 bg-[#7A2A3A] rounded-full flex items-center justify-center text-white text-lg font-bold shrink-0">
                     {previewData.name?.[0] || "?"}
                   </div>
                   <div className="flex-grow">
                     <label className="text-[9px] font-bold uppercase text-gray-400 block mb-1">
-                      角色名称
+                      角色Name
                     </label>
                     <input
                       value={previewData.name || ""}
@@ -798,13 +798,13 @@ export const CreationAssistantModal = ({
                   </div>
                 </div>
 
-                {/* 2. 中间：可滚动编辑区 */}
+                {/* 2. 中间：可滚动Edit区 */}
                 <div className="flex-grow overflow-y-auto custom-scrollbar space-y-4 pr-1">
-                  {/* 编辑人设 (Raw Prompt) - 用户指定：这将作为 inputKey */}
+                  {/* Edit人设 (Raw Prompt) - 用户指定：这将作为 inputKey */}
                   <div>
                     <div className="flex justify-between items-center mb-1">
                       <label className="text-[10px] font-bold uppercase text-gray-400 flex items-center gap-1">
-                        <FileText size={10} /> 核心设定 (Raw Prompt)
+                        <FileText size={10} /> Core Settings (Raw Prompt)
                       </label>
                       <span className="text-[9px] text-gray-300">
                         将存入系统设定
@@ -823,14 +823,14 @@ export const CreationAssistantModal = ({
                     />
                   </div>
 
-                  {/* 编辑开场白 - 用户指定：仅显示和编辑，不自动发送 */}
+                  {/* Edit开场白 - 用户指定：仅显示和Edit，不自动Send */}
                   <div>
                     <div className="flex justify-between items-center mb-1">
                       <label className="text-[10px] font-bold uppercase text-gray-400 flex items-center gap-1">
                         <MessageCircle size={10} /> 开场白 (First Message)
                       </label>
                       <span className="text-[9px] text-gray-300">
-                        仅用于展示/复制
+                        仅用于展示/Copy
                       </span>
                     </div>
                     <textarea
@@ -848,7 +848,7 @@ export const CreationAssistantModal = ({
                 </div>
               </div>
 
-              {/* 操作按钮 */}
+              {/* Actions按钮 */}
               <div className="flex gap-2">
                 <button
                   onClick={() => setPreviewData(null)} // 使用 props
@@ -869,7 +869,7 @@ export const CreationAssistantModal = ({
                   }}
                   className="flex-1 py-2.5 bg-gray-100 text-gray-600 rounded-xl text-sm font-bold hover:bg-gray-200 transition-colors"
                 >
-                  导出JSON
+                  ExportJSON
                 </button>
                 <button
                   onClick={onApply} // 使用 props
@@ -891,7 +891,7 @@ export const StatusPanel = ({ statusHistory, onClose, onDelete }) => (
   <div className="flex flex-col h-full pt-4">
     <div className="flex-grow overflow-y-auto custom-scrollbar space-y-6 px-1">
       {statusHistory.length === 0 && (
-        <p className="text-center text-gray-400 text-xs py-10">暂无状态记录</p>
+        <p className="text-center text-gray-400 text-xs py-10">NoneStatus记录</p>
       )}
       {[...statusHistory].reverse().map((entry, i) => {
         // [新增] 计算原始索引：因为列表倒序了，所以要反算回原始数组的索引
@@ -958,7 +958,7 @@ export const VoiceMessageBubble = ({ msg, isMe }) => {
   const [showTranscript, setShowTranscript] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
 
-  const cleanText = msg.text.replace("[语音消息] ", "");
+  const cleanText = msg.text.replace("[语音Message] ", "");
   const duration = Math.min(60, Math.max(2, Math.ceil(cleanText.length / 3)));
 
   const handleClick = () => {
@@ -1029,7 +1029,7 @@ export const VoiceMessageBubble = ({ msg, isMe }) => {
           </div>
         </div>
 
-        {/* 语音转文字内容 */}
+        {/* 语音转文字Content */}
         {showTranscript && (
           <div
             className={`mt-3 text-xs leading-relaxed opacity-80 border-l-2 pl-2 pt-1 animate-in slide-in-from-top-1 duration-200 ${
@@ -1064,14 +1064,14 @@ export const TransferBubble = ({ msg, isMe, onInteract }) => {
       }`}
     >
       {/* 1. 顶部：图标与金额 */}
-      {/* 如果没有备注，底部留一点 margin (mb-3)，如果有备注，mb-1 紧凑一点 */}
+      {/* 如果没有Note，底部留一:00 margin (mb-3)，如果有Note，mb-1 紧凑一:00 */}
       <div className={`flex items-center gap-3 ${note ? "mb-1" : "mb-3"}`}>
         <div className="p-2.5 rounded-full shrink-0 bg-white/20 text-white">
           <Banknote size={24} />
         </div>
         <div className="overflow-hidden min-w-0">
           <div className="text-[10px] font-bold opacity-90 mb-0.5 truncate">
-            {isMe ? "向对方转账" : "向你转账"}
+            {isMe ? "Sent transfer" : "Received transfer"}
           </div>
           <div className="text-xl font-bold tracking-tight truncate">
             ¥ {amount}
@@ -1079,17 +1079,17 @@ export const TransferBubble = ({ msg, isMe, onInteract }) => {
         </div>
       </div>
 
-      {/* 2. 备注区域 (仅当有备注时显示) */}
+      {/* 2. Note区域 (仅当有Note时显示) */}
       {note && (
         <div className="text-xs opacity-80 mb-2 pl-[52px] leading-tight break-words font-medium">
           {note}
         </div>
       )}
 
-      {/* 3. 底部：状态栏 */}
+      {/* 3. 底部：Status栏 */}
       <div className="flex justify-between items-center border-t border-white/20 pt-2">
         <span className="text-xs font-bold opacity-90">
-          {isPending ? "等待确认" : isAccepted ? "已收款" : "已退还"}
+          {isPending ? "等待Confirm" : isAccepted ? "DoneAccept" : "DoneReturn"}
         </span>
 
         {/* 交互按钮 */}
@@ -1102,7 +1102,7 @@ export const TransferBubble = ({ msg, isMe, onInteract }) => {
               }}
               className="px-2 py-1 bg-white/20 hover:bg-white/30 text-white text-[10px] rounded-md font-bold backdrop-blur-sm"
             >
-              退还
+              Return
             </button>
             <button
               onClick={(e) => {
@@ -1111,7 +1111,7 @@ export const TransferBubble = ({ msg, isMe, onInteract }) => {
               }}
               className="px-2 py-1 bg-white text-[#ff9f43] hover:bg-gray-50 text-[10px] rounded-md font-bold shadow-sm"
             >
-              收款
+              Accept
             </button>
           </div>
         )}
@@ -1125,7 +1125,7 @@ export const CustomDialog = ({ config, onClose }) => {
   const [inputValue, setInputValue] = useState(config.defaultValue || "");
   const inputRef = useRef(null);
 
-  // 自动聚焦输入框
+  // 自动聚焦Enter框
   useEffect(() => {
     if (config.type === "prompt" && inputRef.current) {
       inputRef.current.focus();
@@ -1154,7 +1154,7 @@ export const CustomDialog = ({ config, onClose }) => {
   return (
     <div className="fixed inset-0 z-[200] bg-black/40 backdrop-blur-sm flex items-center justify-center p-6 animate-in fade-in duration-200">
       <div className="bg-white/90 backdrop-blur-xl w-full max-w-xs rounded-2xl shadow-2xl p-5 border border-white/50 animate-in zoom-in-95 duration-200 flex flex-col gap-4">
-        {/* 标题与内容 */}
+        {/* Title与Content */}
         <div className="text-center space-y-2">
           {config.title && (
             <h3 className="text-base font-bold text-gray-800">
@@ -1168,7 +1168,7 @@ export const CustomDialog = ({ config, onClose }) => {
           )}
         </div>
 
-        {/* 输入框 (仅 Prompt 模式) */}
+        {/* Enter框 (仅 Prompt Mode) */}
         {config.type === "prompt" && (
           <input
             ref={inputRef}
@@ -1176,7 +1176,7 @@ export const CustomDialog = ({ config, onClose }) => {
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             className="w-full p-3 bg-gray-100/50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:border-[#7A2A3A] outline-none transition-all text-center font-medium"
-            placeholder="请输入..."
+            placeholder="Enter..."
             onKeyDown={(e) => e.key === "Enter" && handleConfirm()}
           />
         )}
@@ -1188,7 +1188,7 @@ export const CustomDialog = ({ config, onClose }) => {
               onClick={handleCancel}
               className="flex-1 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-xl text-xs font-bold transition-colors"
             >
-              取消
+              Cancel
             </button>
           )}
           <button
@@ -1199,7 +1199,7 @@ export const CustomDialog = ({ config, onClose }) => {
                 : "bg-[#2C2C2C] hover:bg-black text-white"
             }`}
           >
-            {config.confirmText || "确定"}
+            {config.confirmText || "OK"}
           </button>
         </div>
       </div>
@@ -1209,9 +1209,9 @@ export const CustomDialog = ({ config, onClose }) => {
 
 export const LocationBubble = ({ name, address }) => (
   <div className="flex flex-col bg-white border border-gray-200 rounded-lg overflow-hidden w-64 shadow-sm select-none">
-    {/* 上半部分：地图背景图 */}
+    {/* 上半部min：地图背景图 */}
     <div className="h-24 bg-gray-100 relative">
-      {/* 记得确保 mapBg 已经 import 进来了 */}
+      {/* 记得确保 mapBg Done经 import 进来了 */}
       <img
         src={mapBg}
         alt="Map"
@@ -1219,7 +1219,7 @@ export const LocationBubble = ({ name, address }) => (
         draggable="false"
       />
 
-      {/* 自定义 SVG 图标容器 - 绝对居中定位 */}
+      {/* Custom SVG 图标容器 - 绝对居中定位 */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -mt-3 drop-shadow-md">
         <svg
           viewBox="0 0 1024 1024"
@@ -1233,7 +1233,7 @@ export const LocationBubble = ({ name, address }) => (
       </div>
     </div>
 
-    {/* 下半部分：文字信息 */}
+    {/* 下半部min：文字信息 */}
     <div className="p-3 bg-white">
       <div className="text-sm font-medium text-gray-900 truncate leading-tight mb-1">
         {name}

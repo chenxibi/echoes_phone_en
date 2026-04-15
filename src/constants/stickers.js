@@ -9,7 +9,7 @@ export const DEFAULT_CHAR_STICKERS = [
   {
     id: "s2",
     url: "https://files.catbox.moe/6bxk4e.jpg",
-    desc: "一只小狗，眼睛亮亮的，好像在说“女神，我只追随你！”",
+    desc: "一只小狗，眼睛亮亮的，好像在说“Female神，我只追随你！”",
   },
   {
     id: "s3",
@@ -19,7 +19,7 @@ export const DEFAULT_CHAR_STICKERS = [
   {
     id: "s4",
     url: "https://files.catbox.moe/sjjb09.jpg",
-    desc: "一只正在上班、表情平静中带着崩溃的小狗，好像在说“上个屁班。”",
+    desc: "一只Now...上班、表情平静中带着崩溃的小狗，好像在说“上个屁班。”",
   },
   {
     id: "s5",
@@ -79,37 +79,37 @@ export const DEFAULT_CHAR_STICKERS = [
   {
     id: "s16",
     url: "https://files.catbox.moe/n8it3y.jpg",
-    desc: "一个幽默又命苦的打工人上班表情包，好像在说“当牛做马中......”",
+    desc: "一个幽默又命苦的打工人上班Sticker，好像在说“当牛做马中......”",
   },
   {
     id: "s17",
     url: "https://files.catbox.moe/34dlfr.jpg",
-    desc: "一个幽默搞笑、厚脸皮的表情包，好像在说“那咋了，枪毙我？”",
+    desc: "一个幽默搞笑、厚脸皮的Sticker，好像在说“那咋了，枪毙我？”",
   },
   {
     id: "s18",
     url: "https://files.catbox.moe/q9w2zq.jpg",
-    desc: "一只面色阴沉、又有点像撒娇的小熊表情包，好像在说“我要向你施压”",
+    desc: "一只面色阴沉、又有:00像撒娇的小熊Sticker，好像在说“我要向你施压”",
   },
   {
     id: "s19",
     url: "https://files.catbox.moe/tho7pf.jpg",
-    desc: "一个幽默搞笑、可以用于调情的表情包，好像在说“我要插死你”",
+    desc: "一个幽默搞笑、可以用于调情的Sticker，好像在说“我要插死你”",
   },
   {
     id: "s20",
     url: "https://files.catbox.moe/fvvjvj.jpg",
-    desc: "一个幽默搞笑、可以用于调情的表情包，一只企鹅拿着望远镜观察，好像在说“我正在视奸你”",
+    desc: "一个幽默搞笑、可以用于调情的Sticker，一只企鹅拿着望远镜观察，好像在说“我Now...视奸你”",
   },
   {
     id: "s21",
     url: "https://files.catbox.moe/9j9zyj.jpg",
-    desc: "一个温馨可爱、可以用于撒娇或调情的表情包，一只小熊抱着膝盖坐在门口，好像在说“我会在这里等到你来为止！”",
+    desc: "一个温馨可爱、可以用于撒娇或调情的Sticker，一只小熊抱着膝盖坐在门口，好像在说“我会在这里等到你来为止！”",
   },
   {
     id: "s22",
     url: "https://files.catbox.moe/hgdxtz.jpg",
-    desc: "一个幽默情色、可以用于调情的表情包，一只小兔子正处于勃起的状态看着手机，好像在说“你让我勃起了”",
+    desc: "一个幽默情色、可以用于调情的Sticker，一只小兔子正处于勃起的Status看着手机，好像在说“你让我勃起了”",
   },
   {
     id: "s23",
@@ -119,37 +119,37 @@ export const DEFAULT_CHAR_STICKERS = [
   {
     id: "s24",
     url: "https://files.catbox.moe/xg5hbp.jpg",
-    desc: "一个幽默搞笑、可以用于调情的表情包，用直白的纯文字写着“诶，我不是你的狗吗？”",
+    desc: "一个幽默搞笑、可以用于调情的Sticker，用直白的纯文字写着“诶，我不是Your狗吗？”",
   },
   {
     id: "s25",
     url: "https://files.catbox.moe/m1zg0s.jpg",
-    desc: "一个有些调情意味的表情包，一只企鹅专注地盯着眼前的人，好像在说“我现在立马要了你”",
+    desc: "一个有些调情意味的Sticker，一只企鹅专注地盯着眼前的人，好像在说“我Now立马要了你”",
   },
   {
     id: "s26",
     url: "https://files.catbox.moe/aa1qnf.jpg",
-    desc: "一个可爱的、富有同情心的小狗表情包，似乎在说“别难过了，让我抱抱你”",
+    desc: "一个可爱的、富有同情心的小狗Sticker，似乎在说“别难过了，让我抱抱你”",
   },
   {
     id: "s27",
     url: "https://files.catbox.moe/fpyhtf.jpg",
-    desc: "一只小狗表情坏坏地站在危险环境下抽烟的表情包，好像在说“我很牛，我不在乎，天塌下来我也无所谓”",
+    desc: "一只小狗表情坏坏地站在危险环境下抽烟的Sticker，好像在说“我很牛，我不在乎，天塌下来我也无所谓”",
   },
   {
     id: "s28",
     url: "https://files.catbox.moe/4iy2nj.jpg",
-    desc: "一只凌乱、颓废、潦草、骨瘦如柴的小狗表情包，好像在说“网络把我毁了”",
+    desc: "一只凌乱、颓废、潦草、骨瘦如柴的小狗Sticker，好像在说“网络把我毁了”",
   },
   {
     id: "s29",
     url: "https://files.catbox.moe/bi1v6f.jpg",
-    desc: "一个幽默可爱、可以用于调情的表情包，用直白的邀请函写着“上线了，泡我^^！”",
+    desc: "一个幽默可爱、可以用于调情的Sticker，用直白的邀请函写着“上线了，泡我^^！”",
   },
   {
     id: "s30",
     url: "https://files.catbox.moe/2rdd4h.jpg",
-    desc: "一张复古像素风格的电脑屏幕许愿图，写着“请只让姐姐和我过得好吧”，表达了一种占有欲极强、只在乎特定对象的自私又可爱的祈祷",
+    desc: "一张复古像素Style的电脑屏幕许愿图，写着“请只让姐姐和我过得好吧”，表达了一种占有欲极强、只在乎特定对象的自私又可爱的祈祷",
   },
   {
     id: "s31",
@@ -164,7 +164,7 @@ export const DEFAULT_CHAR_STICKERS = [
   {
     id: "s33",
     url: "https://files.catbox.moe/elvjxb.jpg",
-    desc: "一只伸出舌头的简笔画小狗，客气又带点试探地问“哈喽可以聊？”，是一个礼貌、幽默的开场表情、用于以“舔狗”的姿态向对方示好",
+    desc: "一只伸出舌头的简笔画小狗，客气又带:00试探地问“哈喽可以聊？”，是一个礼貌、幽默的开场表情、用于以“舔狗”的姿态向对方示好",
   },
   {
     id: "s34",
@@ -174,7 +174,7 @@ export const DEFAULT_CHAR_STICKERS = [
   {
     id: "s35",
     url: "https://files.catbox.moe/nci514.jpg",
-    desc: "一个简笔画小狗表情包，头顶“败犬”二字，带有一种幽默的自嘲感",
+    desc: "一个简笔画小狗Sticker，头顶“败犬”二字，带有一种幽默的自嘲感",
   },
   {
     id: "s36",
@@ -192,12 +192,12 @@ export const DEFAULT_USER_STICKERS = [
   {
     id: "us1", // 新增 ID
     url: "https://files.catbox.moe/58udeq.jpg",
-    desc: "一只用力踩着地面、生气地目视前方的小熊，好像在说“我现在很不爽！”",
+    desc: "一只用力踩着地面、生气地目视前方的小熊，好像在说“我Now很不爽！”",
   },
   {
     id: "us2", // 新增 ID
     url: "https://files.catbox.moe/kxsnac.jpg",
-    desc: "一只蹦蹦跳跳、欢天喜地的小熊，好像在说“我现在很期待！”",
+    desc: "一只蹦蹦跳跳、欢天喜地的小熊，好像在说“我Now很期待！”",
   },
   {
     id: "us3",
@@ -212,7 +212,7 @@ export const DEFAULT_USER_STICKERS = [
   {
     id: "us5",
     url: "https://github.com/user-attachments/assets/aa55eef9-c185-43ec-bf52-53e057433612",
-    desc: "一只委屈流泪又有点凶巴巴的小熊，好像在说“我有点喜欢你才找你玩，你讲话干嘛凶我。”",
+    desc: "一只委屈流泪又有:00凶巴巴的小熊，好像在说“我有:00喜欢你才找你玩，你讲话干嘛凶我。”",
   },
   {
     id: "us6",
@@ -222,57 +222,57 @@ export const DEFAULT_USER_STICKERS = [
   {
     id: "us7",
     url: "https://github.com/user-attachments/assets/f95fea40-fce4-49c1-ab9d-0a3d7be39e28",
-    desc: "一只害羞脸红的小熊，好像在说“我现在很害羞”",
+    desc: "一只害羞脸红的小熊，好像在说“我Now很害羞”",
   },
   {
     id: "us8",
     url: "https://github.com/user-attachments/assets/aba25131-8554-450f-90a6-83be6b10de11",
-    desc: "一个可以用于表示亲近的表情包，两个彼此散发着爱意的小人牵着手，中间有一颗爱心",
+    desc: "一个可以用于表示亲近的Sticker，两个彼此散发着爱意的小人牵着手，中间有一颗爱心",
   },
   {
     id: "us9",
     url: "https://files.catbox.moe/n8it3y.jpg",
-    desc: "一个幽默又命苦的打工人上班表情包，好像在说“当牛做马中......”",
+    desc: "一个幽默又命苦的打工人上班Sticker，好像在说“当牛做马中......”",
   },
   {
     id: "us10",
     url: "https://github.com/user-attachments/assets/4144d85e-d454-4311-83ac-c808dfddfffd",
-    desc: "一只面色阴沉、又有点像撒娇的小熊表情包，好像在说“我要向你施压”",
+    desc: "一只面色阴沉、又有:00像撒娇的小熊Sticker，好像在说“我要向你施压”",
   },
   {
     id: "us11",
     url: "https://github.com/user-attachments/assets/85deebec-c573-4a10-a65f-eb0d32197093",
-    desc: "一只用梯子向上爬的企鹅表情包，好像在说“无名小卒积极向上中！”",
+    desc: "一只用梯子向上爬的企鹅Sticker，好像在说“无名小卒积极向上中！”",
   },
   {
     id: "us12",
     url: "https://github.com/user-attachments/assets/c13c2fc7-6773-46bd-ad3f-087ae3ef19ff",
-    desc: "一只低头表达感谢的粉色小熊表情包，好像在说“谢谢！”",
+    desc: "一只低头表达感谢的粉色小熊Sticker，好像在说“谢谢！”",
   },
   {
     id: "us13",
     url: "https://github.com/user-attachments/assets/4724d9d0-22f7-4d27-939c-882a195457bf",
-    desc: "一只可爱的粉色小熊的表情包，好像在说“OK！”",
+    desc: "一只可爱的粉色小熊的Sticker，好像在说“OK！”",
   },
   {
     id: "us14",
     url: "https://github.com/user-attachments/assets/50baa92c-9e2e-4424-b674-4c255450c17a",
-    desc: "一个抽象搞笑的、人躺在床上的准备睡觉的表情包，好像在说“晚安，我是工资的奴隶我先睡了”",
+    desc: "一个抽象搞笑的、人躺在床上的准备睡觉的Sticker，好像在说“晚安，我是工资的奴隶我先睡了”",
   },
   {
     id: "us15",
     url: "https://github.com/user-attachments/assets/5ad86b7a-fc6f-4e1c-8572-66dfdf0ae538",
-    desc: "一只厚脸皮、无所畏惧、又有轻微调情意味的小熊表情包，好像在说“你骂我？你不怕我是抖M吗？”",
+    desc: "一只厚脸皮、无所畏惧、又有轻微调情意味的小熊Sticker，好像在说“你骂我？你不怕我是抖M吗？”",
   },
   {
     id: "us16",
     url: "https://github.com/user-attachments/assets/f5e1ae53-07d5-4149-9c3d-517a3c2cc19d",
-    desc: "一个幽默可爱、可以用于调情的表情包，用直白的邀请函写着“上线了，泡我^^！”",
+    desc: "一个幽默可爱、可以用于调情的Sticker，用直白的邀请函写着“上线了，泡我^^！”",
   },
   {
     id: "us17",
     url: "https://github.com/user-attachments/assets/28ec4ac5-cf9a-4610-b286-fb75732266e9",
-    desc: "一只正在大哭流泪的小仓鼠，看起来特别委屈可怜",
+    desc: "一只Now...大哭流泪的小仓鼠，看起来特别委屈可怜",
   },
   {
     id: "us18",
@@ -282,7 +282,7 @@ export const DEFAULT_USER_STICKERS = [
   {
     id: "us19",
     url: "https://github.com/user-attachments/assets/52501a5a-a98b-46dc-90b5-dde1dbe248c2",
-    desc: "一只戴着头巾的小熊，配文感叹“今天和蛋挞酥皮一样脆弱”，形容自己一碰就碎的心理状态",
+    desc: "一只戴着头巾的小熊，配文感叹“Today和蛋挞酥皮一样脆弱”，形容自己一碰就碎的心理Status",
   },
   {
     id: "us20",
@@ -297,7 +297,7 @@ export const DEFAULT_USER_STICKERS = [
   {
     id: "us22",
     url: "https://github.com/user-attachments/assets/33d7078d-1da7-4811-8cae-984189e663bc",
-    desc: "一只小熊的表情包，配着地狱笑话般的文字“幸福就像巧克力，而我是一条狗”，在那自嘲无福消受幸福",
+    desc: "一只小熊的Sticker，配着地狱笑话般的文字“幸福就像巧克力，而我是一条狗”，在那自嘲无福消受幸福",
   },
   {
     id: "us23",
@@ -307,7 +307,7 @@ export const DEFAULT_USER_STICKERS = [
   {
     id: "us24",
     url: "https://github.com/user-attachments/assets/57fb6a60-a481-444e-9866-a26e3f01e51f",
-    desc: "一个跪地抱头、痛苦的3D小白人，配文“我真的没时间陪你闹了”，表达出对某人无理取闹的疲惫和绝望",
+    desc: "一个跪地抱头、痛苦的3D小白人，配文“我真的没Time陪你闹了”，表达出对某人无理取闹的疲惫和绝望",
   },
   {
     id: "us25",
@@ -342,12 +342,12 @@ export const DEFAULT_USER_STICKERS = [
   {
     id: "us31",
     url: "https://github.com/user-attachments/assets/0c48db7a-833c-4940-8de0-2db43aa9a76b",
-    desc: "一个正在左右摆动的催眠怀表，背景文字不断重复“你是我老公”，试图进行强制爱式的洗脑催眠",
+    desc: "一个Now...左右摆动的催眠怀表，背景文字不断重复“You are我老公”，试图进行强制爱式的洗脑催眠",
   },
   {
     id: "us32",
     url: "https://github.com/user-attachments/assets/90e43c73-0295-4e6d-b31f-01e236a4db50",
-    desc: "一只拿着怀表的小黄猫，正在实施催眠术，满屏的“爱我”文字，好像在说“快点被催眠然后爱上我吧”",
+    desc: "一只拿着怀表的小黄猫，Now...实施催眠术，满屏的“爱我”文字，好像在说“快:00被催眠然后爱上我吧”",
   },
   {
     id: "us33",
@@ -362,7 +362,7 @@ export const DEFAULT_USER_STICKERS = [
   {
     id: "us35",
     url: "https://github.com/user-attachments/assets/d09edef7-1842-4c4e-9d2a-34c4ae0ef5e0",
-    desc: "一只自带闪光特效、漂浮在空中的小白仓鼠，表情一脸陶醉，好像快乐得已经升天了",
+    desc: "一只自带闪光特效、漂浮在空中的小白仓鼠，表情一脸陶醉，好像快乐得Done经升天了",
   },
   {
     id: "us36",
@@ -377,27 +377,27 @@ export const DEFAULT_USER_STICKERS = [
   {
     id: "us38",
     url: "https://github.com/user-attachments/assets/28cd5182-a48b-47b4-96cd-0c67928fcfb0",
-    desc: "两只白色小团子围坐在篝火旁发呆，配文“好无聊，可是好幸福”，描绘了一种虽然平淡无事但内心非常充实安宁的状态",
+    desc: "两只白色小团子围坐在篝火旁发呆，配文“好无聊，可是好幸福”，描绘了一种虽然平淡无事但内心非常充实安宁的Status",
   },
   {
     id: "us39",
     url: "https://github.com/user-attachments/assets/9a3edd51-b275-4dcb-a58b-055b34736dc8",
-    desc: "一只竖起大拇指的小白仓鼠，配文“牛逼 又活一天”，用一种积极又带点心酸的语气庆祝自己顽强地活了下来",
+    desc: "一只竖起大拇指的小白仓鼠，配文“牛逼 又活一天”，用一种积极又带:00心酸的语气庆祝自己顽强地活了下来",
   },
   {
     id: "us40",
     url: "https://github.com/user-attachments/assets/3659ad3c-5d50-46ff-a8f3-54197fa34386",
-    desc: "一只双手叠放在身前、看起来非常乖巧害羞的小白仓鼠，配着谐音梗“想鼠”，用最可爱的表情表达“想死”的尴尬或无奈心情",
+    desc: "一只双手叠放在身前、看起来非常乖巧害羞的小白仓鼠，配着谐音梗“想鼠”，用最可爱的表情表达“想死”的尴尬或无奈Mood",
   },
   {
     id: "us41",
     url: "https://github.com/user-attachments/assets/ef1954eb-89d7-4c7f-a2b0-1f75294860a9",
-    desc: "一个红白扩音大喇叭的特写，配文言简意赅的“收帅男人”，简单粗暴地广而告之自己的需求",
+    desc: "一个红白扩音大喇叭的特写，配文言简意赅的“收帅Male人”，简单粗暴地广而告之自己的需求",
   },
   {
     id: "us42",
     url: "https://github.com/user-attachments/assets/91a678dd-bfa8-4dab-81e4-4e02c6e6f72e",
-    desc: "一只看着手机感动落泪的黄色小熊，心里想着“太...可爱...真的是人类吗”，完全被屏幕对面的人萌翻了，甚至开始怀疑物种",
+    desc: "一只看着手机感动落泪的黄色小熊，心里想着“太...可爱...真的是人类吗”，完全被屏幕对面的人萌翻了，甚to开始怀疑物种",
   },
   {
     id: "us43",
@@ -417,7 +417,7 @@ export const DEFAULT_USER_STICKERS = [
   {
     id: "us46",
     url: "https://files.catbox.moe/f3ferx.jpg",
-    desc: "小狗竖起大拇指的表情包，配文“人，很棒”",
+    desc: "小狗竖起大拇指的Sticker，配文“人，很棒”",
   },
   {
     id: "us47",
@@ -447,7 +447,7 @@ export const DEFAULT_USER_STICKERS = [
   {
     id: "us52",
     url: "https://files.catbox.moe/vgb3pw.jpg",
-    desc: "一只被埋在沙子里只露出脑袋的小兔子（乌萨奇），配文带括弧的“嗯。（哽咽）”，表现出一种弱小无助、被迫接受现实的委屈感",
+    desc: "一只被埋在沙子里只露出脑袋的小兔子（乌萨奇），配文带括弧的“嗯。（哽咽）”，表现出一种弱小无助、被迫接受Reality的委屈感",
   },
   {
     id: "us53",
@@ -457,12 +457,12 @@ export const DEFAULT_USER_STICKERS = [
   {
     id: "us54",
     url: "https://files.catbox.moe/619gna.jpg",
-    desc: "一只心碎流泪的小熊（吉伊），发出灵魂拷问“伤心能走医保吗”，幽默地表达了悲伤过度需要治疗的心情",
+    desc: "一只心碎流泪的小熊（吉伊），发出灵魂拷问“伤心能走医保吗”，幽默地表达了悲伤过度需要治疗的Mood",
   },
   {
     id: "us55",
     url: "https://files.catbox.moe/m22uii.jpg",
-    desc: "一只比着大拇指、笑容灿烂的小猫（小八），配文却是“大失败”，用一种乐观积极的态度来面对惨败的现实",
+    desc: "一只比着大拇指、笑容灿烂的小猫（小八），配文却是“大Failed”，用一种乐观积极的态度来面对惨败的Reality",
   },
   {
     id: "us56",
@@ -482,7 +482,7 @@ export const DEFAULT_USER_STICKERS = [
   {
     id: "us59",
     url: "https://files.catbox.moe/6xa1gh.jpeg",
-    desc: "一只穿着西装、竖起双手大拇指的黄豆表情，配文“你人还怪好的嘞”，用一种憨憨的语气称赞对方是好人，既真诚又带点幽默",
+    desc: "一只穿着西装、竖起双手大拇指的黄豆表情，配文“你人还怪好的嘞”，用一种憨憨的语气称赞They are好人，既真诚又带:00幽默",
   },
   {
     id: "us60",
@@ -492,7 +492,7 @@ export const DEFAULT_USER_STICKERS = [
   {
     id: "us61",
     url: "https://files.catbox.moe/kpsnsn.webp",
-    desc: "一张模仿宣传标语的表情包，写着“守好男德 人人有责”，用严肃的口号来搞笑地要求男性洁身自好",
+    desc: "一张模仿宣传标语的Sticker，写着“守好Male德 人人有责”，用严肃的口号来搞笑地要求Male性洁身自好",
   },
   {
     id: "us62",
@@ -502,7 +502,7 @@ export const DEFAULT_USER_STICKERS = [
   {
     id: "us63",
     url: "https://files.catbox.moe/grwucb.jpg",
-    desc: "一个文字表情包，用极其嚣张的语气写着“我现在心情好到走在路上被人扇了一巴掌都笑得出来”，表达了一种无敌的好心情",
+    desc: "一个文字Sticker，用极其嚣张的语气写着“我NowMood好到走在路上被人扇了一巴掌都笑得出来”，表达了一种无敌的好Mood",
   },
   {
     id: "us64",
@@ -512,7 +512,7 @@ export const DEFAULT_USER_STICKERS = [
   {
     id: "us65",
     url: "https://files.catbox.moe/5kgb59.jpg",
-    desc: "一只躺在病床上、眼神空洞的小白熊，配文“已无生命体征”，用来幽默地表达自己累瘫了或被气死了",
+    desc: "一只躺在病床上、眼神空洞的小白熊，配文“Done无生命体征”，用来幽默地表达自己累瘫了或被气死了",
   },
   {
     id: "us66",
@@ -522,12 +522,12 @@ export const DEFAULT_USER_STICKERS = [
   {
     id: "us67",
     url: "https://files.catbox.moe/ylod3g.jpg",
-    desc: "一个纯文字表情包，粉红色的“完全神圣”字样在黑色背景下显得有些幽默的调情意味",
+    desc: "一个纯文字Sticker，粉红色的“完全神圣”字样在黑色背景下显得有些幽默的调情意味",
   },
   {
     id: "us68",
     url: "https://files.catbox.moe/smf0er.jpg",
-    desc: "一个眼神犀利的外星人，双手托着星云，配文“你已急哭”，充满了嘲讽和压迫感",
+    desc: "一个眼神犀利的外星人，双手托着星云，配文“你Done急哭”，充满了嘲讽和压迫感",
   },
   {
     id: "us69",

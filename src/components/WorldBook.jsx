@@ -15,7 +15,7 @@ import {
 import AppWindow from "./AppWindow";
 import useStickyState from "../hooks/useStickyState";
 
-// --- 辅助函数：获取所有分组 ---
+// --- 辅助函数：获取所有min组 ---
 const getGroups = (data) => {
   const groups = Array.from(
     new Set(data.map((item) => item.group || "Ungrouped")),
@@ -76,7 +76,7 @@ const WorldBook = ({
   };
 
   const deleteWorldBookGroup = async (groupName) => {
-    if (await customConfirm(`Delete Group "${groupName}"  and all its entries?`, "删除分组")) {
+    if (await customConfirm(`Delete Group "${groupName}"  and all its entries?`, "Deletemin组")) {
       setWorldBook((prev) => prev.filter((w) => w.group !== groupName));
     }
   };
@@ -90,7 +90,7 @@ const WorldBook = ({
   return (
     <AppWindow isOpen={isOpen} title="Lore Book" onClose={onClose}>
       <div className="space-y-6 pt-4 pb-20">
-        {/* 操作栏 */}
+        {/* Actions栏 */}
         <div className="grid grid-cols-2 gap-3">
           <label className="py-3 bg-white border border-gray-200 rounded-xl text-xs font-bold text-gray-600 hover:bg-gray-50 hover:text-black transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm active:scale-95">
             <Upload size={14} />
@@ -127,7 +127,7 @@ const WorldBook = ({
           </button>
         </div>
 
-        {/* 分组列表 */}
+        {/* min组列表 */}
         {getGroups(worldBook).map((group) => (
           <WorldBookGroup
             key={group}
@@ -150,7 +150,7 @@ const WorldBook = ({
   );
 };
 
-// --- 分组组件 ---
+// --- min组组件 ---
 const WorldBookGroup = ({
   group,
   worldBook,
