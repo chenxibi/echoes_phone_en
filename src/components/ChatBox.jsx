@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Banknote } from "lucide-react"; // 假设你用的是 lucide
+import { Banknote } from "lucide-react"; // AssumeYou用的是 lucide
 import mapBg from "../map_bg.png";
 
 export const VoiceMessageBubble = ({ msg, isMe }) => {
@@ -186,7 +186,7 @@ export const LocationBubble = ({ name, address }) => (
           viewBox="0 0 1024 1024"
           version="1.1"
           xmlns="http://www.w3.org/2000/svg"
-          className="w-8 h-8 text-[#CE4A3A]" // 这里控制大小(w-8 h-8)和颜色(text-red-600)
+          className="w-8 h-8 text-[#CE4A3A]" // here控制大小(w-8 h-8)and颜色(text-red-600)
           fill="currentColor" // 使用 currentColor 让它跟随 className 的颜色
         >
           <path d="M511.913993 63.989249C317.882076 63.989249 159.973123 221.898203 159.973123 415.930119c0 187.323366 315.473879 519.998656 328.890979 534.103813 6.020494 6.364522 14.449185 9.976818 23.221905 9.976818 0.172014 0 0.516042 0 0.688056 0 8.944734 0 17.545439-4.128339 23.393919-11.008903l109.22896-125.054258c145.179909-177.690576 218.629934-314.957836 218.629934-407.845456C864.026877 221.898203 706.117924 63.989249 511.913993 63.989249zM511.913993 575.903242c-88.415253 0-159.973123-71.55787-159.973123-159.973123s71.55787-159.973123 159.973123-159.973123 159.973123 71.55787 159.973123 159.973123S600.329246 575.903242 511.913993 575.903242z" />
@@ -194,7 +194,7 @@ export const LocationBubble = ({ name, address }) => (
       </div>
     </div>
 
-    {/* 下半部min：文字信息 */}
+    {/* 下半部min：文字Info */}
     <div className="p-3 bg-white">
       <div className="text-sm font-medium text-gray-900 truncate leading-tight mb-1">
         {name}

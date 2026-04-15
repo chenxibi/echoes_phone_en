@@ -10,12 +10,12 @@ const HomeScreen = ({
   useStickyState,
 }) => {
   const [currentPage, setCurrentPage] = useState(0);
-  // 存储每个图标的坐标 { app_id: {x, y} }
+  // Storage每个图标的坐标 { app_id: {x, y} }
   const [positions, setPositions] = useStickyState({}, "echoes_icon_positions");
   const [draggingApp, setDraggingApp] = useState(null);
   const containerRef = useRef(null);
 
-  // 处理拖拽开始
+  // Handle drag start
   const handleDragStart = (id, e) => {
     setDraggingApp(id);
     e.dataTransfer.setData("text/plain", id);

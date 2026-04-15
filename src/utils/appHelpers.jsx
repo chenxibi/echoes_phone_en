@@ -727,7 +727,7 @@ export const CreationAssistantModal = ({
             </button>
           </div>
           <p className="text-xs text-white/70 mt-1">
-            Enter简短Description，AI将为你生成完整角色卡
+            Enter简短Description，AI将为You生成完整角色卡
           </p>
         </div>
 
@@ -894,7 +894,7 @@ export const StatusPanel = ({ statusHistory, onClose, onDelete }) => (
         <p className="text-center text-gray-400 text-xs py-10">NoneStatus记录</p>
       )}
       {[...statusHistory].reverse().map((entry, i) => {
-        // [新增] 计算原始索引：因为列表倒序了，所以要反算回原始数组的索引
+        // [new] 计算原始索引：因为列表倒序了，所以要反算回原始数组的索引
         const originalIndex = statusHistory.length - 1 - i;
 
         return (
@@ -1225,7 +1225,7 @@ export const LocationBubble = ({ name, address }) => (
           viewBox="0 0 1024 1024"
           version="1.1"
           xmlns="http://www.w3.org/2000/svg"
-          className="w-8 h-8 text-[#CE4A3A]" // 这里控制大小(w-8 h-8)和颜色(text-red-600)
+          className="w-8 h-8 text-[#CE4A3A]" // here控制大小(w-8 h-8)和颜色(text-red-600)
           fill="currentColor" // 使用 currentColor 让它跟随 className 的颜色
         >
           <path d="M511.913993 63.989249C317.882076 63.989249 159.973123 221.898203 159.973123 415.930119c0 187.323366 315.473879 519.998656 328.890979 534.103813 6.020494 6.364522 14.449185 9.976818 23.221905 9.976818 0.172014 0 0.516042 0 0.688056 0 8.944734 0 17.545439-4.128339 23.393919-11.008903l109.22896-125.054258c145.179909-177.690576 218.629934-314.957836 218.629934-407.845456C864.026877 221.898203 706.117924 63.989249 511.913993 63.989249zM511.913993 575.903242c-88.415253 0-159.973123-71.55787-159.973123-159.973123s71.55787-159.973123 159.973123-159.973123 159.973123 71.55787 159.973123 159.973123S600.329246 575.903242 511.913993 575.903242z" />

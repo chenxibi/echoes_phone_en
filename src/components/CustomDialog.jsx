@@ -61,7 +61,7 @@ const CustomDialog = ({ config, onClose }) => {
           />
         )}
 
-        {/* 按钮组 */}
+        {/* Button group */}
         <div className="flex gap-3 pt-2">
           {config.type !== "alert" && (
             <button

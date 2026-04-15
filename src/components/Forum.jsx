@@ -77,7 +77,7 @@ const Forum = ({
     chat_event_post: false,
   });
 
-  // 草稿箱 (不需要持久化，或者可以用 useStickyState 如果你想Save草稿)
+  // 草稿箱 (不需要持久化，或者可以用 useStickyState 如果You想Save草稿)
   const [postDrafts, setPostDrafts] = useState({
     me: { title: "", content: "", topic: "" },
     char: { title: "", content: "", topic: "" },
@@ -1016,7 +1016,7 @@ ${recentHistory}
                 placeholder="JustBrowsing"
               />
               <p className="text-[9px] text-gray-400 mt-1 mb-2">
-                *用Alt account回复时，角色不会知道是你。
+                *用Alt account回复时，角色不会知道是You。
               </p>
             </div>
             <div>

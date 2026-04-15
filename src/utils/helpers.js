@@ -112,7 +112,7 @@ export const formatTime = (date) =>
     hour12: false,
   });
 export const formatDate = (date) =>
-  date.toLocaleDateString("zh-CN", {
+  date.toLocaleDateString("en-US", {
     month: "long",
     day: "numeric",
     weekday: "short",
@@ -128,44 +128,29 @@ export const replacePlaceholders = (text, charName, userName) => {
 // --- 辅助函数：根据Time生成话题引导 ---
 export const getTimeBasedGuidance = (dateObj) => {
   const hour = dateObj.getHours();
-  const month = dateObj.getMonth() + 1; // 0-11 转 1-12
+  const month = dateObj.getMonth() + 1;
 
   let timeVibe = "";
   let seasonalVibe = "";
 
-  // 1. Time段判断
   if (hour >= 23 || hour < 5) {
-    // 深夜：EMO、成人话题、怪谈、失眠
-    timeVibe =
-      "Late Night (深夜): Emo/Emotional venting, Adult topics/NSFW hints, Urban legends, Insomnia thoughts.";
+    timeVibe = "Late Night: Emo/Emotional venting, Urban legends, Insomnia thoughts.";
   } else if (hour >= 6 && hour < 10) {
-    // 早晨：早高峰、早八、上班打卡、早餐、起床气
-    timeVibe =
-      "Morning (早晨): Morning rush/Commute, Breakfast choices, Waking up, sleepy.";
+    timeVibe = "Morning: Morning rush/Commute, Breakfast, Waking up, sleepy.";
   } else if (hour >= 11 && hour <= 13) {
-    // 午饭:00：外卖、纠结吃什么、探店、美食推荐
-    timeVibe =
-      "Lunch Time (午饭): Food delivery, 'What to eat?', Hunger, Office break.";
+    timeVibe = "Lunch Time: Food delivery, 'What to eat?', Office break.";
   } else if (hour >= 17 && hour <= 20) {
-    // 晚饭:00：做饭、聚餐、团建、下班
-    timeVibe =
-      "Dinner Time (晚饭): Cooking/Recipes, Dining out, Relaxing after work, Night life starting.";
+    timeVibe = "Dinner Time: Cooking/Recipes, Dining out, Relaxing after work, Night life starting.";
   } else {
-    // 其他Time：摸鱼、常
-    timeVibe =
-      "Daily Life (常): Slacking off at work/school, Afternoon tea, Random gossip.";
+    timeVibe = "Daily Life: Slacking off at work/school, Afternoon tea, Random gossip.";
   }
 
-  // 2. 份/季节判断 (仅作氛围参考)
   if (month === 12) {
-    seasonalVibe =
-      " Season: Winter/December. (Keywords: Cold, Christmas vibes, End of year).";
+    seasonalVibe = "Winter/December. (Keywords: Cold, Christmas vibes, End of year).";
   } else if (month === 1 || month === 2) {
-    seasonalVibe =
-      " Season: Winter/New Year. (Keywords: Holidays, Family, Cold).";
+    seasonalVibe = "Winter/New Year. (Keywords: Holidays, Family, Cold).";
   } else if (month >= 6 && month <= 8) {
-    seasonalVibe =
-      " Season: Summer. (Keywords: Heat waves, Air conditioning, Ice cream, Rainstorms).";
+    seasonalVibe = "Summer. (Keywords: Heat waves, Air conditioning, Ice cream, Rainstorms).";
   }
 
   return `
@@ -181,7 +166,7 @@ export const getTimeBasedGuidance = (dateObj) => {
 
 let notificationSetter = null;
 
-// 新增一个初始化函数
+// new一个初始化函数
 export const initNotification = (setter) => {
   notificationSetter = setter;
 };

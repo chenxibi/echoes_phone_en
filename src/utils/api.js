@@ -14,7 +14,7 @@ const generateContent = async (params, apiConfig, onError, signal) => {
         { role: "user", content: prompt },
       ];
 
-      console.group("📝 [Echoes Debug] Send给 AI 的完整数据");
+      console.group("📝 [Echoes Debug] Send给 AI complete data");
       console.log(
         "%cSystem command (System Prompt):",
         "color: blue; font-weight: bold;",
@@ -86,7 +86,7 @@ const generateContent = async (params, apiConfig, onError, signal) => {
       content = data.choices[0].message?.content;
       console.log("[Echoes] Content extracted:", content);
     } else {
-      throw new Error("未配置 API 信息。请在Settings中Enter Base URL 和 Key。");
+      throw new Error("Not configured API Info。请在Settings中Enter Base URL and Key。");
     }
   } catch (error) {
     if (error.name === "AbortError" || error.name === "TimeoutError") {

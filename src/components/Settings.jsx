@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 
 const SettingsPanel = ({
-  // --- Connection Settings参数 ---
+  // --- Connection Settings params ---
   apiConfig,
   setApiConfig,
   connectionStatus,
@@ -30,11 +30,11 @@ const SettingsPanel = ({
   testConnection,
   close,
 
-  // --- 上下文参数 ---
+  // --- Context params ---
   contextLimit,
   setContextLimit,
 
-  // --- 长记忆参数 ---
+  // --- Long-term memory params ---
   memoryConfig,
   setMemoryConfig,
   longMemory,
@@ -42,7 +42,7 @@ const SettingsPanel = ({
   triggerSummary,
   isSummarizing,
 
-  // --- 聊天Settings参数 ---
+  // --- Chat Settings params ---
   chatStyle,
   setChatStyle,
   interactionMode,
@@ -57,15 +57,15 @@ const SettingsPanel = ({
   handleStickerUpload,
   setEditingSticker,
 
-  // --- 指令参数 ---
+  // --- Instruction params ---
   prompts,
   setPrompts,
 
-  // 接收全屏参数
+  // receives fullscreen param
   isFullscreen,
   toggleFullScreen,
 
-  // --- 数据备份参数 ---
+  // --- Data backup params ---
   onExportChat,
   onImportChat,
 
@@ -75,9 +75,9 @@ const SettingsPanel = ({
   handleBulkImport,
   customPrompt,
 
-  // --- 字体参数 ---
-  fontName, // Current字体文件名
-  handleResetFont, // Reset to default函数
+  // --- Font params ---
+  fontName, // current font filename
+  handleResetFont, // reset to default function
   handleFontUrlSubmit,
   inputUrl,
   setInputUrl,
@@ -183,7 +183,7 @@ const SettingsPanel = ({
             </div>
           </div>
 
-          {/* Test ConnectionButton (紧跟Connection Settings) */}
+          {/* Test ConnectionButton */}
           <div className="pt-2">
             <button
               onClick={testConnection}
@@ -260,7 +260,7 @@ const SettingsPanel = ({
               <h3 className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
                 Long-term Memory
               </h3>
-              {/* 开关放在Title行 */}
+              {/* toggle on the title line */}
               <div className="flex items-center gap-2">
                 <span className="text-[10px] text-gray-400">
                   {memoryConfig.enabled ? "On" : "Off"}
@@ -283,7 +283,7 @@ const SettingsPanel = ({
             </div>
 
             <div className="glass-card p-4 rounded-xl space-y-4">
-              {/* 阈值 */}
+              {/* threshold */}
               <div className="flex items-center justify-between">
                 <label className="text-xs font-bold text-gray-600">
                   Auto Summarize
@@ -306,7 +306,7 @@ const SettingsPanel = ({
                 </div>
               </div>
 
-              {/* 记忆文本与手动Button */}
+              {/* memory text and manual button */}
               <div>
                 <div className="flex justify-between items-end mb-2">
                   <label className="text-[10px] uppercase font-bold text-gray-400">
@@ -336,7 +336,7 @@ const SettingsPanel = ({
           </section>
 
           {/* ---------------------------------------------------------
-          SECTION 3: Chat Settings (独立区块)
+          SECTION 3: Chat Settings
          --------------------------------------------------------- */}
           {chatStyle && (
             <section>
@@ -391,7 +391,7 @@ const SettingsPanel = ({
                   </div>
                 </div>
 
-                {/* 交互Mode */}
+                {/* interaction mode */}
                 <div>
                   <label className="block text-[10px] font-bold uppercase text-gray-500 mb-2">
                     Mode
@@ -420,14 +420,13 @@ const SettingsPanel = ({
                   </div>
                 </div>
 
-                {/* Sticker管理 (Inside SettingsPanel) */}
+                {/* Sticker management */}
                 <div>
                   <div className="flex items-center gap-2 mb-3">
                     <label className="text-[10px] font-bold uppercase text-gray-500 mr-auto">
                       Sticker Library
                     </label>
                     {/* Add Single Button */}
-                    {/* UploadButton */}
                     <button
                       onClick={() => stickerInputRef.current.click()}
                       className="flex items-center justify-center gap-1 p-0 text-[10px] text-gray-400 hover:text-[#7A2A3A] transition-colors"
@@ -437,7 +436,7 @@ const SettingsPanel = ({
                       <span>Upload</span>
                     </button>
 
-                    {/* 批量ImportButton */}
+                    {/* bulk import button */}
                     <button
                       onClick={async () => {
                         const input = await customPrompt("Enter sticker URL to import", "", "Bulk Import");
@@ -466,7 +465,7 @@ const SettingsPanel = ({
 
                   {stickersEnabled && (
                     <div className="space-y-4">
-                      {/* [替换后] 使用 StickerGroup 组件 */}
+                      {/* [replaced] use StickerGroup component */}
                       {getGroups(stickers).map((group) => (
                         <StickerGroup
                           key={group}
@@ -481,7 +480,7 @@ const SettingsPanel = ({
                         />
                       ))}
 
-                      {/* Upload区域 */}
+                      {/* upload area */}
                       <input
                         type="file"
                         ref={stickerInputRef}
@@ -513,7 +512,7 @@ const SettingsPanel = ({
                   Export
                 </button>
 
-                {/* ImportButton (关联隐藏的 input) */}
+                {/* import button (tied to hidden input) */}
                 <label className="flex-1 py-3 bg-white border border-gray-200 text-gray-700 rounded-xl text-xs font-bold hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-sm">
                   <Upload size={14} />
                   Import
@@ -605,7 +604,7 @@ const StickerEditorModal = ({ sticker, onSave, onDelete, onClose }) => {
   );
 };
 
-// Stickermin组组件 (功能增强 + 视觉优化)
+// StickerGroup component (feature + visual)
 
 const StickerGroup = ({
   group,
@@ -616,9 +615,9 @@ const StickerGroup = ({
   renameStickerGroup,
   handleStickerUpload,
 }) => {
-  const [isExpanded, setIsExpanded] = useState(false); // 默认折叠
+  const [isExpanded, setIsExpanded] = useState(false); // collapsed by default
 
-  // 过滤出Current组的表情，并排除掉占位符(isPlaceholder)
+  // filter current group stickers, exclude placeholders
   const groupStickers = stickers.filter((s) => s.group === group);
   const visibleStickers = groupStickers.filter((s) => !s.isPlaceholder);
 
@@ -626,9 +625,9 @@ const StickerGroup = ({
 
   return (
     <div className="bg-gray-50 rounded-xl p-3 border border-gray-100 transition-all mb-3">
-      {/* Title头 */}
+      {/* header */}
       <div className="flex justify-between items-center h-6">
-        {/* 左侧：折叠 + Title */}
+        {/* left: collapse + title */}
         <div
           className="flex items-center gap-2 cursor-pointer h-full"
           onClick={() => setIsExpanded(!isExpanded)}
@@ -648,9 +647,9 @@ const StickerGroup = ({
           </span>
         </div>
 
-        {/* 右侧：ActionsButton组 */}
+        {/* right: action buttons */}
         <div className="flex items-center gap-2">
-          {/* 改名 */}
+          {/* rename */}
           <button
             onClick={() => renameStickerGroup(group)}
             className="text-gray-300 hover:text-blue-500 p-1 transition-colors"
@@ -668,10 +667,10 @@ const StickerGroup = ({
             <Trash2 size={12} />
           </button>
 
-          {/* min割线 */}
+          {/* divider */}
           <div className="w-px h-3 bg-gray-200 mx-1"></div>
 
-          {/* 开关 */}
+          {/* toggle */}
           <div
             className="flex items-center gap-1 cursor-pointer"
             onClick={(e) => {
@@ -691,7 +690,7 @@ const StickerGroup = ({
         </div>
       </div>
 
-      {/* 表情网格 (折叠区域) */}
+      {/* sticker grid (collapsed area) */}
       {isExpanded && (
         <div
           className={`pt-3 mt-2 border-t border-gray-200/50 transition-all animate-in slide-in-from-top-1 ${
@@ -715,14 +714,14 @@ const StickerGroup = ({
               >
                 <img src={s.url} className="w-full h-full object-cover" />
 
-                {/* 选中/禁用遮罩 */}
+                {/* selected/disabled mask */}
                 {!s.enabled && (
                   <div className="absolute inset-0 bg-white/60 backdrop-blur-[1px]" />
                 )}
               </div>
             ))}
 
-            {/* [修改] 组内UploadButton - 对应Currentmin组 */}
+            {/* [modified] in-group upload button */}
             <label
               className="
                     aspect-square border border-dashed border-gray-300 rounded-xl 
@@ -736,9 +735,9 @@ const StickerGroup = ({
                 type="file"
                 className="hidden"
                 accept="image/*"
-                // 关键:00：调用 handleStickerUpload 时，传入Current的 group 名字
+                // key: when calling handleStickerUpload, pass current group name
                 onChange={(e) => handleStickerUpload(e, "char", group)}
-                // :00击时Clear，确保能连续Upload同一张图
+                // on click clear to allow uploading the same image repeatedly
                 onClick={(e) => (e.target.value = null)}
               />
             </label>

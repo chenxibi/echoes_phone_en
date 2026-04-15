@@ -7,7 +7,7 @@ export const FontManager = () => {
   );
   const [isSaved, setIsSaved] = useState(false);
 
-  // 初始化时加载存储的字体
+  // Load stored font on init
   useEffect(() => {
     const savedFont = localStorage.getItem("custom-font-data");
     if (savedFont) {
@@ -44,13 +44,13 @@ export const FontManager = () => {
         setIsSaved(true);
         setTimeout(() => setIsSaved(false), 2000);
       } catch (err) {
-        alert("字体File too large，无法Save到本地配置（上限约5MB）");
+        alert("字体File too large，无法Save到本地配置（Limit approx5MB）");
       }
     };
     reader.readAsDataURL(file);
   };
 
-  // [新增] Reset to default逻辑
+  // [new] Reset to default逻辑
   const handleReset = () => {
     localStorage.removeItem("custom-font-data");
     localStorage.removeItem("custom-font-name");

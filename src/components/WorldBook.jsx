@@ -15,7 +15,7 @@ import {
 import AppWindow from "./AppWindow";
 import useStickyState from "../hooks/useStickyState";
 
-// --- 辅助函数：获取所有min组 ---
+// --- Utility：获取所有min组 ---
 const getGroups = (data) => {
   const groups = Array.from(
     new Set(data.map((item) => item.group || "Ungrouped")),
@@ -31,10 +31,10 @@ const WorldBook = ({
   showToast,
   customPrompt,
   customConfirm,
-  worldBook, // 新增接收
+  worldBook, // added接收
   setWorldBook,
 }) => {
-  // --- 逻辑处理函数 ---
+  // --- Logic handler ---
   const handleWorldBookUpload = (e) => {
     const file = e.target.files[0];
     if (file) {

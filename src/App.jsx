@@ -112,8 +112,8 @@ import {
   Eye,
   Sparkle,
   Check, // Bot Icon for Char Reply
-  Circle, // [新增]
-  Sparkles, // [新增]
+  Circle, // [new]
+  Sparkles, // [new]
   Calendar,
   FolderInput,
   ArrowRightToLine,
@@ -159,7 +159,7 @@ const App = () => {
     "echoes_user_stickers",
   );
 
-  // 批量ImportSticker函数
+  // batchImportSticker function
   const handleBulkImport = (
     text,
     type = "char",
@@ -193,12 +193,12 @@ const App = () => {
         setUserStickers((prev) => [...prev, ...newStickers]);
       }
       if (typeof showToast === "function")
-        // 加上第一参数 "success"
-        showToast("success", `DoneSuccessImport ${newStickers.length} Sticker`);
+        // add first arg "success"
+        showToast("success", `Successfully imported ${newStickers.length} Sticker`);
     } else {
       if (typeof showToast === "function")
-        // 把 "error" 挪到前面
-        showToast("error", "格式Error (应为 Description: Link)");
+        // move "error" to front
+        showToast("error", "Format error (use: Description: Link)");
     }
   };
   // -- PERSISTENT STATE --
@@ -232,7 +232,7 @@ const App = () => {
       document.head.appendChild(styleTag);
     }
 
-    // 这里直接把 url 放进去即可，Browser会自动去Download
+    // directly put url in, Browser will auto-download
     styleTag.innerHTML = `
     @font-face { font-family: '${name}'; src: url('${url}'); font-display: swap; }
     body { --app-font: '${name}' !important; }
@@ -252,21 +252,21 @@ const App = () => {
   }, []);
 
   const handleFontUrlSubmit = async () => {
-    const url = inputUrl.trim(); // 使用你定义好的 inputUrl Status
+    const url = inputUrl.trim(); // use the defined inputUrl status
     if (url) {
       applyFont("UserCustomFont", url);
       setFontName("Custom font");
       await echoesDB.setItem("custom-font-url", url);
       await echoesDB.setItem("custom-font-name", "Custom font");
-      // setShowFontInput(false); // 如果有这Status就加上
-      showToast("success", "字体Done应用");
+      // setShowFontInput(false); // add if this status exists
+      showToast("success", "Font applied");
     } else {
-      showToast("error", "Enter字体 URL");
+      showToast("error", "Enter font URL");
     }
   };
 
   const handleResetFont = async () => {
-    // 加上 async
+    // add async
     // Remove custom font
     const styleElement = document.getElementById("UserCustomFont");
     if (styleElement) styleElement.remove();
@@ -274,35 +274,35 @@ const App = () => {
     setFontName("Default font");
     await echoesDB.removeItem("custom-font-url");
     await echoesDB.removeItem("custom-font-name");
-    showToast("info", "DoneRestoreDefault font");
+    showToast("info", "Restored default font");
   };
 
-  // [新增] Custom图标Status
+  // [new] Custom图标Status
   const [customIcons, setCustomIcons, customIconsLoaded] = useStickyState(
     {},
     "echoes_custom_icons",
   );
 
   const handleAppIconUpload = async (e, appId) => {
-    // 加上 async
+    // add async
     const file = e.target.files[0];
     if (!file) return;
 
     const reader = new FileReader();
     reader.onload = async (event) => {
-      // 这里的匿名回调也要加 async
+      // anonymous callback here also needs async
       const base64 = event.target.result;
       const newIcons = { ...customIcons, [appId]: base64 };
       setCustomIcons(newIcons);
       await echoesDB.setItem("my_custom_icons", newIcons);
-      showToast("success", "图标DoneUpdate");
+      showToast("success", "Icon updated");
     };
     reader.readAsDataURL(file);
   };
 
-  // [新增] Reset图标
+  // [new] Reset图标
   const handleResetIcon = async (appId) => {
-    if (await customConfirm("ConfirmReset icon吗？", "Restore图标")) {
+    if (await customConfirm("Confirm reset icon?", "Restore icon")) {
       setCustomIcons((prev) => {
         const newState = { ...prev };
         delete newState[appId];
@@ -314,29 +314,29 @@ const App = () => {
   // --- CUSTOM DIALOG STATE ---
   const [dialogConfig, setDialogConfig] = useState(null);
 
-  // Helper: 封装 Promise 以等待用户Actions
+  // Helper: wraps Promise to wait for user action
   const showDialog = (options) => {
     return new Promise((resolve) => {
       setDialogConfig({ ...options, resolve });
     });
   };
 
-  // 替代 window.alert
+  // replace window.alert
   const customAlert = (message, title = "Notice") => {
     return showDialog({ type: "alert", title, message });
   };
 
-  // 替代 window.confirm
+  // replace window.confirm
   const customConfirm = (message, title = "Confirm", danger = false) => {
     return showDialog({ type: "confirm", title, message, danger });
   };
 
-  // 替代 window.prompt
+  // replace window.prompt
   const customPrompt = (message, defaultValue = "", title = "Enter") => {
     return showDialog({ type: "prompt", title, message, defaultValue });
   };
 
-  // 1. Memory 相关的 State
+  // 1. Memory-related State
   const [memoryConfig, setMemoryConfig, memoryConfigLoaded] = useStickyState(
     {
       enabled: true,
@@ -396,7 +396,7 @@ const App = () => {
   const [browserHistory, setBrowserHistory, browserHistoryLoaded] =
     useStickyState([], "echoes_browser");
 
-  // 追踪器相关Status
+  // Tracker-related state
   const [userFacts, setUserFacts, userFactsLoaded] = useStickyState(
     [],
     "echoes_user_facts",
@@ -430,7 +430,7 @@ const App = () => {
   const [stickersEnabled, setStickersEnabled, stickersEnabledLoaded] =
     useStickyState(true, "echoes_stickers_enabled");
 
-  // Context记忆数
+  // context memory count
   const [contextLimit, setContextLimit, contextLimitLoaded] = useStickyState(
     10,
     "echoes_context_limit",
@@ -439,18 +439,18 @@ const App = () => {
   const handleSendTransfer = async () => {
     // async
     const amount = await customPrompt(
-      "EnterTransfer Amount (CNY):",
+      "Enter transfer amount (CNY):",
       "520",
       "Send Transfer",
     );
     if (!amount || isNaN(amount) || parseFloat(amount) <= 0) {
-      if (amount) showToast("error", "Enter有效的金额");
+      if (amount) showToast("error", "Enter valid amount");
       return;
     }
 
     // Note
     const noteInput = await customPrompt(
-      "AddTransfer Note (可选):",
+      "Add a note (optional):",
       "Treat yourself",
       "Transfer Note",
     );
@@ -468,14 +468,14 @@ const App = () => {
     msg.transfer.status = action === "accept" ? "accepted" : "rejected";
 
     const amount = msg.transfer.amount;
-    const actionText = action === "accept" ? "DoneAccept" : "DoneReturn";
+    const actionText = action === "accept" ? "accepted" : "returned";
 
     // 生成系统Message
     const notificationMsg = {
       id: `sys_${Date.now()}`,
       sender: "me",
       isSystem: true,
-      text: `你${actionText} ¥${amount}`,
+      text: `You${actionText} ¥${amount}`,
       time: formatTime(getCurrentTimeObj()),
     };
 
@@ -488,16 +488,16 @@ const App = () => {
     setPendingHint(hint);
   };
 
-  // [新增] 核心回退逻辑：根据Message ID Delete它生成的所有 Facts 和 Events
+  // [new] 核心回退逻辑：根据Message ID Delete它生成的所有 Facts 和 Events
   const rollbackTrackerData = (sourceMsgId) => {
     if (!sourceMsgId) return;
 
-    // 1. 回退 User Facts
+    // 1. rollback User Facts
     setUserFacts((prev) => {
       const filtered = prev.filter((item) => item.sourceMsgId !== sourceMsgId);
       if (filtered.length !== prev.length) {
         console.log(
-          `[Echoes] Done回退关联的 User Facts (${
+          `[Echoes] Rolled back associated User Facts (${
             prev.length - filtered.length
           })`,
         );
@@ -505,12 +505,12 @@ const App = () => {
       return filtered;
     });
 
-    // 2. 回退 Char Facts
+    // 2. rollback Char Facts
     setCharFacts((prev) => {
       const filtered = prev.filter((item) => item.sourceMsgId !== sourceMsgId);
       if (filtered.length !== prev.length) {
         console.log(
-          `[Echoes] Done回退关联的 Char Facts (${
+          `[Echoes] Rolled back associated Char Facts (${
             prev.length - filtered.length
           })`,
         );
@@ -518,12 +518,12 @@ const App = () => {
       return filtered;
     });
 
-    // 3. 回退 Shared Events (pending Status的)
+    // 3. rollback Shared Events (pending status)
     setSharedEvents((prev) => {
       const filtered = prev.filter((item) => item.sourceMsgId !== sourceMsgId);
       if (filtered.length !== prev.length) {
         console.log(
-          `[Echoes] Done回退关联的 Events (${prev.length - filtered.length})`,
+          `[Echoes] Rolled back associated Events (${prev.length - filtered.length})`,
         );
       }
       return filtered;
@@ -532,15 +532,15 @@ const App = () => {
 
   // 3. 临时 UI Status
   const [editingSticker, setEditingSticker] = useState(null); // CurrentNow...Edit的Sticker
-  const [showUserStickerPanel, setShowUserStickerPanel] = useState(false); // 用户表情面板开关
-  const [isUserStickerEditMode, setIsUserStickerEditMode] = useState(false); // 用户StickerEditMode开关
-  const [isVoiceMode, setIsVoiceMode] = useState(false); // 语音Mode开关
+  const [showUserStickerPanel, setShowUserStickerPanel] = useState(false); // user sticker panel toggle
+  const [isUserStickerEditMode, setIsUserStickerEditMode] = useState(false); // user StickerEditMode toggle
+  const [isVoiceMode, setIsVoiceMode] = useState(false); // voice mode toggle
   const [showLocationModal, setShowLocationModal] = useState(false);
   const [isLocGenerating, setIsLocGenerating] = useState(false);
 
   const [showMediaMenu, setShowMediaMenu] = useState(false);
 
-  // [新增] 全屏Status控制
+  // [new] 全屏Status控制
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   const toggleFullScreen = () => {
@@ -552,7 +552,7 @@ const App = () => {
         })
         .catch((e) => {
           console.log(e);
-          showToast("error", "全屏Mode被Browser拒绝");
+          showToast("error", "Fullscreen mode denied by browser");
         });
     } else {
       if (document.exitFullscreen) {
@@ -563,7 +563,7 @@ const App = () => {
     }
   };
 
-  // 监听原生全屏变化（比如用户按ESC退出），同步按钮Status
+  // listen for native fullscreen changes（比如用户按ESC退出），同步按钮Status
   useEffect(() => {
     const handleFsChange = () => {
       setIsFullscreen(!!document.fullscreenElement);
@@ -604,10 +604,10 @@ const App = () => {
   const [regenerateTarget, setRegenerateTarget] = useState(null);
   const [regenHint, setRegenHint] = useState("");
   const [expandedMusicHistory, setExpandedMusicHistory] = useState(null);
-  const [activeMenuIndex, setActiveMenuIndex] = useState(null); // Current哪Message显示了Menu
+  const [activeMenuIndex, setActiveMenuIndex] = useState(null); // which message currently shows Menu
   const [pendingHint, setPendingHint] = useState(null);
-  const [editIndex, setEditIndex] = useState(null); // CurrentNow...Edit哪Message
-  const [editContent, setEditContent] = useState(""); // Edit框的Content
+  const [editIndex, setEditIndex] = useState(null); // which message is currently being edited
+  const [editContent, setEditContent] = useState(""); // Edit box content
   const longPressTimerRef = useRef(null);
   const [isSummarizing, setIsSummarizing] = useState(false); // Loading Status
 
@@ -625,16 +625,16 @@ const App = () => {
   const stickerInputRef = useRef(null);
   const chatScrollRef = useRef(null);
 
-  // === 新增Status ===
+  // === new state ===
   const [showCreationAssistant, setShowCreationAssistant] = useState(false);
   const [creationInput, setCreationInput] = useState("");
   const [isGeneratingCharacter, setIsGeneratingCharacter] = useState(false);
   const [generatedPreview, setGeneratedPreview] = useState(null);
 
-  // === 角色生成函数 ===
+  // === character generation function ===
   const generateCharacterFromDescription = async () => {
     if (!creationInput.trim()) {
-      showToast("error", "Enter角色Description");
+      showToast("error", "Enter character description");
       return;
     }
 
@@ -645,7 +645,7 @@ const App = () => {
         {
           prompt: `用户Description: "${creationInput}"
         
-          请根据以上简短Description，生成一完整、详细的角色卡。确保所有细节都有逻辑支撑。`,
+          Based on the above brief description, generate a complete, detailed character card. Make sure all details are logically supported.`,
           systemInstruction: CHARACTER_CREATION_PROMPT,
           isJson: true,
         },
@@ -655,29 +655,29 @@ const App = () => {
 
       if (result) {
         setGeneratedPreview(result);
-        showToast("success", "角色生成Success！");
+        showToast("success", "Character created!");
       }
     } catch (error) {
-      showToast("error", "生成Failed: " + error.message);
+      showToast("error", "Generation failed: " + error.message);
     } finally {
       setIsGeneratingCharacter(false);
     }
   };
 
-  // === 应用生成的角色 ===
+  // === applied generated character ===
   const applyGeneratedCharacter = () => {
     if (!generatedPreview) return;
 
     const cleaned = cleanCharacterJson(generatedPreview);
     const finalDescription = generatedPreview.description || cleaned.rawText;
-    // 优先级：generatedPreview.name > cleaned.name > 从description正则提取 > "Unknown"
-    // Support标准格式 "Name: xxx" 和 YAML 格式 "角色名:\n  Chinese_name:"
+    // priority: generatedPreview.name > cleaned.name > regex from description > "Unknown"
+    // support standard format "Name: xxx" and YAML format "Name:\n  name:"
     const raw = finalDescription || "";
-    // 标准 Name: xxx 格式
+    // standard Name: xxx format
     const nameFromStandard = raw.match(/^Name:\s*(.+)/m);
-    // YAML 格式：取 description 里第一 "角色名:\n" 后紧跟 Chinese_name 的Mode
+    // YAML format: first "Name:\n" in description followed by name
     const nameFromYaml = raw.match(/^([^\n:]{2,20}):\s*\n\s+Chinese_name:/m);
-    // 兜底：直接取 description 第一行（去掉 <info> 等标签后的第一行Content）
+    // fallback: take first line of description (after stripping <info> tags)
     const firstLineRaw = raw.replace(/<[^>]+>/g, "").split("\n").find(l => l.trim().length > 0);
     const nameFromFirstLine = firstLineRaw ? firstLineRaw.trim().match(/^([^\n:]{2,20})$/) : null;
     const finalName =
@@ -697,11 +697,11 @@ const App = () => {
     // 5. SettingsLore Book (如果有)
     const groupedWorldBook = (cleaned.worldBook || []).map((entry) => ({
       ...entry,
-      group: finalName, // 使用角色名作为Group
+      group: finalName, // 使用Character名作为Group
     }));
     setWorldBook(groupedWorldBook);
 
-    // 6. Reset生成器 UI
+    // 6. reset generator UI
     setShowCreationAssistant(false);
     setGeneratedPreview(null);
     setCreationInput("");
@@ -710,7 +710,7 @@ const App = () => {
     setShowCreationAssistant(false);
     setGeneratedPreview(null);
     setCreationInput("");
-    showToast("success", `角色「${finalName}」Done加载`);
+    showToast("success", `Character "${finalName}" loaded`);
   };
 
   const handleOpenLocationModal = () => {
@@ -736,18 +736,18 @@ const App = () => {
       .join("\n---\n");
     const pendingEvents = sharedEvents.filter((e) => e.type === "pending");
 
-    // 准备数据传给 Prompt
+    // prepare data for Prompt
     const pendingEventsStr = JSON.stringify(
       pendingEvents.map((e) => ({ id: e.id, content: e.content })),
     );
     const userFactsStr = JSON.stringify(userFacts.map((f) => f.content));
-    const charFactsStr = JSON.stringify(charFacts.map((f) => f.content)); // [新增]
+    const charFactsStr = JSON.stringify(charFacts.map((f) => f.content)); // [new]
 
     const prompt = prompts.tracker_update
       .replaceAll("{{HISTORY}}", recentHistory)
       .replaceAll("{{PENDING_EVENTS}}", pendingEventsStr)
       .replaceAll("{{USER_FACTS}}", userFactsStr)
-      .replaceAll("{{CHAR_FACTS}}", charFactsStr) // [新增]
+      .replaceAll("{{CHAR_FACTS}}", charFactsStr) // [new]
       .replaceAll("{{USER_NAME}}", userName || "User")
       .replaceAll("{{NAME}}", persona.name);
 
@@ -759,7 +759,7 @@ const App = () => {
       );
 
       if (data) {
-        // 1. 处理 User Facts
+        // 1. process User Facts
         if (data.newUserFacts && data.newUserFacts.length > 0) {
           const newEntries = data.newUserFacts.map((f) => ({
             id: `ufact_${Date.now()}_${Math.random()}`,
@@ -772,7 +772,7 @@ const App = () => {
           showToast("success", `Learned about you: ${newEntries.length} facts`);
         }
 
-        // 2. 处理 Char Facts
+        // 2. process Char Facts
         if (data.newCharFacts && data.newCharFacts.length > 0) {
           const newEntries = data.newCharFacts.map((f) => ({
             id: `cfact_${Date.now()}_${Math.random()}`,
@@ -785,7 +785,7 @@ const App = () => {
           showToast("success", `Character facts updated (${newEntries.length})`);
         }
 
-        // 3. 处理 Events
+        // 3. process Events
         if (data.newEvents && data.newEvents.length > 0) {
           const newEntries = data.newEvents.map((e) => ({
             id: `evt_${Date.now()}_${Math.random()}`,
@@ -798,7 +798,7 @@ const App = () => {
           setSharedEvents((prev) => [...newEntries, ...prev]);
         }
 
-        // 4. Done事件 (逻辑不变)
+        // 4. Done events (logic unchanged)
         if (data.completedEventIds && data.completedEventIds.length > 0) {
           setSharedEvents((prev) =>
             prev.map((evt) => {
@@ -826,28 +826,28 @@ const App = () => {
   // --- TRACKER HANDLERS ---
 
   const handleDeleteTrackerItem = async (type, id) => {
-    if (!(await customConfirm("ConfirmDelete这记录吗？"))) return;
+    if (!(await customConfirm("Confirm delete this entry?"))) return;
 
-    // 修复:00：兼容 "fact" (User Facts) 和 "userFact"
+    // fix: compat "fact" (User Facts) and "userFact"
     if (type === "userFact" || type === "fact") {
       setUserFacts((prev) => prev.filter((i) => i.id !== id));
     } else if (type === "charFact") {
       setCharFacts((prev) => prev.filter((i) => i.id !== id));
     } else {
-      // 这里的 else 对应 events
+      // the else here corresponds to events
       setSharedEvents((prev) => prev.filter((i) => i.id !== id));
     }
   };
 
   const handleEditTrackerItem = async (type, id, oldContent) => {
-    const newContent = await customPrompt("EditContent:", oldContent);
+    const newContent = await customPrompt("Edit content:", oldContent);
     if (newContent && newContent.trim() !== "") {
       if (type === "fact" || type === "userFact") {
         setUserFacts((prev) =>
           prev.map((i) => (i.id === id ? { ...i, content: newContent } : i)),
         );
       } else if (type === "charFact") {
-        // [新增] 之前漏了这min支，导致 CharFacts Edit会跑到 else 里去改 SharedEvents
+        // [new] 之前漏了这min支，导致 CharFacts Edit会跑到 else 里去改 SharedEvents
         setCharFacts((prev) =>
           prev.map((i) => (i.id === id ? { ...i, content: newContent } : i)),
         );
@@ -856,7 +856,7 @@ const App = () => {
           prev.map((i) => (i.id === id ? { ...i, content: newContent } : i)),
         );
       }
-      showToast("success", "DoneUpdate");
+      showToast("success", "Updated");
     }
   };
 
@@ -867,11 +867,11 @@ const App = () => {
 
   // DeleteStatus Log函数
   const handleDeleteStatus = async (index) => {
-    if (await customConfirm("ConfirmDelete这Status Log？")) {
+    if (await customConfirm("Confirm delete this status log?")) {
       const newHistory = [...statusHistory];
       newHistory.splice(index, 1);
       setStatusHistory(newHistory);
-      showToast("success", "Status LogDoneDelete");
+      showToast("success", "Status log deleted");
     }
   };
 
@@ -963,9 +963,9 @@ const App = () => {
             const { rawText, worldBook, name } = cleanCharacterJson(json);
             setInputKey(rawText);
             setWorldBook(worldBook);
-            showToast("success", "角色卡读取Success");
+            showToast("success", "Character card loaded successfully");
           } catch (err) {
-            showToast("error", "JSON 解析Failed: " + err.message);
+            showToast("error", "JSON parse failed: " + err.message);
           }
         }
       };
@@ -983,7 +983,7 @@ const App = () => {
   const moveWorldBookEntry = async (id, newGroup) => {
     let finalGroup = newGroup;
     if (newGroup === "NEW_GROUP_TRIGGER") {
-      const name = await customPrompt("Enter新GroupName:", "", "NewGroup");
+      const name = await customPrompt("Enter new Group name:", "", "New Group");
       if (!name) return;
       finalGroup = name;
     }
@@ -997,7 +997,7 @@ const App = () => {
 
   // RenameLore BookGroup
   const renameWorldBookGroup = async (oldName) => {
-    const newName = await customPrompt("RenameGroup:", oldName);
+    const newName = await customPrompt("Rename Group:", oldName);
     if (!newName || newName.trim() === "" || newName === oldName) return;
 
     setWorldBook((prev) =>
@@ -1007,27 +1007,27 @@ const App = () => {
     );
   };
 
-  // [新增] DeleteLore BookGroup (SupportCustom弹窗)
+  // [new] DeleteLore BookGroup (SupportCustom弹窗)
   const deleteWorldBookGroup = async (groupName) => {
     if (
       await customConfirm(
-        `ConfirmDeleteGroup "${groupName}" 下的所有目吗？`,
-        "DeleteGroup",
+        `Confirm delete group "${groupName}"" and all its entries?`,
+        "Delete Group",
       )
     ) {
       setWorldBook((prev) => prev.filter((w) => w.group !== groupName));
-      showToast("success", "GroupDoneDelete");
+      showToast("success", "Group deleted");
     }
   };
 
   const addStickerGroup = async () => {
-    const name = await customPrompt("Enter新Sticker库Name:", "", "New库");
+    const name = await customPrompt("Enter new Sticker库 name:", "", "New Library");
     if (!name || name.trim() === "") return;
 
     // 检查是否Done存在
     const exists = charStickers.some((s) => s.group === name);
     if (exists) {
-      showToast("error", "该GroupDone存在");
+      showToast("error", "This group already exists");
       return;
     }
 
@@ -1044,21 +1044,21 @@ const App = () => {
     ]);
   };
 
-  // [新增] DeleteSticker库
+  // [new] Delete Sticker库
   const deleteStickerGroup = async (groupName) => {
     if (
       await customConfirm(
-        `ConfirmDelete库 "${groupName}" 及其中所有Sticker吗？`,
-        "DeleteSticker库",
+        `Confirm delete library "${groupName}"" and all its stickers?`,
+        "Delete Sticker库",
       )
     ) {
       setCharStickers((prev) => prev.filter((s) => s.group !== groupName));
     }
   };
 
-  // [新增] RenameSticker库
+  // [new] Rename Sticker库
   const renameStickerGroup = async (oldName) => {
-    const newName = await customPrompt("RenameSticker库:", oldName);
+    const newName = await customPrompt("Rename Sticker库:", oldName);
     if (!newName || newName.trim() === "" || newName === oldName) return;
 
     setCharStickers((prev) =>
@@ -1137,14 +1137,14 @@ const App = () => {
             setWorldBook((prev) => [...prev, ...formattedEntries]);
             showToast(
               "success",
-              `DoneImport ${formattedEntries.length} to "${defaultGroupName}"`,
+              `Imported ${formattedEntries.length} to "${defaultGroupName}"`,
             );
           } else {
-            showToast("error", "未找到有效的Lore Book词");
+            showToast("error", "No valid Lore Book entries found");
           }
         } catch (err) {
           console.error(err);
-          showToast("error", "JSON 解析Failed");
+          showToast("error", "JSON parse failed");
         }
       };
       reader.readAsText(file);
@@ -1158,10 +1158,10 @@ const App = () => {
       try {
         const compressedBase64 = await compressImage(file);
         setter(compressedBase64);
-        showToast("success", "头像读取Success");
+        showToast("success", "Avatar loaded successfully");
       } catch (err) {
-        console.error("Image Processing Error", err);
-        showToast("error", "图片处理Failed，请重试");
+        console.error("Image Processing... Error", err);
+        showToast("error", "Image processing failed, please retry");
       }
     }
   };
@@ -1177,7 +1177,7 @@ const App = () => {
       const desc = await customPrompt(
         "EnterSticker的Description (AI将根据Description决定何时Send):",
         "开心",
-        "AddSticker",
+        "Add Sticker",
       );
       if (!desc) {
         // 处理Cancel (null)
@@ -1186,7 +1186,7 @@ const App = () => {
       }
 
       try {
-        // 2. 压缩图片
+        // 2. 压缩Image
         const compressedBase64 = await compressImage(file);
 
         // 3. [关键修改] ConfirmGroup：如果有传入 targetGroup 就用它，否则用默认值
@@ -1207,10 +1207,10 @@ const App = () => {
           setUserStickers((prev) => [...prev, newSticker]);
         }
 
-        showToast("success", "StickerAddSuccess");
+        showToast("success", "Sticker added successfully");
       } catch (err) {
-        console.error("StickerUploadFailed详情:", err);
-        showToast("error", "Sticker处理Failed: " + (err.message || "未知Error"));
+        console.error("StickerUpload failed详情:", err);
+        showToast("error", "Sticker processing failed: " + (err.message || "未知Error"));
       }
     }
     // 5. Reset input value 允许重复Upload同一文件
@@ -1229,12 +1229,12 @@ const App = () => {
       );
     }
     setEditingSticker(null);
-    showToast("success", "修改DoneSave");
+    showToast("success", "Changes saved");
   };
 
   // DeleteSticker
   const handleDeleteSticker = async (id) => {
-    if (await customConfirm("ConfirmDelete这Sticker吗？")) {
+    if (await customConfirm("Confirm delete this sticker?")) {
       if (editingSticker?.source === "user") {
         setUserStickers((prev) => prev.filter((s) => s.id !== id));
       } else {
@@ -1246,7 +1246,7 @@ const App = () => {
 
   const exportChatData = () => {
     if (chatHistory.length === 0) {
-      showToast("error", "None yet聊天记录可Export");
+      showToast("error", "No chat history to export");
       return;
     }
     const dataToSave = {
@@ -1271,10 +1271,10 @@ const App = () => {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 
-    showToast("success", "聊天记录DoneExport");
+    showToast("success", "Chat history exported");
   };
 
-  // [新增] Import聊天记录
+  // [new] Import聊天记录
   const importChatData = (event) => {
     const file = event.target.files[0];
     if (!file) return;
@@ -1287,20 +1287,20 @@ const App = () => {
           // 简单校验一下格式
           if (
             await customConfirm(
-              `Confirm覆盖Current的聊天记录吗？\n文件包含 ${data.history.length} Message。\n(建议先备份Current记录)`,
-              "Import备份",
+              `Confirm覆盖Current的聊天记录吗？\nFile contains ${data.history.length}  messages.\n(Recommend backing up current record first)`,
+              "Import backup",
               true,
             )
           ) {
             setChatHistory(data.history);
-            showToast("success", "聊天记录DoneRestore");
+            showToast("success", "Chat history restored");
           }
         } else {
-          showToast("error", "文件格式不正确，找不到History");
+          showToast("error", "Invalid file format, history not found");
         }
       } catch (err) {
         console.error(err);
-        showToast("error", "读取Failed: " + err.message);
+        showToast("error", "Read failed: " + err.message);
       }
     };
     reader.readAsText(file);
@@ -1310,7 +1310,7 @@ const App = () => {
 
   const fetchModelsList = async () => {
     if (!apiConfig.baseUrl || !apiConfig.key) {
-      showToast("error", "请填写 API URL和密钥");
+      showToast("error", "Please fill in API URL and Key");
       return;
     }
     setIsFetchingModels(true);
@@ -1330,19 +1330,19 @@ const App = () => {
       if (data.data && Array.isArray(data.data)) {
         const ids = data.data.map((m) => m.id);
         setAvailableModels(ids);
-        showToast("success", `Done获取 ${ids.length} Model`);
+        showToast("success", `Fetched ${ids.length} Model`);
 
         if (!ids.includes(apiConfig.model)) {
           const newDefault = ids[0] || "";
           setApiConfig((prev) => ({ ...prev, model: newDefault }));
-          if (newDefault) showToast("info", `ModelDone自动Switch为: ${newDefault}`);
+          if (newDefault) showToast("info", `Model auto-switched to: ${newDefault}`);
         }
       } else {
-        showToast("success", "连接Success (未能解析Model列表)");
+        showToast("success", "连接Success (未能解析Model list)");
       }
     } catch (e) {
       console.error("Fetch Models Failed", e);
-      showToast("error", "拉取ModelFailed，请检查配置");
+      showToast("error", "Failed to fetch models, please check config");
     } finally {
       setIsFetchingModels(false);
     }
@@ -1370,12 +1370,12 @@ const App = () => {
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       setConnectionStatus("success");
-      showToast("success", "连接Success，配置DoneSave");
+      showToast("success", "Connection success, config saved");
       setTimeout(() => setShowLockSettings(false), 1000);
     } catch (e) {
       console.error("Connection Test Failed", e);
       setConnectionStatus("error");
-      showToast("error", "连接Failed，请检查地址or密钥");
+      showToast("error", "Connection failed, please check address or key");
     }
   };
 
@@ -1388,7 +1388,7 @@ const App = () => {
     setLoading({});
     setMessageQueue([]);
     setIsTyping(false);
-    showToast("info", "DoneCancel生成");
+    showToast("info", "Cancelled generation");
   };
 
   // Generator Actions
@@ -1402,8 +1402,8 @@ const App = () => {
     abortControllerRef.current = abortController;
 
     // Fix: Use replaceAll to ensure all instances are replaced
-    // Fallback logic: If userName is empty, use "你" (natural in Chinese) or "User"
-    const effectiveUserName = userName || "你";
+    // Fallback logic: If userName is empty, use "You" (natural in Chinese) or "User"
+    const effectiveUserName = userName || "You";
 
     const cleanCharDesc = replacePlaceholders(
       inputKey,
@@ -1453,7 +1453,7 @@ const App = () => {
         } else {
           setter((prev) => [data, ...prev]);
         }
-        showToast("success", "Content生成Success");
+        showToast("success", "Content generated successfully");
       }
     } finally {
       setLoading((prev) => ({ ...prev, [type]: false }));
@@ -1473,7 +1473,7 @@ const App = () => {
   const triggerAppEvents = async () => {
     if (!persona) return;
     const charName = persona.name || "Character";
-    const effectiveUserName = userName || "你";
+    const effectiveUserName = userName || "You";
     const historyText = getContextString(chatHistory, effectiveUserName, persona, null, 10);
 
     const prompt = prompts.trigger_events
@@ -1491,7 +1491,7 @@ const App = () => {
 
       if (data) {
         // 在异步调用前Save所有需要的值，避免闭包问题
-        const savedPersonaName = persona?.name || "角色";
+        const savedPersonaName = persona?.name || "Character";
         const savedCharName = charName;
         const savedUserName = effectiveUserName;
         const savedSmartWatchLocations = [...smartWatchLocations];
@@ -1503,7 +1503,7 @@ const App = () => {
         const savedCustomRules = customRules;
         const savedInputKey = inputKey;
 
-        // 位置Move触发 → UpdateLiveTracker，生成Done后弹窗
+        // LocationMove触发 → UpdateLiveTracker，生成Done后弹窗
         if (data.triggerLocation) {
           setTimeout(() => {
             const doUpdate = async () => {
@@ -1524,7 +1524,7 @@ const App = () => {
               try {
                 const abortCtrl = new AbortController();
                 await generateContent({ prompt, systemInstruction: systemPrompt }, apiConfig, (err) => {}, abortCtrl.signal);
-                if (typeof showToast === "function") showToast("info", `${savedCharName}的实时位置updated`);
+                if (typeof showToast === "function") showToast("info", `${savedCharName}的实时Locationupdated`);
               } finally {
                 setLoading((prev) => ({ ...prev, sw_update: false }));
               }
@@ -1604,29 +1604,29 @@ const App = () => {
         name: extractedName,
         enName: null, // 设为 null，UI层会判断不显示
         title: "Connected Soul",
-        bio: "档案Done加载。详细设定将直接用于对话生成。",
+        bio: "Profile loaded. Detailed settings will be used directly for conversation generation.",
         mbti: null, // 设为 null
         tags: [], // 空数组
       };
 
       setPersona(localPersona);
       setIsLocked(false);
-      showToast("success", "终端DoneUnlock");
+      showToast("success", "Terminal unlocked");
 
       // 注意：Done移除自动生成Audio的逻辑
     } catch (e) {
       console.error("Unlock Error", e);
-      showToast("error", "解析Failed，请检查文件");
+      showToast("error", "Parse failed, please check file");
     }
   };
 
   const handleLogout = async () => {
-    // 加上 async
+    // add async
     if (
       !(await customConfirm(
         // 替换 window.confirm
-        "Confirm要Sign Out吗？这将彻底清除Current角色的所有本地数据，无法Restore。",
-        "清除数据",
+        "Confirm sign out? This will completely clear all local data for the current character and cannot be restored.",
+        "Clear data",
       ))
     ) {
       return;
@@ -1688,7 +1688,7 @@ const App = () => {
     // Lock
     setIsLocked(true);
     setActiveApp(null);
-    showToast("success", "DoneReset角色数据");
+    showToast("success", "Reset character data");
   };
 
   const handleSendFakeImage = async () => {
@@ -1712,7 +1712,7 @@ const App = () => {
   // 统一生成System command的辅助函数
   const getFinalSystemPrompt = () => {
     if (!persona) return "";
-    const effectiveUserName = userName || "你";
+    const effectiveUserName = userName || "You";
 
     // 1. 处理Description和Lore Book中的 {{user}}/{{char}} 替换
     const cleanCharDesc = replacePlaceholders(
@@ -1737,7 +1737,7 @@ const App = () => {
       .replaceAll("{{USER_PERSONA}}", userPersona + "\n" + trackerContext)
       .replaceAll("{{CUSTOM_RULES}}", customRules)
       .replaceAll("{{WORLD_INFO}}", cleanWorldInfo)
-      .replaceAll("{{LONG_MEMORY}}", longMemory || "None yetLong-term Memory。");
+      .replaceAll("{{LONG_MEMORY}}", longMemory || "No long-term memory yet.");
   };
 
   const [isGhostwriting, setIsGhostwriting] = useState(false);
@@ -1875,7 +1875,7 @@ Requirements:
           isJson: false,
         },
         apiConfig,
-        (err) => alert(`代写出错: ${err}`),
+        (err) => alert(`Ghostwrite error: ${err}`),
       );
 
       // --- 7. 填入结果 ---
@@ -1909,13 +1909,13 @@ Requirements:
     if (type === "voice") {
       displayText = `[语音Message] ${content}`;
     } else if (type === "sticker") {
-      displayText = `[Sticker] ${sticker?.desc || "图片"}`;
+      displayText = `[Sticker] ${sticker?.desc || "Image"}`;
     } else if (type === "transfer") {
-      // [新增] 文本回退显示包含Note
+      // [new] 文本回退显示包含Note
       const note = extraData?.note ? ` (${extraData.note})` : "";
       displayText = `[Transfer] ¥${content}${note}`;
     } else if (type === "location") {
-      displayText = `[位置] ${extraData?.name || content}`;
+      displayText = `[Location] ${extraData?.name || content}`;
     } else {
       displayText = content;
     }
@@ -1925,7 +1925,7 @@ Requirements:
       text: displayText,
       isVoice: type === "voice",
 
-      // [新增] Transfer数据结构Update
+      // [new] Transfer数据结构Update
       isTransfer: type === "transfer",
       transfer:
         type === "transfer"
@@ -2004,7 +2004,7 @@ Requirements:
     const abortController = new AbortController();
     abortControllerRef.current = abortController;
 
-    const effectiveUserName = userName || "你";
+    const effectiveUserName = userName || "You";
 
     // --- 2. 格式化History (用于Send给 AI) ---
     const historyText = getRecentTurns(newHistory, contextLimit)
@@ -2058,7 +2058,7 @@ Requirements:
       const processedHint = replacePlaceholders(
         finalHint,
         persona.name,
-        userName || "你",
+        userName || "You",
       );
       styleInst += `\n[Special Instruction]: ${processedHint}`;
     }
@@ -2066,7 +2066,7 @@ Requirements:
     const rawForwardContext = overrideContext || forwardContext;
     // 核心修复：Say something to forwardContext 进行占位符替换处理
     const finalForwardSection = rawForwardContext
-      ? `\n**Forwarded Content Context**: ${replacePlaceholders(rawForwardContext, persona.name, userName || "你")}`
+      ? `\n**Forwarded Content Context**: ${replacePlaceholders(rawForwardContext, persona.name, userName || "You")}`
       : "";
 
     const modeInstruction =
@@ -2229,7 +2229,7 @@ Requirements:
 
           // 惊喜逻辑：概率触发Post
           if (forumData.isInitialized && Math.random() < 0.9) {
-            const charName = persona?.name || "角色";
+            const charName = persona?.name || "Character";
             if (typeof showToast === "function") showToast("info", `${charName}在FeedPost了一Post`);
             setTimeout(() => {
               if (window.__forumGenerateChatEventPost) {
@@ -2238,7 +2238,7 @@ Requirements:
             }, 5000);
           }
 
-          // 惊喜逻辑2：概率触发app事件Update（位置/Diary/Browser/Receipts）
+          // 惊喜逻辑2：概率触发app事件Update（Location/Diary/Browser/Receipts）
           if (Math.random() < 0.1) {
             setTimeout(() => {
               triggerAppEvents();
@@ -2388,7 +2388,7 @@ Requirements:
     if (
       await customConfirm(
         `Confirm要Delete选中的 ${selectedMsgs.size}  messages?`,
-        "批量Delete",
+        "Batch delete",
       )
     ) {
       selectedMsgs.forEach((index) => {
@@ -2402,7 +2402,7 @@ Requirements:
 
       setIsMultiSelectMode(false);
       setSelectedMsgs(new Set());
-      showToast("success", "Done批量Delete");
+      showToast("success", "DoneBatch delete");
     }
   };
 
@@ -2484,12 +2484,12 @@ ${charFactsList || "None"}
         .map((m) => {
           // 判断Send者
           const sender = m.sender === "me" ? effectiveUserName : charName;
-          // 判断Content (处理文本、语音、图片、位置等不同类型)
+          // 判断Content (处理文本、语音、Image、Location等不同类型)
           let content = m.text || "";
           if (m.isVoice) content = "[语音]";
-          if (m.isLocation) content = `[位置: ${m.location.name}, 地址: ${m.location.address}]`;
+          if (m.isLocation) content = `[Location: ${m.location.name}, 地址: ${m.location.address}]`;
           // 如果没有文本也没有特殊类型，可能是空
-          if (!content) content = "[图片/表情]";
+          if (!content) content = "[Image/Sticker]";
 
           return `${sender}: ${content}`;
         })
@@ -2586,7 +2586,7 @@ Requirements:
 
       const systemPrompt = prompts.system
         .replaceAll("{{NAME}}", persona.name)
-        // 修复：Add角色Description和 Tracker Context
+        // 修复：AddCharacterDescription和 Tracker Context
         .replaceAll(
           "{{CHAR_DESCRIPTION}}",
           cleanCharDesc + "\n" + charTrackerContext,
@@ -2616,7 +2616,7 @@ Requirements:
       }
 
       // --- STEP 2: Match Images ---
-      // 准备图片库字符串
+      // 准备Image库字符串
       const imageLibraryStr = PRESET_LOCATION_IMAGES.map(
         (img) => `ID: ${img.id}, Desc: ${img.desc}, Keywords: ${img.keywords}`,
       ).join("\n");
@@ -2628,7 +2628,7 @@ Requirements:
         .replaceAll("{{GENERATED_LOCATIONS}}", generatedLocsStr)
         .replaceAll("{{IMAGE_LIBRARY}}", imageLibraryStr);
 
-      // 第二发请求：匹配图片
+      // 第二发请求：匹配Image
       const step2Data = await generateContent(
         {
           prompt: matchPrompt,
@@ -2666,7 +2666,7 @@ Requirements:
       }
     } catch (e) {
       console.error(e);
-      showToast("error", "Initializing...Failed: " + e.message);
+      showToast("error", "Initialization failed: " + e.message);
     } finally {
       setLoading((prev) => ({ ...prev, smartwatch: false }));
     }
@@ -2745,7 +2745,7 @@ Requirements:
           thought: fixedData.thought,
         };
         setSmartWatchLogs((prev) => [newLog, ...prev]);
-        showToast("success", "行踪DoneUpdate");
+        showToast("success", "Location updated");
       }
     } finally {
       setLoading((prev) => ({ ...prev, sw_update: false }));
@@ -2797,7 +2797,7 @@ Requirements:
       <div className="h-screen w-full bg-[#F5F5F7] flex flex-col items-center justify-center gap-4">
         <RefreshCw className="animate-spin text-gray-400" size={32} />
         <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">
-          Now...同步本地数据库...
+          Now...Syncing local database...
         </p>
       </div>
     );
@@ -2902,7 +2902,7 @@ Requirements:
               </div>
               {!avatar && (
                 <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[9px] text-gray-400 tracking-widest uppercase opacity-60 whitespace-nowrap">
-                  :00击Upload头像
+                  Tap to upload avatar
                 </div>
               )}
             </div>
@@ -2930,7 +2930,7 @@ Requirements:
                     inputKey ? "text-green-700" : "text-gray-600"
                   }`}
                 >
-                  {inputKey ? "档案Done就绪" : "Import Character Card"}
+                  {inputKey ? "Profile ready" : "Import Character Card"}
                 </span>
                 <span className="text-[9px] text-gray-400 uppercase tracking-wider mt-1">
                   {inputKey ? "Ready to sync" : "Upload .JSON File"}
@@ -3081,7 +3081,7 @@ Requirements:
       const summaryText = await generateContent(
         { prompt, systemInstruction: simpleSystem, isJson: false },
         apiConfig,
-        (err) => showToast("error", "总结Failed: " + err),
+        (err) => showToast("error", "Summary failed: " + err),
       );
 
       if (summaryText) {
@@ -3090,7 +3090,7 @@ Requirements:
 
         setLongMemory((prev) => (prev ? prev + "\n\n" + newEntry : newEntry));
         setMsgCountSinceSummary(0);
-        showToast("info", "记忆Done追加");
+        showToast("info", "Memory appended");
       }
     } finally {
       setIsSummarizing(false);
@@ -3189,7 +3189,7 @@ Requirements:
                 <AppIcon
                   key={app.id}
                   label={app.label}
-                  // 核心逻辑：如果有Custom图标，显示图片；否则显示默认 Lucide 图标
+                  // 核心逻辑：如果有Custom图标，显示Image；否则显示默认 Lucide 图标
                   icon={
                     customIcons[app.id] ? (
                       <img
@@ -3269,7 +3269,7 @@ Requirements:
                     <Camera className="text-white drop-shadow-md" />
                   </div>
                   <span className="absolute bottom-0 right-0 text-[10px] bg-black text-white px-2 rounded-full">
-                    角色
+                    Character
                   </span>
                 </div>
 
@@ -3279,7 +3279,7 @@ Requirements:
                   <div className="glass-card p-4 rounded-2xl text-left space-y-3">
                     <div className="flex justify-between items-center border-b border-gray-200 pb-2">
                       <span className="text-xs font-bold uppercase text-gray-500">
-                        Edit原始数据 (JSON/Text)
+                        Edit raw data (JSON/Text)
                       </span>
                       <button onClick={() => setShowEditPersona(false)}>
                         <X
@@ -3303,7 +3303,7 @@ Requirements:
                       }}
                       className="w-full py-2 bg-black text-white rounded-lg text-xs font-bold hover:bg-gray-800 transition-colors"
                     >
-                      Save并应用设定
+                      Save and apply settings
                     </button>
                   </div>
                 ) : (
@@ -3329,18 +3329,18 @@ Requirements:
                           onClick={() => setShowEditPersona(true)}
                           className="text-[10px] text-[#7A2A3A] hover:underline flex items-center gap-1"
                         >
-                          <Edit2 size={10} /> Edit设定
+                          <Edit2 size={10} /> Edit settings
                         </button>
                       </div>
 
                       <div
                         className="glass-card p-4 rounded-xl text-left max-h-60 overflow-y-auto custom-scrollbar border border-gray-200/50 cursor-pointer hover:bg-white/60 transition-colors"
-                        onClick={() => setShowEditPersona(true)} // :00击卡片也能直接Edit
-                        title=":00击Edit"
+                        onClick={() => setShowEditPersona(true)} // Tap card to edit directly
+                        title="Tap to edit"
                       >
                         <p className="text-[10px] leading-relaxed text-gray-600 whitespace-pre-wrap">
                           {inputKey ||
-                            "None yet设定数据，请:00击Edit手动Enter... "}
+                            "No settings data yet, tap Edit to enter manually... "}
                         </p>
                       </div>
                       <p className="text-[9px] text-gray-400 text-center">
@@ -3369,7 +3369,7 @@ Requirements:
                 )}
                 {/* --- 结束 --- */}
 
-                {/* --- [修改后] Profile界面底部：显示角色信息 (Char Facts) --- */}
+                {/* --- [修改后] Profile界面底部：显示Character信息 (Char Facts) --- */}
                 <div className="px-1 text-left mt-8">
                   <div className="flex justify-between items-center mb-3 border-b border-gray-200/50 pb-2">
                     <div className="flex items-center gap-2">
@@ -3384,7 +3384,7 @@ Requirements:
                     {charFacts.length === 0 && (
                       <div className="text-center py-6 border border-dashed border-gray-300 rounded-xl">
                         <p className="text-[10px] text-gray-400">
-                          None yet信息
+                          No information yet
                           <br />
                           More will be revealed as you chat
                         </p>
@@ -3408,7 +3408,7 @@ Requirements:
               </div>
             ) : (
               <div className="h-full flex items-center justify-center text-gray-300">
-                <p>数据Loading......</p>
+                <p>Loading data...</p>
               </div>
             )}
           </AppWindow>
@@ -3454,7 +3454,7 @@ Requirements:
                       My Avatar
                     </span>
                     <span className="text-[9px] text-gray-400">
-                      在聊天中显示
+                      shown in chat
                     </span>
                   </div>
                 </div>
@@ -3463,7 +3463,7 @@ Requirements:
                     className="block text-[9px] uppercase text-gray-400 mb-1 font-bold"
                     htmlFor="user-name-input"
                   >
-                    My名字
+                    My name
                   </label>
                   <input
                     id="user-name-input"
@@ -3480,7 +3480,7 @@ Requirements:
                     className="block text-[9px] uppercase text-gray-400 mb-1 font-bold"
                     htmlFor="user-persona-input"
                   >
-                    我是谁
+                    Who am I
                   </label>
                   <textarea
                     id="user-persona-input"
@@ -3496,7 +3496,7 @@ Requirements:
                     className="block text-[9px] uppercase text-gray-400 mb-1 font-bold"
                     htmlFor="custom-rules-input"
                   >
-                    世界规则
+                    World rules
                   </label>
                   <textarea
                     id="custom-rules-input"
@@ -3535,7 +3535,7 @@ Requirements:
                     {userFacts.length === 0 && (
                       <div className="text-center py-6 border border-dashed border-gray-300 rounded-xl bg-white/30">
                         <p className="text-[10px] text-gray-400">
-                          None yet信息
+                          No information yet
                           <br />
                           They'll remember your preferences and habits
                         </p>
@@ -3555,7 +3555,7 @@ Requirements:
                   </div>
                 ) : (
                   <div className="text-center py-4 bg-gray-50 rounded-xl">
-                    <p className="text-[10px] text-gray-400">功能DoneClose</p>
+                    <p className="text-[10px] text-gray-400">Feature closed</p>
                   </div>
                 )}
               </div>
@@ -3607,7 +3607,7 @@ Requirements:
                 <div className="absolute bottom-0 left-0 right-0 glass-panel p-4 z-[120] animate-in slide-in-from-bottom-10 rounded-t-2xl">
                   <div className="flex justify-between mb-2">
                     <span className="text-xs font-bold uppercase text-gray-500">
-                      Regenerate指令
+                      Regenerate instruction
                     </span>
                     <button onClick={() => setRegenerateTarget(null)}>
                       <X size={14} />
@@ -3618,7 +3618,7 @@ Requirements:
                     name="regen-hint"
                     autoFocus
                     type="text"
-                    placeholder="例：语气更温柔一:00..."
+                    placeholder="E.g.: gentler tone..."
                     value={regenHint}
                     onChange={(e) => setRegenHint(e.target.value)}
                     className="w-full p-2 bg-white/50 border border-gray-200 rounded-lg text-sm mb-2 outline-none"
@@ -3629,7 +3629,7 @@ Requirements:
                     }
                     className="w-full py-2 bg-black text-white text-xs rounded-lg font-bold"
                   >
-                    ConfirmRegenerate
+                    Confirm regenerate
                   </button>
                 </div>
               )}
@@ -3886,7 +3886,7 @@ Requirements:
                                   );
                                 }
 
-                                // B. 图片/Sticker逻辑
+                                // B. Image/Sticker逻辑
                                 let stickerUrl = msg.sticker?.url;
                                 if (!stickerUrl && msg.stickerId) {
                                   let found = charStickers.find(
@@ -3910,7 +3910,7 @@ Requirements:
                                   );
                                 }
 
-                                // C. 假图片逻辑
+                                // C. 假Image逻辑
                                 const isFakeImg = isImageMsg(msg.text);
 
                                 if (isFakeImg) {
@@ -3920,7 +3920,7 @@ Requirements:
                                     <div
                                       className="cursor-pointer overflow-hidden rounded-xl border-2 border-white shadow-sm bg-white relative group/img transition-transform active:scale-95"
                                       onClick={() =>
-                                        customAlert(imgDesc, "图片Content")
+                                        customAlert(imgDesc, "ImageContent")
                                       }
                                     >
                                       <img
@@ -4164,7 +4164,7 @@ Requirements:
                       style={{ animationDelay: "0.4s" }}
                     ></div>
                     <span className="text-xs text-gray-400 ml-1">
-                      对方Now...Enter...
+                      They are typing...
                     </span>
                   </div>
                 )}
@@ -4175,7 +4175,7 @@ Requirements:
                 <div className="absolute bottom-16 left-4 right-4 h-48 bg-white/90 backdrop-blur-xl rounded-2xl shadow-2xl p-4 z-[110] overflow-y-auto custom-scrollbar border border-white animate-in slide-in-from-bottom-2">
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-[10px] font-bold uppercase text-gray-500">
-                      My表情
+                      My Stickers
                     </span>
                     <div className="flex items-center gap-2.5">
                       <div className="flex items-center gap-2">
@@ -4184,7 +4184,7 @@ Requirements:
                           onClick={() =>
                             setIsUserStickerEditMode(!isUserStickerEditMode)
                           }
-                          // 这里我建议把 px-1 改成 px-2，这样跟后面两按钮大小更一致，你可以看看效果
+                          // here我建议把 px-1 改成 px-2，这样跟后面两按钮大小更一致，You可以看看效果
                           className={`text-[10px] px-2 py-1 rounded-full transition-colors ${
                             isUserStickerEditMode
                               ? "bg-red-50 text-red-500 font-bold"
@@ -4204,16 +4204,16 @@ Requirements:
                           />
                         </label>
 
-                        {/* 批量按钮 - 改为透明灰色Style */}
+                        {/* Bulk按钮 - 改为透明灰色Style */}
                         <button
                           onClick={async () => {
-                            const input = await customPrompt("EnterLink进行批量Import", "", "批量Import");
+                            const input = await customPrompt("EnterLink进行Bulk Import", "", "Bulk Import");
                             if (input) handleBulkImport(input, "user", "My");
                           }}
                           className="text-[10px] text-gray-600 hover:text-gray-400 px-2 py-1 rounded-full cursor-pointer transition-colors flex items-center gap-1"
                         >
-                          {/* 注意：你原代码这里用的是 Download 图标，我保留了，如果需要 Link 图标请自行替换 */}
-                          <Download size={10} /> 批量
+                          {/* 注意：You原代码这里用的是 Download 图标，我保留了，如果需要 Link 图标请自行替换 */}
+                          <Download size={10} /> Bulk
                         </button>
                       </div>
                     </div>
@@ -4232,7 +4232,7 @@ Requirements:
                             // EditMode：:00击进入Edit，标记来源为 user
                             setEditingSticker({ ...s, source: "user" });
                           } else {
-                            // 正常Mode：Send表情
+                            // 正常Mode：SendSticker
                             handleUserSend(null, "sticker", s);
                           }
                         }}
@@ -4254,7 +4254,7 @@ Requirements:
                     ))}
                     {userStickers.length === 0 && (
                       <p className="col-span-5 text-center text-xs text-gray-400 py-4">
-                        None yet表情，请Upload
+                        No stickers yet, please upload
                       </p>
                     )}
                   </div>
@@ -4276,7 +4276,7 @@ Requirements:
                       Cancel
                     </button>
                     <span className="text-xs font-bold text-gray-500">
-                      Done选 {selectedMsgs.size} 
+                      Selected {selectedMsgs.size} 
                     </span>
                     <button
                       onClick={handleBatchDelete}
@@ -4292,7 +4292,7 @@ Requirements:
                     {/* [新增] 媒体Menu (绝对定位在上方) */}
                     {showMediaMenu && (
                       <div className="absolute bottom-14 left-0 bg-white/90 backdrop-blur-xl border border-gray-200 p-2 rounded-xl shadow-xl flex gap-4 animate-in slide-in-from-bottom-2 z-50">
-                        {/* 表情按钮 (搬到这里了) */}
+                        {/* Sticker按钮 (搬到这里了) */}
                         <button
                           onClick={() => {
                             setShowUserStickerPanel(!showUserStickerPanel);
@@ -4303,7 +4303,7 @@ Requirements:
                           <div className="p-2 bg-gray-100 rounded-full">
                             <Smile size={20} />
                           </div>
-                          <span className="text-[10px]">表情</span>
+                          <span className="text-[10px]">Sticker</span>
                         </button>
 
                         {/* [新增] 发图按钮 */}
@@ -4314,7 +4314,7 @@ Requirements:
                           <div className="p-2 bg-gray-100 rounded-full">
                             <ImageIcon size={20} />
                           </div>
-                          <span className="text-[10px]">图片</span>
+                          <span className="text-[10px]">Image</span>
                         </button>
 
                         <button
@@ -4334,7 +4334,7 @@ Requirements:
                           <div className="p-2 bg-gray-100 rounded-full">
                             <MapPin size={20} />
                           </div>
-                          <span className="text-[10px]">位置</span>
+                          <span className="text-[10px]">Location</span>
                         </button>
                       </div>
                     )}
@@ -4343,7 +4343,7 @@ Requirements:
                         onClick={stopGeneration}
                         className="w-full py-2.5 bg-red-50 text-red-500 rounded-full text-xs font-bold flex items-center justify-center gap-2 animate-pulse"
                       >
-                        <X size={14} /> Cancel生成
+                        <X size={14} /> Cancel generation
                       </button>
                     ) : (
                       <>
@@ -4406,7 +4406,7 @@ Requirements:
                             }}
                             placeholder={
                               isVoiceMode
-                                ? "语音..."
+                                ? "Voice..."
                                 : chatStyle === "novel" && !chatInput
                                   ? ":00击右侧按钮可AI代写..."
                                   : "Send message..."
@@ -4459,7 +4459,7 @@ Requirements:
                             <button
                               onClick={() => triggerAIResponse()}
                               className="p-2 md:p-2.5 bg-[#2C2C2C] text-white rounded-full hover:bg-gray-200 border border-gray-200 transition-all active:scale-95"
-                              title="让对方回复"
+                              title="Trigger reply"
                             >
                               <MessageSquare size={18} strokeWidth={1.5} />
                             </button>
@@ -4546,12 +4546,12 @@ Requirements:
           {/* APP: JOURNAL (DIARY & EVENTS) */}
           <AppWindow
             isOpen={activeApp === "journal"}
-            title={showEventsInDiary ? "共同经历" : "Diary"} // Title随Status变化
+            title={showEventsInDiary ? "Shared Experiences" : "Diary"} // Title随Status变化
             onClose={() => {
               setActiveApp(null);
               setShowEventsInDiary(false); // Close时Reset
             }}
-            // [新增] 右上角Actions按钮
+            // [new] 右上角Actions按钮
             actions={
               <button
                 onClick={() => setShowEventsInDiary(!showEventsInDiary)}
@@ -4574,7 +4574,7 @@ Requirements:
             <div className="space-y-6 pb-20 pt-4">
               {/* === Content区：根据开关Switch显示 === */}
               {showEventsInDiary ? (
-                /* --- A. 共同经历列表 (原 Identity 里的代码移过来) --- */
+                /* --- A. Shared Experiences列表 (原 Identity 里的代码移过来) --- */
                 <div className="animate-in slide-in-from-right-4">
                   {/* 统计 */}
                   <div className="flex gap-2 mb-4">
@@ -4586,7 +4586,7 @@ Requirements:
                         }
                       </div>
                       <div className="text-[9px] text-gray-400 uppercase">
-                        进行中
+                        In Progress
                       </div>
                     </div>
                     <div className="flex-1 bg-gray-50 p-3 rounded-xl border border-transparent text-center">
@@ -4597,7 +4597,7 @@ Requirements:
                         }
                       </div>
                       <div className="text-[9px] text-gray-400 uppercase">
-                        DoneDone
+                        Done
                       </div>
                     </div>
                   </div>
@@ -4605,7 +4605,7 @@ Requirements:
                   <div className="space-y-2">
                     {sharedEvents.length === 0 && (
                       <div className="text-center py-10 opacity-50">
-                        <p className="text-xs text-gray-400">None yet共同经历</p>
+                        <p className="text-xs text-gray-400">None yetShared Experiences</p>
                       </div>
                     )}
 
@@ -4631,7 +4631,7 @@ Requirements:
                       0 && (
                       <div className="pt-4 border-t border-gray-200/50 mt-4">
                         <span className="text-[10px] font-bold text-gray-300 uppercase mb-3 block">
-                          历史存档
+                          History Archive
                         </span>
                         {sharedEvents
                           .filter((e) => e.type === "completed")
@@ -4665,12 +4665,12 @@ Requirements:
                     ) : (
                       <FileText size={14} />
                     )}{" "}
-                    记录此刻
+                    Record this moment
                   </button>
 
                   {diaries.length === 0 && (
                     <p className="text-center text-gray-400 text-xs mt-10">
-                      None yetDiary
+                      No diary entries yet
                     </p>
                   )}
 
@@ -4728,7 +4728,7 @@ Requirements:
                 ) : (
                   <Plus size={14} />
                 )}{" "}
-                生成新消费记录
+                Generate new spending record
               </button>
               {receipts.map((r, i) => (
                 <div
@@ -4810,7 +4810,7 @@ Requirements:
                       : "text-gray-400 border-gray-200"
                   }`}
                 >
-                  {isEditingMap ? "DoneEdit" : "Edit地图"}
+                  {isEditingMap ? "Done editing" : "Edit map"}
                 </button>
                 <button
                   onClick={() => generateSmartWatchUpdate()}
@@ -4824,7 +4824,7 @@ Requirements:
                   ) : (
                     <ScanLine size={10} />
                   )}
-                  Update行踪
+                  Update location
                 </button>
               </div>
 
@@ -4832,16 +4832,16 @@ Requirements:
               <div className="relative w-full h-[550px] bg-[#F5F5F7] border-y border-gray-200 overflow-y-auto custom-scrollbar mb-6">
                 {smartWatchLocations.length === 0 ? (
                   <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-center px-6">
-                    <p className="text-xs text-gray-400">None yet监控数据</p>
+                    <p className="text-xs text-gray-400">No monitoring data yet</p>
                     <p className="text-[10px] text-gray-300">
-                      请ConfirmDone开启Lore Book，然后Initializing...系统
+                      Please confirm Lore Book is enabled, then initialize system
                     </p>
                     <button
                       onClick={initSmartWatch}
                       disabled={loading.smartwatch}
                       className="px-6 py-2 bg-black text-white text-xs rounded-lg active:scale-95 transition-transform disabled:bg-gray-400"
                     >
-                      {loading.smartwatch ? "Initializing...中..." : "Initializing...监控系统"}
+                      {loading.smartwatch ? "Initializing..." : "Initialize monitoring system"}
                     </button>
                   </div>
                 ) : (
@@ -4968,7 +4968,7 @@ Requirements:
                                       ),
                                     );
                                   } else {
-                                    showToast("error", "最少保留4地:00");
+                                    showToast("error", "Keep at least 4 locations");
                                   }
                                 }}
                               >
@@ -4996,14 +4996,14 @@ Requirements:
               <div className="px-4">
                 <div className="flex justify-between items-end mb-4 border-b border-gray-200 pb-2">
                   <h3 className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
-                    监控志
+                    Activity Log
                   </h3>
                   {swFilter !== "all" && (
                     <button
                       onClick={() => setSwFilter("all")}
                       className="text-[9px] text-blue-500 flex items-center hover:underline"
                     >
-                      <X size={10} className="mr-1" /> 清除Filter
+                      <X size={10} className="mr-1" /> Clear filter
                     </button>
                   )}
                 </div>
@@ -5085,7 +5085,7 @@ Requirements:
                     ))}
                   {smartWatchLogs.length === 0 && (
                     <div className="text-center text-gray-400 text-xs py-8">
-                      None yet志记录
+                      No activity records yet
                     </div>
                   )}
                 </div>
@@ -5146,7 +5146,7 @@ Requirements:
                       </div>
                       <CollapsibleThought
                         text={item.thought}
-                        label="查看想法"
+                        label="View thoughts"
                       />
                     </div>
                   ))}
@@ -5172,7 +5172,7 @@ Requirements:
                       </div>
                       <CollapsibleThought
                         text={item.thought}
-                        label="窥探心声"
+                        label="Peek at thoughts"
                       />
                     </div>
                   ))}
@@ -5184,7 +5184,7 @@ Requirements:
           {/* APP: MUSIC */}
           <AppWindow
             isOpen={activeApp === "music"}
-            title="共鸣旋律"
+            title="Resonance Melody"
             onClose={() => setActiveApp(null)}
           >
             <MusicApp
@@ -5202,7 +5202,7 @@ Requirements:
           </AppWindow>
           <AppWindow
             isOpen={activeApp === "status"}
-            title="Status监控"
+            title="Status Monitor"
             onClose={() => setActiveApp(previousApp || null)}
           >
             <StatusPanel
@@ -5266,7 +5266,7 @@ Requirements:
           onClose={() => setDialogConfig(null)}
         />
       )}
-      {/* [新增] 位置Send弹窗 */}
+      {/* [新增] LocationSend弹窗 */}
       {showLocationModal && (
         <div className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4 animate-in fade-in">
           <div className="bg-white rounded-2xl w-full max-w-sm p-6 shadow-2xl space-y-4">
@@ -5285,10 +5285,10 @@ Requirements:
                 </label>
                 <input
                   id="loc-name-input"
-                  className="w-full bg-gray-50 border border-gray-200 rounded-lg p-2.5 pr-9 text-sm focus:border-[#7A2A3A] focus:outline-none transition-colors" // pr-9 留出按钮位置
+                  className="w-full bg-gray-50 border border-gray-200 rounded-lg p-2.5 pr-9 text-sm focus:border-[#7A2A3A] focus:outline-none transition-colors" // pr-9 留出按钮Location
                   placeholder="可Enter地:00类型如“餐厅”并:00击右侧按钮"
                 />
-                {/* [复用] 位置弹窗里的代写按钮 */}
+                {/* [复用] Location弹窗里的代写按钮 */}
                 <GhostButton
                   loading={isLocGenerating} // 需在 App 里定义此Status
                   className="absolute right-2 bottom-2" // 定位在Enter框右下角
@@ -5297,7 +5297,7 @@ Requirements:
                     const addrInput = document.getElementById("loc-addr-input");
                     const draft = nameInput.value;
 
-                    // 调用位置代写逻辑
+                    // 调用Location代写逻辑
                     handleGhostwriteLocation(
                       draft,
                       (n) => (nameInput.value = n),
@@ -5310,12 +5310,12 @@ Requirements:
 
               <div>
                 <label className="block text-xs text-gray-500 mb-1">
-                  详细地址
+                  Detailed address
                 </label>
                 <input
                   id="loc-addr-input"
                   className="w-full bg-gray-50 border border-gray-200 rounded-lg p-2.5 text-sm focus:border-[#7A2A3A] focus:outline-none transition-colors"
-                  placeholder="自动生成or手动Enter..."
+                  placeholder="Auto-generate or enter manually..."
                 />
               </div>
             </div>
@@ -5332,7 +5332,7 @@ Requirements:
                 onClick={() => {
                   const name = document.getElementById("loc-name-input").value;
                   const addr = document.getElementById("loc-addr-input").value;
-                  if (!name) return alert("EnterLocation name");
+                  if (!name) return alert("Enter location name");
 
                   handleUserSend(name, "location", null, {
                     name,
@@ -5410,7 +5410,7 @@ const StickerGroup = ({
 }) => {
   const [isExpanded, setIsExpanded] = React.useState(false); // 默认折叠
 
-  // 过滤出Current组的表情，并排除掉占位符(isPlaceholder)
+  // 过滤出Current组的Sticker，并排除掉占位符(isPlaceholder)
   const groupStickers = stickers.filter((s) => s.group === group);
   const visibleStickers = groupStickers.filter((s) => !s.isPlaceholder);
 
@@ -5446,7 +5446,7 @@ const StickerGroup = ({
           <button
             onClick={() => renameStickerGroup(group)}
             className="text-gray-300 hover:text-blue-500 p-1 transition-colors"
-            title="Rename库"
+            title="Rename library"
           >
             <Edit2 size={12} />
           </button>
@@ -5455,7 +5455,7 @@ const StickerGroup = ({
           <button
             onClick={() => deleteStickerGroup(group)}
             className="text-gray-300 hover:text-red-500 p-1 transition-colors"
-            title="Delete库"
+            title="Delete library"
           >
             <Trash2 size={12} />
           </button>
@@ -5483,7 +5483,7 @@ const StickerGroup = ({
         </div>
       </div>
 
-      {/* 表情网格 (折叠区域) */}
+      {/* Sticker网格 (折叠区域) */}
       {isExpanded && (
         <div
           className={`pt-3 mt-2 border-t border-gray-200/50 transition-all animate-in slide-in-from-top-1 ${
@@ -5494,7 +5494,7 @@ const StickerGroup = ({
         >
           {visibleStickers.length === 0 && (
             <div className="text-center py-4 text-[10px] text-gray-400 italic">
-              None yet表情，请Upload
+              No stickers yet, please upload
             </div>
           )}
 

@@ -4,12 +4,12 @@ export const DEFAULT_CHAR_STICKERS = [
   {
     id: "s1",
     url: "https://files.catbox.moe/yxozv0.jpg",
-    desc: "一只流泪的小狗，好像在说“你欺负我，我要把你告到小狗法庭！”",
+    desc: "一只流泪的小狗，好像在说“You欺负我，我要把You告到小狗法庭！”",
   },
   {
     id: "s2",
     url: "https://files.catbox.moe/6bxk4e.jpg",
-    desc: "一只小狗，眼睛亮亮的，好像在说“Female神，我只追随你！”",
+    desc: "一只小狗，眼睛亮亮的，好像在说“Female神，我只追随You！”",
   },
   {
     id: "s3",
@@ -29,7 +29,7 @@ export const DEFAULT_CHAR_STICKERS = [
   {
     id: "s6",
     url: "https://files.catbox.moe/2inse5.jpg",
-    desc: "一只趴在地上耍赖撒娇的小狗，好像在说“你说我什么都特别好！你快说呀！”",
+    desc: "一只趴在地上耍赖撒娇的小狗，好像在说“You说我什么都特别好！You快说呀！”",
   },
   {
     id: "s7",
@@ -69,7 +69,7 @@ export const DEFAULT_CHAR_STICKERS = [
   {
     id: "s14",
     url: "https://files.catbox.moe/epavgj.jpg",
-    desc: "一只穿着龙袍、威风凛凛的皇帝小狗，好像在说“皇帝驾到，你们都跪下！”",
+    desc: "一只穿着龙袍、威风凛凛的皇帝小狗，好像在说“皇帝驾到，You们都跪下！”",
   },
   {
     id: "s15",
@@ -89,27 +89,27 @@ export const DEFAULT_CHAR_STICKERS = [
   {
     id: "s18",
     url: "https://files.catbox.moe/q9w2zq.jpg",
-    desc: "一只面色阴沉、又有:00像撒娇的小熊Sticker，好像在说“我要向你施压”",
+    desc: "一只面色阴沉、又有:00像撒娇的小熊Sticker，好像在说“我要向You施压”",
   },
   {
     id: "s19",
     url: "https://files.catbox.moe/tho7pf.jpg",
-    desc: "一个幽默搞笑、可以用于调情的Sticker，好像在说“我要插死你”",
+    desc: "一个幽默搞笑、可以用于调情的Sticker，好像在说“我要插死You”",
   },
   {
     id: "s20",
     url: "https://files.catbox.moe/fvvjvj.jpg",
-    desc: "一个幽默搞笑、可以用于调情的Sticker，一只企鹅拿着望远镜观察，好像在说“我Now...视奸你”",
+    desc: "一个幽默搞笑、可以用于调情的Sticker，一只企鹅拿着望远镜观察，好像在说“我Now...视奸You”",
   },
   {
     id: "s21",
     url: "https://files.catbox.moe/9j9zyj.jpg",
-    desc: "一个温馨可爱、可以用于撒娇或调情的Sticker，一只小熊抱着膝盖坐在门口，好像在说“我会在这里等到你来为止！”",
+    desc: "一个温馨可爱、可以用于撒娇或调情的Sticker，一只小熊抱着膝盖坐在门口，好像在说“我会在这里等到You来为止！”",
   },
   {
     id: "s22",
     url: "https://files.catbox.moe/hgdxtz.jpg",
-    desc: "一个幽默情色、可以用于调情的Sticker，一只小兔子正处于勃起的Status看着手机，好像在说“你让我勃起了”",
+    desc: "一个幽默情色、可以用于调情的Sticker，一只小兔子正处于勃起的Status看着手机，好像在说“You让我勃起了”",
   },
   {
     id: "s23",
@@ -124,12 +124,12 @@ export const DEFAULT_CHAR_STICKERS = [
   {
     id: "s25",
     url: "https://files.catbox.moe/m1zg0s.jpg",
-    desc: "一个有些调情意味的Sticker，一只企鹅专注地盯着眼前的人，好像在说“我Now立马要了你”",
+    desc: "一个有些调情意味的Sticker，一只企鹅专注地盯着眼前的人，好像在说“我Now立马要了You”",
   },
   {
     id: "s26",
     url: "https://files.catbox.moe/aa1qnf.jpg",
-    desc: "一个可爱的、富有同情心的小狗Sticker，似乎在说“别难过了，让我抱抱你”",
+    desc: "一个可爱的、富有同情心的小狗Sticker，似乎在说“别难过了，让我抱抱You”",
   },
   {
     id: "s27",
@@ -159,7 +159,7 @@ export const DEFAULT_CHAR_STICKERS = [
   {
     id: "s32",
     url: "https://files.catbox.moe/ij8isj.png",
-    desc: "一只乖巧地躺在被窝里只露出脑袋的小猫，配文“想你了”，看起来很温顺，被子却鼓起一个弧度，暗示自己勃起了。幽默情色、可以用于调情",
+    desc: "一只乖巧地躺在被窝里只露出脑袋的小猫，配文“想You了”，看起来很温顺，被子却鼓起一个弧度，暗示自己勃起了。幽默情色、可以用于调情",
   },
   {
     id: "s33",
@@ -190,12 +190,12 @@ export const DEFAULT_CHAR_STICKERS = [
 
 export const DEFAULT_USER_STICKERS = [
   {
-    id: "us1", // 新增 ID
+    id: "us1", // new ID
     url: "https://files.catbox.moe/58udeq.jpg",
     desc: "一只用力踩着地面、生气地目视前方的小熊，好像在说“我Now很不爽！”",
   },
   {
-    id: "us2", // 新增 ID
+    id: "us2", // new ID
     url: "https://files.catbox.moe/kxsnac.jpg",
     desc: "一只蹦蹦跳跳、欢天喜地的小熊，好像在说“我Now很期待！”",
   },
@@ -212,7 +212,7 @@ export const DEFAULT_USER_STICKERS = [
   {
     id: "us5",
     url: "https://github.com/user-attachments/assets/aa55eef9-c185-43ec-bf52-53e057433612",
-    desc: "一只委屈流泪又有:00凶巴巴的小熊，好像在说“我有:00喜欢你才找你玩，你讲话干嘛凶我。”",
+    desc: "一只委屈流泪又有:00凶巴巴的小熊，好像在说“我有:00喜欢You才找You玩，You讲话干嘛凶我。”",
   },
   {
     id: "us6",
@@ -237,7 +237,7 @@ export const DEFAULT_USER_STICKERS = [
   {
     id: "us10",
     url: "https://github.com/user-attachments/assets/4144d85e-d454-4311-83ac-c808dfddfffd",
-    desc: "一只面色阴沉、又有:00像撒娇的小熊Sticker，好像在说“我要向你施压”",
+    desc: "一只面色阴沉、又有:00像撒娇的小熊Sticker，好像在说“我要向You施压”",
   },
   {
     id: "us11",
@@ -262,7 +262,7 @@ export const DEFAULT_USER_STICKERS = [
   {
     id: "us15",
     url: "https://github.com/user-attachments/assets/5ad86b7a-fc6f-4e1c-8572-66dfdf0ae538",
-    desc: "一只厚脸皮、无所畏惧、又有轻微调情意味的小熊Sticker，好像在说“你骂我？你不怕我是抖M吗？”",
+    desc: "一只厚脸皮、无所畏惧、又有轻微调情意味的小熊Sticker，好像在说“You骂我？You不怕我是抖M吗？”",
   },
   {
     id: "us16",
@@ -277,7 +277,7 @@ export const DEFAULT_USER_STICKERS = [
   {
     id: "us18",
     url: "https://github.com/user-attachments/assets/34506d5b-3420-48a9-a083-afc7f683cc4f",
-    desc: "一只可爱但表情凶狠的小白猫，放狠话说“别以为我是小猫我就不能弄你”，好像在奶声奶气地威胁人",
+    desc: "一只可爱但表情凶狠的小白猫，放狠话说“别以为我是小猫我就不能弄You”，好像在奶声奶气地威胁人",
   },
   {
     id: "us19",
@@ -307,7 +307,7 @@ export const DEFAULT_USER_STICKERS = [
   {
     id: "us24",
     url: "https://github.com/user-attachments/assets/57fb6a60-a481-444e-9866-a26e3f01e51f",
-    desc: "一个跪地抱头、痛苦的3D小白人，配文“我真的没Time陪你闹了”，表达出对某人无理取闹的疲惫和绝望",
+    desc: "一个跪地抱头、痛苦的3D小白人，配文“我真的没Time陪You闹了”，表达出对某人无理取闹的疲惫和绝望",
   },
   {
     id: "us25",
@@ -322,7 +322,7 @@ export const DEFAULT_USER_STICKERS = [
   {
     id: "us27",
     url: "https://github.com/user-attachments/assets/1ff0555f-d12d-47da-a8cc-0a42e1b0b545",
-    desc: "一只面带微笑、看起来人畜无害的小白兔，配文却是凶狠的“我真的会假装玩SM把你往死里打”，用最可爱的脸说最狠毒的话，威胁感拉满",
+    desc: "一只面带微笑、看起来人畜无害的小白兔，配文却是凶狠的“我真的会假装玩SM把You往死里打”，用最可爱的脸说最狠毒的话，威胁感拉满",
   },
   {
     id: "us28",
@@ -332,12 +332,12 @@ export const DEFAULT_USER_STICKERS = [
   {
     id: "us29",
     url: "https://github.com/user-attachments/assets/232ddef4-e417-4865-91cd-f49fdd5de5e1",
-    desc: "一只被气得倒在地上、灵魂出窍的小熊，配文“谢谢你 看完乳腺又长俩结节”，形容被对方的言论气得身体不适",
+    desc: "一只被气得倒在地上、灵魂出窍的小熊，配文“谢谢You 看完乳腺又长俩结节”，形容被对方的言论气得身体不适",
   },
   {
     id: "us30",
     url: "https://github.com/user-attachments/assets/118202a8-5f58-4183-8981-ec3ec1929e66",
-    desc: "长着人脸的小熊一脸冷漠敷衍，配文“0人在意”和“嗯嗯宝汁你继续”，阴阳怪气地表示根本不想听对方废话",
+    desc: "长着人脸的小熊一脸冷漠敷衍，配文“0人在意”和“嗯嗯宝汁You继续”，阴阳怪气地表示根本不想听对方废话",
   },
   {
     id: "us31",
@@ -412,7 +412,7 @@ export const DEFAULT_USER_STICKERS = [
   {
     id: "us45",
     url: "https://github.com/user-attachments/assets/9f043584-9d32-45d6-a01f-0d6087714c3d",
-    desc: "一只拿着“婚姻申报书”的小兔子，一脸“拿你没办法”的宠溺表情，配文“没办法咯~！我要和你结婚”，一种霸道又甜蜜的求婚",
+    desc: "一只拿着“婚姻申报书”的小兔子，一脸“拿You没办法”的宠溺表情，配文“没办法咯~！我要和You结婚”，一种霸道又甜蜜的求婚",
   },
   {
     id: "us46",
@@ -442,7 +442,7 @@ export const DEFAULT_USER_STICKERS = [
   {
     id: "us51",
     url: "https://files.catbox.moe/dqtyu6.webp",
-    desc: "一只表面乖巧的小兔子（乌萨奇），灵魂却演示着“左耳进右耳出”，配文“你说吧我在听”，主打一个“我在听但完全没过脑子”的敷衍态度",
+    desc: "一只表面乖巧的小兔子（乌萨奇），灵魂却演示着“左耳进右耳出”，配文“You说吧我在听”，主打一个“我在听但完全没过脑子”的敷衍态度",
   },
   {
     id: "us52",
@@ -482,7 +482,7 @@ export const DEFAULT_USER_STICKERS = [
   {
     id: "us59",
     url: "https://files.catbox.moe/6xa1gh.jpeg",
-    desc: "一只穿着西装、竖起双手大拇指的黄豆表情，配文“你人还怪好的嘞”，用一种憨憨的语气称赞They are好人，既真诚又带:00幽默",
+    desc: "一只穿着西装、竖起双手大拇指的黄豆表情，配文“You人还怪好的嘞”，用一种憨憨的语气称赞They are好人，既真诚又带:00幽默",
   },
   {
     id: "us60",
@@ -527,7 +527,7 @@ export const DEFAULT_USER_STICKERS = [
   {
     id: "us68",
     url: "https://files.catbox.moe/smf0er.jpg",
-    desc: "一个眼神犀利的外星人，双手托着星云，配文“你Done急哭”，充满了嘲讽和压迫感",
+    desc: "一个眼神犀利的外星人，双手托着星云，配文“YouDone急哭”，充满了嘲讽和压迫感",
   },
   {
     id: "us69",

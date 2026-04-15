@@ -14,7 +14,7 @@ const PersonalizationPanel = ({
   setInputUrl,
 
   // --- 图标定制 Props ---
-  appList, // 应用列表 (从App.jsx传入，确保两边数据一致)
+  appList, // App list (从App.jsx传入，确保两边数据一致)
   customIcons, // Current的Custom图标Status { appId: base64Str }
   handleAppIconUpload, // Upload处理函数
   handleResetIcon, // Reset处理函数
