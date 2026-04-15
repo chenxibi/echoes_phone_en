@@ -87,17 +87,17 @@ const SettingsPanel = ({
   <div className="flex flex-col h-full">
     <div className="space-y-10 overflow-y-auto custom-scrollbar flex-grow px-1 pb-10">
       {/* ---------------------------------------------------------
-          连接配置
+          Connection Settings
          --------------------------------------------------------- */}
       <section>
         <h3 className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-4 border-b border-gray-200/50 pb-2">
-          连接配置
+          Connection Settings
         </h3>
         <div className="glass-card p-4 rounded-xl space-y-4">
           {/* API Base URL */}
           <div>
             <label className="block text-[10px] uppercase text-gray-500 mb-1.5 font-bold">
-              API 地址 (Base URL)
+              API URL
             </label>
             <input
               type="text"
@@ -113,7 +113,7 @@ const SettingsPanel = ({
           {/* API Key */}
           <div>
             <label className="block text-[10px] uppercase text-gray-500 mb-1.5 font-bold">
-              密钥 (API Key)
+              API Key
             </label>
             <input
               type="password"
@@ -129,7 +129,7 @@ const SettingsPanel = ({
           {/* Model Selection */}
           <div>
             <label className="block text-[10px] uppercase text-gray-500 mb-1.5 font-bold">
-              模型 (Model)
+              Model
             </label>
             <div className="flex gap-2">
               <div className="relative flex-grow">
@@ -142,7 +142,7 @@ const SettingsPanel = ({
                     className="w-full p-3.5 bg-gray-50 border border-gray-200 rounded-xl text-xs font-mono focus:border-black outline-none transition-colors appearance-none cursor-pointer"
                   >
                     <option value="" disabled>
-                      选择模型...
+                      Select model...
                     </option>
                     {availableModels.map((m) => (
                       <option key={m} value={m}>
@@ -206,12 +206,12 @@ const SettingsPanel = ({
               {connectionStatus === "success" && <CheckCircle2 size={14} />}
               {connectionStatus === "error" && <AlertCircle size={14} />}
               {connectionStatus === "testing"
-                ? "连接中..."
+                ? "Testing..."
                 : connectionStatus === "success"
-                  ? "连接成功"
+                  ? "Connected"
                   : connectionStatus === "error"
-                    ? "连接失败"
-                    : "测试连接并保存"}
+                    ? "Connection failed"
+                    : "Test Connection"}
             </button>
           </div>
         </div>
@@ -220,19 +220,19 @@ const SettingsPanel = ({
       {!simpleMode && (
         <>
           {/* ---------------------------------------------------------
-          上下文记忆
+          Context Memory
          --------------------------------------------------------- */}
           <section>
             <h3 className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-4 border-b border-gray-200/50 pb-2">
-              上下文
+              Context
             </h3>
             <div className="glass-card p-4 rounded-xl flex items-center justify-between">
               <div>
                 <label className="block text-xs font-bold text-gray-700 mb-1">
-                  上下文记忆 (轮数)
+                  Context Turns
                 </label>
                 <p className="text-[10px] text-gray-400">
-                  按对话轮次计算，同一人连续发送的多条消息仅计为 1 轮。
+                  Counts consecutive messages from the same person as 1 turn.
                 </p>
               </div>
               <div className="flex items-center gap-2">
@@ -247,23 +247,23 @@ const SettingsPanel = ({
                   }}
                   className="w-16 p-2 bg-white border border-gray-200 rounded-lg text-center text-xs font-mono outline-none focus:border-black"
                 />
-                <span className="text-[10px] text-gray-400">轮</span>
+                <span className="text-[10px] text-gray-400">turns</span>
               </div>
             </div>
           </section>
 
           {/* ---------------------------------------------------------
-          长记忆配置
+          Long-term Memory
          --------------------------------------------------------- */}
           <section>
             <div className="flex justify-between items-center mb-4 border-b border-gray-200/50 pb-2">
               <h3 className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
-                长记忆
+                Long-term Memory
               </h3>
               {/* 开关放在标题行 */}
               <div className="flex items-center gap-2">
                 <span className="text-[10px] text-gray-400">
-                  {memoryConfig.enabled ? "已开启" : "已关闭"}
+                  {memoryConfig.enabled ? "On" : "Off"}
                 </span>
                 <button
                   onClick={() =>
@@ -286,7 +286,7 @@ const SettingsPanel = ({
               {/* 阈值 */}
               <div className="flex items-center justify-between">
                 <label className="text-xs font-bold text-gray-600">
-                  自动总结
+                  Auto Summarize
                 </label>
                 <div className="flex items-center gap-2">
                   <input
@@ -302,7 +302,7 @@ const SettingsPanel = ({
                     }
                     className="w-16 p-2 bg-white border border-gray-200 rounded-lg text-center text-xs font-mono outline-none focus:border-black"
                   />
-                  <span className="text-[10px] text-gray-400">轮对话触发</span>
+                  <span className="text-[10px] text-gray-400">turns to trigger</span>
                 </div>
               </div>
 
@@ -310,7 +310,7 @@ const SettingsPanel = ({
               <div>
                 <div className="flex justify-between items-end mb-2">
                   <label className="text-[10px] uppercase font-bold text-gray-400">
-                    记忆详情 (Prompt)
+                    Memory Detail
                   </label>
                   <button
                     onClick={triggerSummary}
@@ -322,49 +322,49 @@ const SettingsPanel = ({
                     ) : (
                       <FileText size={10} />
                     )}
-                    手动总结
+                    Summarize Now
                   </button>
                 </div>
                 <textarea
                   value={longMemory}
                   onChange={(e) => setLongMemory(e.target.value)}
                   className="w-full h-32 p-3 bg-white/50 border border-gray-200 rounded-xl text-xs leading-relaxed resize-none focus:border-black outline-none custom-scrollbar transition-colors focus:bg-white"
-                  placeholder="开启时，角色将自动在此处积累对你的长期记忆..."
+                  placeholder="When enabled, the character will accumulate long-term memory about you here..."
                 />
               </div>
             </div>
           </section>
 
           {/* ---------------------------------------------------------
-          SECTION 3: 聊天设置 (独立区块)
+          SECTION 3: Chat Settings (独立区块)
          --------------------------------------------------------- */}
           {chatStyle && (
             <section>
               <h3 className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-4 border-b border-gray-200/50 pb-2">
-                聊天设置
+                Chat Settings
               </h3>
               <div className="glass-card p-4 rounded-xl space-y-4">
                 {/* 风格 */}
                 <div>
                   <label className="block text-[10px] font-bold uppercase text-gray-500 mb-2">
-                    风格 (Style)
+                    Style
                   </label>
                   <div className="grid grid-cols-3 gap-2">
                     {[
                       {
                         id: "dialogue",
-                        label: "短信",
-                        desc: "拟真聊天体验",
+                        label: "Chat",
+                        desc: "Realistic chat",
                       },
                       {
                         id: "novel",
-                        label: "小说",
-                        desc: "大段文字描写",
+                        label: "Novel",
+                        desc: "Long prose",
                       },
                       {
                         id: "brackets",
-                        label: "剧本",
-                        desc: "括号动作描写",
+                        label: "Script",
+                        desc: "Action in brackets",
                       },
                     ].map((style) => (
                       <button
@@ -394,7 +394,7 @@ const SettingsPanel = ({
                 {/* 交互模式 */}
                 <div>
                   <label className="block text-[10px] font-bold uppercase text-gray-500 mb-2">
-                    交互模式 (Mode)
+                    Mode
                   </label>
                   <div className="flex gap-2">
                     <button
@@ -405,7 +405,7 @@ const SettingsPanel = ({
                           : "bg-white/50 text-gray-500 hover:bg-white"
                       }`}
                     >
-                      <Smartphone size={12} /> 线上 (Phone)
+                      <Smartphone size={12} /> Online
                     </button>
                     <button
                       onClick={() => setInteractionMode("offline")}
@@ -415,7 +415,7 @@ const SettingsPanel = ({
                           : "bg-white/50 text-gray-500 hover:bg-white"
                       }`}
                     >
-                      <MapPin size={12} /> 现实 (Reality)
+                      <MapPin size={12} /> Reality
                     </button>
                   </div>
                 </div>
@@ -424,30 +424,30 @@ const SettingsPanel = ({
                 <div>
                   <div className="flex items-center gap-2 mb-3">
                     <label className="text-[10px] font-bold uppercase text-gray-500 mr-auto">
-                      角色表情包库
+                      Sticker Library
                     </label>
                     {/* Add Single Button */}
                     {/* 上传按钮 */}
                     <button
                       onClick={() => stickerInputRef.current.click()}
                       className="flex items-center justify-center gap-1 p-0 text-[10px] text-gray-400 hover:text-[#7A2A3A] transition-colors"
-                      title="上传本地图片"
+                      title="Upload image"
                     >
                       <Plus size={10} />
-                      <span>上传</span>
+                      <span>Upload</span>
                     </button>
 
                     {/* 批量导入按钮 */}
                     <button
                       onClick={async () => {
-                        const input = await customPrompt("请输入表情包链接进行导入", "", "批量导入");
+                        const input = await customPrompt("Enter sticker URL to import", "", "Bulk Import");
                         if (input) handleBulkImport(input, "char");
                       }}
                       className="flex items-center justify-center gap-1 pl-1 pr-3 text-[10px] text-gray-400 hover:text-blue-500 transition-colors"
-                      title="链接一键导入"
+                      title="Import from URL"
                     >
                       <Download size={10} />
-                      <span>批量</span>
+                      <span>Bulk</span>
                     </button>
 
                     <button
@@ -497,11 +497,11 @@ const SettingsPanel = ({
 
           <section>
             <h3 className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-4 border-b border-gray-200/50 pb-2">
-              数据管理
+              Data Management
             </h3>
             <div className="glass-card p-4 rounded-xl space-y-3">
               <p className="text-[9px] text-gray-400 mb-2">
-                将聊天记录导出为文件保存，或从文件恢复。
+                Export chat history to a file, or restore from a file.
               </p>
               <div className="flex gap-3">
                 {/* 导出按钮 */}
@@ -510,13 +510,13 @@ const SettingsPanel = ({
                   className="flex-1 py-3 bg-black text-white rounded-xl text-xs font-bold hover:bg-gray-800 transition-colors flex items-center justify-center gap-2 shadow-md"
                 >
                   <Download size={14} />
-                  导出备份
+                  Export
                 </button>
 
                 {/* 导入按钮 (关联隐藏的 input) */}
                 <label className="flex-1 py-3 bg-white border border-gray-200 text-gray-700 rounded-xl text-xs font-bold hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-sm">
                   <Upload size={14} />
-                  导入恢复
+                  Import
                   <input
                     type="file"
                     accept=".json"
@@ -566,13 +566,13 @@ const StickerEditorModal = ({ sticker, onSave, onDelete, onClose }) => {
   return (
     <div className="fixed inset-0 z-[100] bg-black/50 flex items-center justify-center p-4 animate-in fade-in">
       <div className="bg-white w-full max-w-sm rounded-2xl p-4 shadow-2xl flex flex-col gap-4">
-        <h3 className="text-sm font-bold text-gray-700">编辑表情包</h3>
+        <h3 className="text-sm font-bold text-gray-700">Edit Sticker</h3>
         <div className="aspect-square w-32 mx-auto bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
           <img src={sticker.url} className="w-full h-full object-cover" />
         </div>
         <div>
           <label className="text-[10px] font-bold uppercase text-gray-400">
-            描述 (角色将根据此描述选用)
+            Description (character uses this to decide when to send)
           </label>
           <textarea
             className="w-full h-20 p-2 text-xs border border-gray-200 rounded-lg mt-1 resize-none focus:border-black outline-none"
@@ -585,19 +585,19 @@ const StickerEditorModal = ({ sticker, onSave, onDelete, onClose }) => {
             onClick={() => onDelete(sticker.id)}
             className="flex-1 py-2 bg-red-50 text-red-500 rounded-lg text-xs font-bold hover:bg-red-100"
           >
-            删除
+            Delete
           </button>
           <button
             onClick={onClose}
             className="flex-1 py-2 bg-gray-100 text-gray-600 rounded-lg text-xs font-bold"
           >
-            取消
+            Cancel
           </button>
           <button
             onClick={() => onSave(sticker.id, desc)}
             className="flex-1 py-2 bg-black text-white rounded-lg text-xs font-bold"
           >
-            保存
+            Save
           </button>
         </div>
       </div>
@@ -654,7 +654,7 @@ const StickerGroup = ({
           <button
             onClick={() => renameStickerGroup(group)}
             className="text-gray-300 hover:text-blue-500 p-1 transition-colors"
-            title="重命名库"
+            title="Rename group"
           >
             <Edit2 size={12} />
           </button>
@@ -663,7 +663,7 @@ const StickerGroup = ({
           <button
             onClick={() => deleteStickerGroup(group)}
             className="text-gray-300 hover:text-red-500 p-1 transition-colors"
-            title="删除库"
+            title="Delete group"
           >
             <Trash2 size={12} />
           </button>
@@ -702,7 +702,7 @@ const StickerGroup = ({
         >
           {visibleStickers.length === 0 && (
             <div className="text-center py-4 text-[10px] text-gray-400 italic">
-              暂无表情，请上传
+              No stickers yet. Upload some.
             </div>
           )}
 

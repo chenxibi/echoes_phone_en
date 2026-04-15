@@ -119,7 +119,7 @@ export const TransferBubble = ({ msg, isMe, onInteract }) => {
         </div>
         <div className="overflow-hidden min-w-0">
           <div className="text-[10px] font-bold opacity-90 mb-0.5 truncate">
-            {isMe ? "向对方转账" : "向你转账"}
+            {isMe ? "Sent transfer" : "Received transfer"}
           </div>
           <div className="text-xl font-bold font-mono tracking-tight truncate">
             ¥ {amount}
@@ -137,7 +137,7 @@ export const TransferBubble = ({ msg, isMe, onInteract }) => {
       {/* 3. 底部：状态栏 */}
       <div className="flex justify-between items-center border-t border-white/20 pt-2">
         <span className="text-xs font-bold opacity-90">
-          {isPending ? "等待确认" : isAccepted ? "已收款" : "已退还"}
+          {isPending ? "Awaiting" : isAccepted ? "Received" : "Refunded"}
         </span>
 
         {/* 交互按钮 */}
@@ -150,7 +150,7 @@ export const TransferBubble = ({ msg, isMe, onInteract }) => {
               }}
               className="px-2 py-1 bg-white/20 hover:bg-white/30 text-white text-[10px] rounded-md font-bold backdrop-blur-sm"
             >
-              退还
+              Return
             </button>
             <button
               onClick={(e) => {
@@ -159,7 +159,7 @@ export const TransferBubble = ({ msg, isMe, onInteract }) => {
               }}
               className="px-2 py-1 bg-white text-[#ff9f43] hover:bg-gray-50 text-[10px] rounded-md font-bold shadow-sm"
             >
-              收款
+              Accept
             </button>
           </div>
         )}

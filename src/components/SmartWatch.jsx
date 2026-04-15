@@ -27,7 +27,7 @@ const CollapsibleThought = ({ text, label }) => {
         className="flex items-center gap-1 text-[10px] uppercase font-bold text-gray-400 hover:text-blue-500 transition-colors"
       >
         {isExpanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
-        {isExpanded ? "收起心声" : label}
+        {isExpanded ? "Hide thoughts" : label}
       </button>
       {isExpanded && (
         <div className="mt-2 p-3 bg-blue-50/50 rounded-lg border border-blue-100 text-[11px] italic text-gray-600 leading-relaxed animate-in fade-in slide-in-from-top-1">
@@ -99,7 +99,7 @@ const SmartWatch = ({
   });
 
   return (
-    <AppWindow isOpen={isOpen} title="智能家" onClose={onClose}>
+    <AppWindow isOpen={isOpen} title="LiveTracker" onClose={onClose}>
       <div className="pb-20">
         {/* Header Actions */}
         <div className="flex justify-between items-center px-4 pt-4 mb-4">
@@ -111,7 +111,7 @@ const SmartWatch = ({
                 : "text-gray-400 border-gray-200"
             }`}
           >
-            {isEditingMap ? "完成编辑" : "编辑地图"}
+            {isEditingMap ? "Done" : "Edit Map"}
           </button>
           <button
             onClick={() => generateSmartWatchUpdate()}
@@ -123,7 +123,7 @@ const SmartWatch = ({
             ) : (
               <ScanLine size={10} />
             )}
-            更新行踪
+            Update Location
           </button>
         </div>
 
@@ -131,16 +131,16 @@ const SmartWatch = ({
         <div className="relative w-full h-[550px] bg-[#F5F5F7] border-y border-gray-200 overflow-y-auto custom-scrollbar mb-6">
           {smartWatchLocations.length === 0 ? (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-center px-6">
-              <p className="text-xs text-gray-400">暂无监控数据</p>
+              <p className="text-xs text-gray-400">No tracking data yet</p>
               <p className="text-[10px] text-gray-300">
-                请确认已开启世界书，然后初始化系统
+                Enable Lore Book first, then initialize
               </p>
               <button
                 onClick={initSmartWatch}
                 disabled={loading.smartwatch}
                 className="px-6 py-2 bg-black text-white text-xs rounded-lg active:scale-95 transition-transform disabled:bg-gray-400"
               >
-                {loading.smartwatch ? "初始化中..." : "初始化监控系统"}
+                {loading.smartwatch ? "Initializing..." : "Initialize System"}
               </button>
             </div>
           ) : (
@@ -262,7 +262,7 @@ const SmartWatch = ({
                                 smartWatchLocations.filter((_, i) => i !== idx),
                               );
                             } else {
-                              showToast("error", "最少保留4个地点");
+                              showToast("error", "Keep at least 4 locations");
                             }
                           }}
                         >
@@ -277,7 +277,7 @@ const SmartWatch = ({
               {!smartWatchLogs[0]?.locationId && smartWatchLogs.length > 0 && (
                 <div className="absolute bottom-4 left-0 right-0 text-center">
                   <span className="bg-black/70 backdrop-blur text-white text-[10px] px-3 py-1 rounded-full">
-                    📍 当前位于: {smartWatchLogs[0].locationName}
+                    📍 Currently at: {smartWatchLogs[0].locationName}
                   </span>
                 </div>
               )}
@@ -289,14 +289,14 @@ const SmartWatch = ({
         <div className="px-4">
           <div className="flex justify-between items-end mb-4 border-b border-gray-200 pb-2">
             <h3 className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
-              监控日志
+              Activity Log
             </h3>
             {swFilter !== "all" && (
               <button
                 onClick={() => setSwFilter("all")}
                 className="text-[9px] text-blue-500 flex items-center hover:underline"
               >
-                <X size={10} className="mr-1" /> 清除筛选
+                <X size={10} className="mr-1" /> Clear filter
               </button>
             )}
           </div>
@@ -326,12 +326,12 @@ const SmartWatch = ({
                   </div>
 
                   <div className="text-xs text-gray-600 mb-3 bg-white/60 p-2 rounded-lg border border-white/50">
-                    <span className="font-bold mr-1 text-gray-400">状态:</span>{" "}
+                    <span className="font-bold mr-1 text-gray-400">Status:</span>{" "}
                     {log.action}
                   </div>
 
                   <div className="space-y-2">
-                    <CollapsibleThought text={log.thought} label="查看心声" />
+                    <CollapsibleThought text={log.thought} label="View thoughts" />
                     {log.avData && (
                       <details className="group/details">
                         <summary className="list-none cursor-pointer flex items-center gap-1 text-[10px] uppercase font-bold text-gray-400 hover:text-red-500 transition-colors mt-2">
@@ -343,7 +343,7 @@ const SmartWatch = ({
                             size={12}
                             className="hidden group-open/details:block"
                           />
-                          <span>{log.avData ? "音视频数据" : "无信号"}</span>
+                          <span>{log.avData ? "AV Data" : "No signal"}</span>
                         </summary>
                         <div className="mt-2 p-3 bg-black/5 rounded-lg border border-black/10 text-[10px] leading-relaxed text-gray-600 animate-in slide-in-from-top-1">
                           <div className="flex items-center gap-1 text-red-500 mb-1 font-bold animate-pulse">
@@ -370,7 +370,7 @@ const SmartWatch = ({
               ))}
             {smartWatchLogs.length === 0 && (
               <div className="text-center text-gray-400 text-xs py-8">
-                暂无日志记录
+                No log entries yet
               </div>
             )}
           </div>

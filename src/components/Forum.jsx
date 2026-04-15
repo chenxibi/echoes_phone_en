@@ -85,10 +85,10 @@ const Forum = ({
 
   // --- 辅助逻辑 ---
   const getForumName = (type) => {
-    if (type === "me") return forumSettings.userNick || userName || "User本U";
+    if (type === "me") return forumSettings.userNick || userName || "User";
     if (type === "char")
-      return forumSettings.charNick || persona?.name || "匿名用户";
-    return "匿名网友";
+      return forumSettings.charNick || persona?.name || "Anonymous";
+    return "Anonymous netizen";
   };
 
   const getFormattedSystemPrompt = () => {
@@ -130,7 +130,7 @@ const Forum = ({
       );
       if (data && data.posts) {
         setForumData({
-          name: data.forumName || "本地社区",
+          name: data.forumName || "Local Community",
           posts: data.posts.map((p) => ({
             ...p,
             replies: p.replies || [],
@@ -138,7 +138,7 @@ const Forum = ({
           })),
           isInitialized: true,
         });
-        showToast("success", "生活圈已初始化");
+        showToast("success", "Feed initialized");
       }
     } finally {
       setLoading((prev) => ({ ...prev, forum: false }));

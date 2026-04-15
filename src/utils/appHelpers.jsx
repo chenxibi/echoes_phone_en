@@ -42,15 +42,15 @@ export const isImageMsg = (content) => content && content.startsWith(IMG_TAG_STA
 export const getImageDesc = (content) => content.replace(IMG_TAG_START, "");
 
 export const APP_LIST = [
-  { id: "forum", label: "生活圈", icon: Hash },
-  { id: "smartwatch", label: "智能家", icon: ScanEye },
-  { id: "browser", label: "浏览器", icon: Globe },
-  { id: "journal", label: "日记", icon: Book },
-  { id: "traces", label: "生活痕迹", icon: Receipt },
-  { id: "music", label: "共鸣旋律", icon: Disc3 },
-  { id: "worldbook", label: "世界书", icon: BookOpen },
-  { id: "personalization", label: "个性化", icon: Wand },
-  { id: "settings", label: "系统设置", icon: SlidersHorizontal },
+  { id: "forum", label: "Feed", icon: Hash },
+  { id: "smartwatch", label: "LiveTracker", icon: ScanEye },
+  { id: "browser", label: "Browser", icon: Globe },
+  { id: "journal", label: "Diary", icon: Book },
+  { id: "traces", label: "Activity Log", icon: Receipt },
+  { id: "music", label: "Music", icon: Disc3 },
+  { id: "worldbook", label: "Lore Book", icon: BookOpen },
+  { id: "personalization", label: "Personalization", icon: Wand },
+  { id: "settings", label: "Settings", icon: SlidersHorizontal },
 ];
 
 /* --- UTILS --- */
