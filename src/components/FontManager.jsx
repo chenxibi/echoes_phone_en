@@ -44,19 +44,18 @@ export const FontManager = () => {
         setIsSaved(true);
         setTimeout(() => setIsSaved(false), 2000);
       } catch (err) {
-        alert("Font file too large. Cannot save to local config (limit ~5MB).");
+        alert("Font file too large to save locally (limit ~5MB)");
       }
     };
     reader.readAsDataURL(file);
   };
 
-  // [new] Reset to default逻辑
+  // Reset to default logic
   const handleReset = () => {
     localStorage.removeItem("custom-font-data");
     localStorage.removeItem("custom-font-name");
     const styleTag = document.getElementById("dynamic-user-font");
     if (styleTag) styleTag.remove();
-    // Reset CSS 变量回默认值（Inter 或 sans-serif）
     document.documentElement.style.setProperty(
       "--app-font",
       "'Inter', sans-serif",
@@ -68,14 +67,14 @@ export const FontManager = () => {
     <div className="p-4 bg-gray-50/50 rounded-2xl border border-gray-100">
       <div className="flex items-center justify-between mb-3">
         <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-          UI Font Customization
+          Interface Font
         </label>
         {fontName && (
           <button
             onClick={handleReset}
             className="flex items-center gap-1 text-[10px] text-gray-400 hover:text-red-500 transition-colors"
           >
-            <RotateCcw size={10} /> Reset to default
+            <RotateCcw size={10} /> Reset
           </button>
         )}
       </div>
@@ -90,9 +89,9 @@ export const FontManager = () => {
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-xs font-medium text-gray-700 truncate">
-            {fontName || "Click to upload font file"}
+            {fontName || "Click to upload a font file"}
           </p>
-          <p className="text-[10px] text-gray-400">Support .ttf, .otf, .woff2</p>
+          <p className="text-[10px] text-gray-400">Supports .ttf, .otf, .woff2</p>
         </div>
         <input
           type="file"

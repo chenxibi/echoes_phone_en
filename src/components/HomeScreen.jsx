@@ -10,12 +10,12 @@ const HomeScreen = ({
   useStickyState,
 }) => {
   const [currentPage, setCurrentPage] = useState(0);
-  // Storage每个图标的坐标 { app_id: {x, y} }
+  // 存储每个图标的坐标 { app_id: {x, y} }
   const [positions, setPositions] = useStickyState({}, "echoes_icon_positions");
   const [draggingApp, setDraggingApp] = useState(null);
   const containerRef = useRef(null);
 
-  // Handle drag start
+  // 处理拖拽开始
   const handleDragStart = (id, e) => {
     setDraggingApp(id);
     e.dataTransfer.setData("text/plain", id);
@@ -44,7 +44,7 @@ const HomeScreen = ({
       onDragOver={(e) => e.preventDefault()}
       onDrop={handleDrop}
     >
-      {/* Page 1：App 与 黑胶组件 */}
+      {/* 页面 1：App 与 黑胶组件 */}
       {currentPage === 0 && (
         <div className="w-full h-full p-8">
           {/* 2x2 黑胶挂件 (固定或拖拽) */}
@@ -112,7 +112,7 @@ const HomeScreen = ({
         </div>
       )}
 
-      {/* Page 2：系统Actions */}
+      {/* 页面 2：系统操作 */}
       {currentPage === 1 && (
         <div className="w-full h-full flex flex-col items-center justify-center p-10 animate-in fade-in zoom-in duration-300">
           <button
@@ -120,7 +120,7 @@ const HomeScreen = ({
             className="bg-white/80 backdrop-blur-md border border-red-100 text-red-500 px-10 py-4 rounded-3xl font-bold flex items-center gap-3 shadow-xl active:scale-95 transition-all"
           >
             <LogOut size={20} />
-            Sign Out
+            Log Out
           </button>
           <p className="mt-4 text-gray-300 text-[10px] font-mono tracking-widest uppercase">
             System Control
@@ -128,7 +128,7 @@ const HomeScreen = ({
         </div>
       )}
 
-      {/* 底部Page指示器 */}
+      {/* 底部页面指示器 */}
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-3">
         {[0, 1].map((i) => (
           <div

@@ -38,13 +38,13 @@ const Forum = ({
   userPersona,
   charTrackerContext, // 角色追踪上下文
   trackerContext, // 用户追踪上下文
-  setChatHistory, // 用于转Send message
+  setChatHistory, // 用于转发消息
   setMsgCountSinceSummary,
   setForwardContext,
   setActiveApp, // 用于跳转到 Chat
-  onChatEventPost, // 聊天事件触发Post的回调
+  onChatEventPost, // 聊天事件触发发帖的回调
 }) => {
-  // --- 内部Status管理 ---
+  // --- 内部状态管理 ---
   const [forumData, setForumData] = useStickyState(
     { name: "", posts: [], isInitialized: false },
     "echoes_forum_data",
@@ -60,13 +60,13 @@ const Forum = ({
   const [showPostModal, setShowPostModal] = useState(false);
   const [postTab, setPostTab] = useState("me"); // 'me' or 'char'
 
-  // 聊天事件触发Post的弹窗Status
+  // 聊天事件触发发帖的弹窗状态
   const [showChatEventModal, setShowChatEventModal] = useState(false);
-  const [chatEventPostData, setChatEventPostData] = useState(null); // 存储 AI 生成的PostContent
+  const [chatEventPostData, setChatEventPostData] = useState(null); // 存储 AI Generate的发帖内容
   const [replyIdentity, setReplyIdentity] = useState("me"); // 'me' or 'smurf'
   const [forumGuidance, setForumGuidance] = useState("");
 
-  // Loading Status集合
+  // Loading 状态集合
   const [loading, setLoading] = useState({
     forum: false,
     forum_new: false,
@@ -77,7 +77,7 @@ const Forum = ({
     chat_event_post: false,
   });
 
-  // 草稿箱 (不需要持久化，或者可以用 useStickyState 如果You想Save草稿)
+  // 草稿箱 (不需要持久化，或者可以用 useStickyState 如果你想保存草稿)
   const [postDrafts, setPostDrafts] = useState({
     me: { title: "", content: "", topic: "" },
     char: { title: "", content: "", topic: "" },
@@ -85,10 +85,10 @@ const Forum = ({
 
   // --- 辅助逻辑 ---
   const getForumName = (type) => {
-    if (type === "me") return forumSettings.userNick || userName || "RealMe";
+    if (type === "me") return forumSettings.userNick || userName || "User";
     if (type === "char")
-      return forumSettings.charNick || persona?.name || "AnonUser";
-    return "Anonymous";
+      return forumSettings.charNick || persona?.name || "Anonymous";
+    return "Netizen";
   };
 
   const getFormattedSystemPrompt = () => {
@@ -110,7 +110,7 @@ const Forum = ({
       .replaceAll("{{WORLD_INFO}}", cleanWorldInfo);
   };
 
-  // --- 核心业务逻辑 (Done修复 WorldInfo 引用) ---
+  // --- 核心业务逻辑 (已修复 WorldInfo 引用) ---
 
   const initForum = async () => {
     if (!persona) return;
@@ -123,7 +123,7 @@ const Forum = ({
 
     try {
       const data = await generateContent(
-        // 【修改处】使用格式化后的System Notice词
+        // 【修改处】使用格式化后的系统提示词
         { prompt, systemInstruction: getFormattedSystemPrompt() },
         apiConfig,
         (err) => showToast("error", err),
@@ -138,7 +138,7 @@ const Forum = ({
           })),
           isInitialized: true,
         });
-        showToast("success", "FeedDoneInitializing...");
+        showToast("success", "Forum initialized");
       }
     } finally {
       setLoading((prev) => ({ ...prev, forum: false }));
@@ -151,7 +151,7 @@ const Forum = ({
     const currentUserName = userName || "User";
 
     // [辅助] 简单的占位符替换 (如果 helpers.js 没导这个函数，就在这里简写)
-    // 假设 props 里的 worldInfoString Done经是处理好的，或者这里做简单的 replace
+    // 假设 props 里的 worldInfoString 已经是处理好的，或者这里做简单的 replace
     const cleanWorldInfo = worldInfoString || "";
 
     const dateObj = getCurrentTimeObj();
@@ -192,7 +192,7 @@ const Forum = ({
             ...prev.posts,
           ],
         }));
-        showToast("success", "DoneNew Post");
+        showToast("success", "New post generated");
       }
     } finally {
       setLoading((prev) => ({ ...prev, forum_new: false }));
@@ -244,8 +244,8 @@ const Forum = ({
       !isSmurfReply;
     const aiPromptMode = isCharThread || mode === "Manual" ? "Manual" : "Auto";
     const currentUserName = userName || "User";
-    const userNick = forumSettings.userNick || userName || "RealMe";
-    const charNick = forumSettings.charNick || persona.name || "AnonUser";
+    const userNick = forumSettings.userNick || userName || "User";
+    const charNick = forumSettings.charNick || persona.name || "Anonymous";
 
     let targetInstruction = "";
     if (isSmurfReply) {
@@ -335,7 +335,7 @@ ${recentHistory}
         const newReplies = data.replies.map((r) => ({
           id: `r_${Date.now()}_${Math.random()}`,
           author: r.isCharacter
-            ? forumSettings.charNick || "AnonUser"
+            ? forumSettings.charNick || "Anonymous"
             : r.author,
           content: r.content,
           isCharacter: r.isCharacter || false,
@@ -354,7 +354,7 @@ ${recentHistory}
               : p,
           ),
         }));
-        if (mode === "Manual") showToast("success", "DoneRefreshComment");
+        if (mode === "Manual") showToast("success", "Comments refreshed");
       }
     } finally {
       setLoading((prev) => ({ ...prev, [loadingKey]: false }));
@@ -365,7 +365,7 @@ ${recentHistory}
     const recentPosts = forumData.posts.slice(0, 5);
     if (recentPosts.length === 0) return;
     setLoading((prev) => ({ ...prev, forum_refresh_all: true }));
-    showToast("info", "Updating feed......");
+    showToast("info", "Updating feed...");
     for (const post of recentPosts) {
       await generateForumReplies(post.id, "Auto");
     }
@@ -375,7 +375,7 @@ ${recentHistory}
 
   const generateCharacterPost = async () => {
     if (!postDrafts.char.topic) {
-      showToast("error", "Enter prompt");
+      showToast("error", "Please enter a prompt");
       return;
     }
     setLoading((prev) => ({ ...prev, forum_char: true }));
@@ -410,13 +410,13 @@ ${recentHistory}
     }
   };
 
-  // 聊天事件触发Post：AI min析聊天历史后自动Post
+  // 聊天事件触发发帖：AI 分析聊天历史后自动发帖
   const generateChatEventPost = async (showModal = true) => {
     if (!persona) return;
     setLoading((prev) => ({ ...prev, chat_event_post: true }));
 
     const currentUserName = userName || "User";
-    const charNick = forumSettings.charNick || persona.name || "AnonUser";
+    const charNick = forumSettings.charNick || persona.name || "Anonymous";
     const cleanWorldInfo = worldInfoString || "";
 
     const prompt = prompts.forum_chat_event
@@ -456,13 +456,13 @@ ${recentHistory}
           })),
         };
 
-        // Add新Post到Feed数据
+        // 添加新帖子到论坛数据
         setForumData((prev) => ({
           ...prev,
           posts: [newPost, ...prev.posts],
         }));
 
-        // Settings弹窗数据并通知 App
+        // 设置弹窗数据并通知 App
         setChatEventPostData(newPost);
         if (showModal) {
           setShowChatEventModal(true);
@@ -520,7 +520,7 @@ ${recentHistory}
     if (!content.trim()) return;
     const replyAuthor =
       type === "smurf"
-        ? forumSettings.smurfNick || "Alt user"
+        ? forumSettings.smurfNick || "Alt User"
         : getForumName("me");
     const newReply = {
       id: `ur_${Date.now()}`,
@@ -544,13 +544,13 @@ ${recentHistory}
   };
 
   const handleDeletePost = async (postId) => {
-    if (await customConfirm("Permanently delete this post?", "Delete Post")) {
+    if (await customConfirm("Delete this post permanently?", "Delete Post")) {
       setForumData((prev) => ({
         ...prev,
         posts: prev.posts.filter((p) => p.id !== postId),
       }));
       if (activeThreadId === postId) setActiveThreadId(null);
-      showToast("success", "PostDeleted");
+      showToast("success", "Post deleted");
     }
   };
 
@@ -564,15 +564,19 @@ ${recentHistory}
           return { ...p, replies: newReplies, replyCount: newReplies.length };
         }),
       }));
-      showToast("success", "CommentDeleted");
+      showToast("success", "Comment deleted");
     }
   };
 
   const handleForwardToChat = (item, type = "post", parentTitle = "") => {
     const content =
       type === "post"
-        ? `[Forwarded Post]\nTitle: ${item.title}\nAuthor: ${item.author}\nContent: ${item.content}`
-        : `[Forwarded Comment]\nSource post: ${parentTitle}\nCommenter: ${item.author}\nContent: ${item.content}`;
+        ? `[Post] Title: ${item.title}
+Author: ${item.author}
+Content: ${item.content}`
+        : `[Comment] From: ${parentTitle}
+Comment by: ${item.author}
+Content: ${item.content}`;
 
     const newMsg = {
       sender: "me",
@@ -611,30 +615,30 @@ ${recentHistory}
       const newPosts = prev.posts.map((p) => {
         let newAuthor = p.author;
         if (p.authorType === "me")
-          newAuthor = newSettings.userNick || "RealMe";
+          newAuthor = newSettings.userNick || "User";
         else if (p.authorType === "char" || p.author === persona.name)
-          newAuthor = newSettings.charNick || "AnonUser";
+          newAuthor = newSettings.charNick || "Anonymous";
 
         const newReplies = (p.replies || []).map((r) => {
           let rAuthor = r.author;
           if (r.authorType === "me" || r.isUser)
-            rAuthor = newSettings.userNick || "RealMe";
+            rAuthor = newSettings.userNick || "User";
           else if (r.authorType === "smurf")
-            rAuthor = newSettings.smurfNick || "JustBrowsing";
-          else if (r.isCharacter) rAuthor = newSettings.charNick || "AnonUser";
+            rAuthor = newSettings.smurfNick || "Not an alt";
+          else if (r.isCharacter) rAuthor = newSettings.charNick || "Anonymous";
           return { ...r, author: rAuthor };
         });
         return { ...p, author: newAuthor, replies: newReplies };
       });
       return { ...prev, posts: newPosts };
     });
-    showToast("success", "Nicknames updated across history");
+    showToast("success", "IDs updated, history synced");
   };
 
   return (
     <AppWindow
       isOpen={isOpen}
-      title={activeThreadId ? "Post Details" : forumData.name || "Local Feed"}
+      title={activeThreadId ? "Post Detail" : forumData.name || "Local Forum"}
       onClose={() => {
         if (activeThreadId) setActiveThreadId(null);
         else onClose();
@@ -659,14 +663,14 @@ ${recentHistory}
         )
       }
     >
-      {/* Status 0: 未Initializing... */}
+      {/* 状态 0: 未初始化 */}
       {!forumData.isInitialized ? (
         <div className="flex flex-col items-center justify-center h-full pb-20 px-6 animate-in fade-in">
-          <h2 className="text-xl font-bold text-gray-800 mb-2">Local Feed</h2>
+          <h2 className="text-xl font-bold text-gray-800 mb-2">Local Forum</h2>
           <p className="text-xs text-gray-500 text-center mb-8 leading-relaxed max-w-[240px]">
-            Connect with the city pulse. Discover the real world around your character.
+            Connect to the pulse of the city and discover the real world around your character.
             <br />
-            Initializing... Random local topics and discussions will be generated.
+            Connect to the pulse of the city and discover the real world around your character. Random local topics and netizen discussions will be generated on init.
           </p>
           <button
             onClick={initForum}
@@ -678,11 +682,11 @@ ${recentHistory}
             ) : (
               <Hash size={16} />
             )}
-            {loading.forum ? "FeedLoading......" : "Initializing...Feed"}
+            {loading.forum ? "Loading..." : "Initialize Forum"}
           </button>
         </div>
       ) : activeThreadId ? (
-        // Status 1: Post详情页
+        // 状态 1: 帖子详情页
         (() => {
           const thread = forumData.posts.find((p) => p.id === activeThreadId);
           if (!thread) return <div>Post not found</div>;
@@ -745,7 +749,7 @@ ${recentHistory}
                         ) : (
                           <Sparkle size={12} />
                         )}
-                        {loading.forum_char_reply ? "Typing..." : "Reply as character"}
+                        {loading.forum_char_reply ? "Typing..." : "Reply as Character"}
                       </button>
                     )}
                     <button
@@ -773,9 +777,7 @@ ${recentHistory}
                       >
                         {reply.author}
                         {reply.author === thread.author && (
-                          <span className="px-1.5 py-0.5 bg-gray-200 text-gray-500 text-[8px] rounded-md scale-90 origin-left">
-                            OP
-                          </span>
+                          <span className="px-1.5 py-0.5 bg-gray-200 text-gray-500 text-[8px] rounded-md scale-90 origin-left">OP</span>
                         )}
                       </span>
                       <div className="flex items-center gap-2">
@@ -786,7 +788,7 @@ ${recentHistory}
                               handleDeleteReply(thread.id, reply.id);
                             }}
                             className="p-1 text-gray-300 hover:text-red-500"
-                            title="Delete"
+                            title="Delete this comment"
                           >
                             <Trash2 size={12} />
                           </button>
@@ -829,7 +831,7 @@ ${recentHistory}
                           Main ({forumSettings.userNick || "Me"})
                         </option>
                         <option value="smurf" className="text-black">
-                          Alt account ({forumSettings.smurfNick || "Alt account"})
+                          Alt ({forumSettings.smurfNick || "Alt"})
                         </option>
                       </select>
                       <ChevronDown size={10} className="opacity-60 mr-1" />
@@ -880,7 +882,7 @@ ${recentHistory}
           );
         })()
       ) : (
-        // Status 2: Post列表页
+        // 状态 2: 帖子列表页
         <div className="space-y-4 pt-2 pb-20 animate-in fade-in">
           <div className="glass-card p-3 rounded-xl space-y-3">
             <div className="flex gap-2">
@@ -888,8 +890,8 @@ ${recentHistory}
                 type="text"
                 value={forumGuidance}
                 onChange={(e) => setForumGuidance(e.target.value)}
-                placeholder="Topic guidance (e.g., discuss recent urban legends)"
-                className="flex-grow bg-white/50 text-xs p-2 rounded-lg outline-none border border-transparent focus:bg-white focus:border-gray-200 transition-colors"
+                placeholder="Discussion direction (e.g.: discuss recent urban legends)"
+                className="flex-grow bg-white/50 text-xs p-2 rounded-lg outline-none border border-transparent focus:bg-white focus:border-gray-200 transition-colors placeholder:text-gray-400"
               />
               {forumGuidance && (
                 <button
@@ -911,7 +913,7 @@ ${recentHistory}
                 ) : (
                   <Plus size={12} />
                 )}{" "}
-                New Post
+                Generate New Post
               </button>
               <button
                 onClick={refreshAllForumReplies}
@@ -923,7 +925,7 @@ ${recentHistory}
                 ) : (
                   <RefreshCcw size={12} />
                 )}{" "}
-                Refresh
+                Refresh Replies
               </button>
             </div>
           </div>
@@ -968,7 +970,7 @@ ${recentHistory}
                       handleDeletePost(post.id);
                     }}
                     className="text-gray-300 hover:text-red-400 p-1"
-                    title="Delete Post"
+                    title="Delete post"
                   >
                     <Trash2 size={12} />
                   </button>
@@ -982,19 +984,19 @@ ${recentHistory}
         </div>
       )}
 
-      {/* 弹窗：Settings ID */}
+      {/* 弹窗：设置 ID */}
       {showForumSettings && (
         <div className="absolute inset-0 z-[60] bg-black/50 flex items-center justify-center p-6 animate-in fade-in">
           <div className="bg-white w-full max-w-sm rounded-2xl p-5 shadow-2xl flex flex-col gap-4">
             <h3 className="text-sm font-bold text-gray-800 flex items-center gap-2">
-              <User size={16} /> SettingsID
+              <User size={16} /> Set IDs
             </h3>
             <p className="text-[10px] text-gray-400">
-              Changing nicknames updates all historical posts。
+              Changing IDs will update historical posts as well.
             </p>
             <div>
               <label className="text-[10px] font-bold uppercase text-gray-500 mb-1 block">
-                MyNickname
+                My Nickname
               </label>
               <input
                 value={forumSettings.userNick}
@@ -1002,10 +1004,10 @@ ${recentHistory}
                   setForumSettings((p) => ({ ...p, userNick: e.target.value }))
                 }
                 className="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg text-xs outline-none focus:border-black mb-3"
-                placeholder="RealMe"
+                placeholder="User"
               />
               <label className="text-[10px] font-bold uppercase text-gray-400 mb-1 block">
-                MyAlt Account
+                My Alt Account
               </label>
               <input
                 value={forumSettings.smurfNick}
@@ -1013,10 +1015,10 @@ ${recentHistory}
                   setForumSettings((p) => ({ ...p, smurfNick: e.target.value }))
                 }
                 className="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg text-xs outline-none focus:border-gray-400"
-                placeholder="JustBrowsing"
+                placeholder="Not an alt"
               />
               <p className="text-[9px] text-gray-400 mt-1 mb-2">
-                *When replying with an alt, the character won't know it's you.
+                *Character will not know it is you when replying from an alt.
               </p>
             </div>
             <div>
@@ -1029,7 +1031,7 @@ ${recentHistory}
                   setForumSettings((p) => ({ ...p, charNick: e.target.value }))
                 }
                 className="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg text-xs outline-none focus:border-[#7A2A3A]"
-                placeholder="AnonUser"
+                placeholder="Anonymous"
               />
             </div>
             <div className="flex gap-2 mt-2">
@@ -1043,14 +1045,14 @@ ${recentHistory}
                 onClick={() => updateForumSettings(forumSettings)}
                 className="flex-1 py-2 bg-black text-white rounded-lg text-xs font-bold"
               >
-                Save & Update
+                Save &amp; Update
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* 弹窗：Post */}
+      {/* 弹窗：发帖 */}
       {showPostModal && (
         <div className="absolute inset-0 z-50 bg-[#F2F2F7] flex flex-col animate-in slide-in-from-bottom-10">
           <div className="h-14 px-4 flex items-center justify-between bg-white border-b border-gray-200/50">
@@ -1077,13 +1079,13 @@ ${recentHistory}
                 className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all ${postTab === "me" ? "bg-white shadow-sm text-black" : "text-gray-400"}`}
                 onClick={() => setPostTab("me")}
               >
-                As me ({getForumName("me")})
+                My Identity ({getForumName("me")})
               </button>
               <button
                 className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all ${postTab === "char" ? "bg-[#7A2A3A] text-white shadow-sm" : "text-gray-400"}`}
                 onClick={() => setPostTab("char")}
               >
-                As character ({getForumName("char")})
+                Character Identity ({getForumName("char")})
               </button>
             </div>
             <div className="space-y-4">
@@ -1091,7 +1093,7 @@ ${recentHistory}
                 <div className="bg-[#7A2A3A]/5 p-3 rounded-xl border border-[#7A2A3A]/10 animate-in fade-in">
                   <div className="flex justify-between items-center mb-2">
                     <label className="text-[10px] font-bold text-[#7A2A3A] uppercase flex items-center gap-1">
-                      <Ghost size={10} /> AI Assist (Character Voice)
+                      <Ghost size={10} /> AI Writing (Character perspective)
                     </label>
                   </div>
                   <div className="flex gap-2">
@@ -1103,7 +1105,7 @@ ${recentHistory}
                           char: { ...p.char, topic: e.target.value },
                         }))
                       }
-                      placeholder="Enter topic, e.g., complaining about overtime..."
+                      placeholder="Enter a topic, e.g.: complaining about overtime..."
                       className="flex-grow bg-white text-xs p-2.5 rounded-lg outline-none border border-transparent focus:border-[#7A2A3A]/30"
                     />
                     <button
@@ -1127,7 +1129,7 @@ ${recentHistory}
                       [postTab]: { ...p[postTab], title: val },
                     }));
                   }}
-                  placeholder="AddTitle"
+                  placeholder="Add a title"
                   className="w-full text-base font-bold outline-none bg-transparent placeholder:text-gray-300"
                 />
                 <div className="h-[1px] bg-gray-100 w-full"></div>
@@ -1140,7 +1142,7 @@ ${recentHistory}
                       [postTab]: { ...p[postTab], content: val },
                     }));
                   }}
-                  placeholder="Share what's new..."
+                  placeholder="Share something new..."
                   className="w-full h-48 text-sm resize-none outline-none bg-transparent custom-scrollbar leading-relaxed placeholder:text-gray-300"
                 />
               </div>
@@ -1149,7 +1151,7 @@ ${recentHistory}
         </div>
       )}
 
-      {/* 弹窗：聊天事件自动Post提醒 */}
+      {/* 弹窗：聊天事件自动发帖提醒 */}
       {showChatEventModal && chatEventPostData && (
         <div className="absolute inset-0 z-[70] bg-black/60 flex items-center justify-center p-6 animate-in fade-in">
           <div className="bg-white w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-4">
@@ -1157,7 +1159,7 @@ ${recentHistory}
             <div className="bg-gradient-to-r from-[#7A2A3A] to-[#963448] px-5 py-4 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Sparkle size={16} className="text-white/80" />
-                <span className="text-white font-bold text-sm">New post from character</span>
+                <span className="text-white font-bold text-sm">Character Posted!</span>
               </div>
               <button
                 onClick={() => setShowChatEventModal(false)}
@@ -1167,7 +1169,7 @@ ${recentHistory}
               </button>
             </div>
 
-            {/* PostContentPreview */}
+            {/* 帖子内容预览 */}
             <div className="p-5 space-y-4">
               <div className="flex items-center gap-3 pb-3 border-b border-gray-100">
                 <div className="w-10 h-10 rounded-full bg-[#7A2A3A]/10 flex items-center justify-center">
@@ -1192,11 +1194,11 @@ ${recentHistory}
                 </p>
               </div>
 
-              {/* 初始CommentPreview */}
+              {/* 初始评论预览 */}
               {chatEventPostData.replies && chatEventPostData.replies.length > 0 && (
                 <div className="bg-gray-50 rounded-xl p-3 space-y-2">
                   <div className="text-xs text-gray-400 font-bold mb-2">
-                    Top Comments
+                    Hot Comments
                   </div>
                   {chatEventPostData.replies.slice(0, 2).map((reply, idx) => (
                     <div key={reply.id || idx} className="flex gap-2">
@@ -1210,7 +1212,7 @@ ${recentHistory}
                   ))}
                   {chatEventPostData.replies.length > 2 && (
                     <div className="text-xs text-gray-400">
-                      {chatEventPostData.replies.length - 2} more comments...
+                      and {chatEventPostData.replies.length - 2} more comments...
                     </div>
                   )}
                 </div>

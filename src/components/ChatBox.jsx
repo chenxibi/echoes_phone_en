@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import { Banknote } from "lucide-react"; // assuming lucide-react
+import { Banknote } from "lucide-react"; // 假设你用的是 lucide
 import mapBg from "../map_bg.png";
 
 export const VoiceMessageBubble = ({ msg, isMe }) => {
   const [showTranscript, setShowTranscript] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
 
-  const cleanText = msg.text.replace("[Voice message] ", "");
+  const cleanText = msg.text.replace("[Voice Message] ", "");
   const duration = Math.min(60, Math.max(2, Math.ceil(cleanText.length / 3)));
 
   const handleClick = () => {
@@ -77,7 +77,7 @@ export const VoiceMessageBubble = ({ msg, isMe }) => {
           </div>
         </div>
 
-        {/* 语音转文字Content */}
+        {/* 语音转文字内容 */}
         {showTranscript && (
           <div
             className={`mt-3 text-xs leading-relaxed opacity-80 border-l-2 pl-2 pt-1 animate-in slide-in-from-top-1 duration-200 ${
@@ -112,14 +112,14 @@ export const TransferBubble = ({ msg, isMe, onInteract }) => {
       }`}
     >
       {/* 1. 顶部：图标与金额 */}
-      {/* 如果没有Note，底部留一:00 margin (mb-3)，如果有Note，mb-1 紧凑一:00 */}
+      {/* 如果没有备注，底部留一点 margin (mb-3)，如果有备注，mb-1 紧凑一点 */}
       <div className={`flex items-center gap-3 ${note ? "mb-1" : "mb-3"}`}>
         <div className="p-2.5 rounded-full shrink-0 bg-white/20 text-white">
           <Banknote size={24} />
         </div>
         <div className="overflow-hidden min-w-0">
           <div className="text-[10px] font-bold opacity-90 mb-0.5 truncate">
-            {isMe ? "Sent transfer" : "Received transfer"}
+            {isMe ? "Transfer to them" : "Transfer to you"}
           </div>
           <div className="text-xl font-bold font-mono tracking-tight truncate">
             ¥ {amount}
@@ -127,20 +127,20 @@ export const TransferBubble = ({ msg, isMe, onInteract }) => {
         </div>
       </div>
 
-      {/* 2. Note区域 (仅当有Note时显示) */}
+      {/* 2. 备注区域 (仅当有备注时显示) */}
       {note && (
         <div className="text-xs opacity-80 mb-2 pl-[52px] leading-tight break-words font-medium">
           {note}
         </div>
       )}
 
-      {/* 3. 底部：Status栏 */}
+      {/* 3. Bottom: Status Bar */}
       <div className="flex justify-between items-center border-t border-white/20 pt-2">
         <span className="text-xs font-bold opacity-90">
-          {isPending ? "Awaiting" : isAccepted ? "Received" : "Refunded"}
+          {isPending ? "Waiting" : isAccepted ? "Received" : "Refunded"}
         </span>
 
-        {/* 交互按钮 */}
+        {/* Action Buttons */}
         {!isMe && isPending && (
           <div className="flex gap-2">
             <button
@@ -150,7 +150,7 @@ export const TransferBubble = ({ msg, isMe, onInteract }) => {
               }}
               className="px-2 py-1 bg-white/20 hover:bg-white/30 text-white text-[10px] rounded-md font-bold backdrop-blur-sm"
             >
-              Return
+              Decline
             </button>
             <button
               onClick={(e) => {
@@ -170,9 +170,9 @@ export const TransferBubble = ({ msg, isMe, onInteract }) => {
 
 export const LocationBubble = ({ name, address }) => (
   <div className="flex flex-col bg-white border border-gray-200 rounded-lg overflow-hidden w-64 shadow-sm select-none">
-    {/* 上半部min：地图背景图 */}
+    {/* 上半部分：地图背景图 */}
     <div className="h-24 bg-gray-100 relative">
-      {/* 记得确保 mapBg Done经 import 进来了 */}
+      {/* 记得确保 mapBg 已经 import 进来了 */}
       <img
         src={mapBg}
         alt="Map"
@@ -180,13 +180,13 @@ export const LocationBubble = ({ name, address }) => (
         draggable="false"
       />
 
-      {/* Custom SVG 图标容器 - 绝对居中定位 */}
+      {/* 自定义 SVG 图标容器 - 绝对居中定位 */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -mt-3 drop-shadow-md">
         <svg
           viewBox="0 0 1024 1024"
           version="1.1"
           xmlns="http://www.w3.org/2000/svg"
-          className="w-8 h-8 text-[#CE4A3A]" // here控制大小(w-8 h-8)and颜色(text-red-600)
+          className="w-8 h-8 text-[#CE4A3A]" // 这里控制大小(w-8 h-8)和颜色(text-red-600)
           fill="currentColor" // 使用 currentColor 让它跟随 className 的颜色
         >
           <path d="M511.913993 63.989249C317.882076 63.989249 159.973123 221.898203 159.973123 415.930119c0 187.323366 315.473879 519.998656 328.890979 534.103813 6.020494 6.364522 14.449185 9.976818 23.221905 9.976818 0.172014 0 0.516042 0 0.688056 0 8.944734 0 17.545439-4.128339 23.393919-11.008903l109.22896-125.054258c145.179909-177.690576 218.629934-314.957836 218.629934-407.845456C864.026877 221.898203 706.117924 63.989249 511.913993 63.989249zM511.913993 575.903242c-88.415253 0-159.973123-71.55787-159.973123-159.973123s71.55787-159.973123 159.973123-159.973123 159.973123 71.55787 159.973123 159.973123S600.329246 575.903242 511.913993 575.903242z" />
@@ -194,7 +194,7 @@ export const LocationBubble = ({ name, address }) => (
       </div>
     </div>
 
-    {/* 下半部min：文字Info */}
+    {/* 下半部分：文字信息 */}
     <div className="p-3 bg-white">
       <div className="text-sm font-medium text-gray-900 truncate leading-tight mb-1">
         {name}

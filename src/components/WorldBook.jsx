@@ -15,7 +15,7 @@ import {
 import AppWindow from "./AppWindow";
 import useStickyState from "../hooks/useStickyState";
 
-// --- Utility：获取所有min组 ---
+// --- Helper: get all groups ---
 const getGroups = (data) => {
   const groups = Array.from(
     new Set(data.map((item) => item.group || "Ungrouped")),
@@ -31,10 +31,9 @@ const WorldBook = ({
   showToast,
   customPrompt,
   customConfirm,
-  worldBook, // added接收
+  worldBook,
   setWorldBook,
 }) => {
-  // --- Logic handler ---
   const handleWorldBookUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -44,10 +43,10 @@ const WorldBook = ({
           const json = JSON.parse(ev.target.result);
           if (Array.isArray(json)) {
             setWorldBook(json);
-            showToast("success", "Lore Book imported");
+            showToast("success", "World Book imported successfully");
           }
         } catch (err) {
-          showToast("error", "Invalid JSON");
+          showToast("error", "Invalid JSON format");
         }
       };
       reader.readAsText(file);
@@ -76,7 +75,7 @@ const WorldBook = ({
   };
 
   const deleteWorldBookGroup = async (groupName) => {
-    if (await customConfirm(`Delete Group "${groupName}"  and all its entries?`, "Delete group")) {
+    if (await customConfirm(`Delete group "${groupName}" and all its entries?`, "Delete Group")) {
       setWorldBook((prev) => prev.filter((w) => w.group !== groupName));
     }
   };
@@ -88,9 +87,9 @@ const WorldBook = ({
   };
 
   return (
-    <AppWindow isOpen={isOpen} title="Lore Book" onClose={onClose}>
+    <AppWindow isOpen={isOpen} title="World Book" onClose={onClose}>
       <div className="space-y-6 pt-4 pb-20">
-        {/* Actions栏 */}
+        {/* Action Bar */}
         <div className="grid grid-cols-2 gap-3">
           <label className="py-3 bg-white border border-gray-200 rounded-xl text-xs font-bold text-gray-600 hover:bg-gray-50 hover:text-black transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm active:scale-95">
             <Upload size={14} />
@@ -105,7 +104,7 @@ const WorldBook = ({
           <button
             onClick={async () => {
               const name = await customPrompt(
-                "Enter group name (empty entry will be created):",
+                "Enter new group name (an empty entry will be created):",
               );
               if (name) {
                 setWorldBook([
@@ -127,7 +126,7 @@ const WorldBook = ({
           </button>
         </div>
 
-        {/* min组列表 */}
+        {/* Group List */}
         {getGroups(worldBook).map((group) => (
           <WorldBookGroup
             key={group}
@@ -142,7 +141,7 @@ const WorldBook = ({
         ))}
         {worldBook.length === 0 && (
           <div className="text-center py-20 text-gray-300 text-xs">
-            Lore Book is empty. Create an entry above.
+            World Book is empty — click a button above to create one
           </div>
         )}
       </div>
@@ -150,7 +149,7 @@ const WorldBook = ({
   );
 };
 
-// --- min组组件 ---
+// --- Group Component ---
 const WorldBookGroup = ({
   group,
   worldBook,
@@ -260,7 +259,7 @@ const WorldBookGroup = ({
   );
 };
 
-// --- 条目组件 ---
+// --- Entry Component ---
 const WorldBookEntryItem = ({
   entry,
   worldBook,
@@ -385,7 +384,7 @@ const WorldBookEntryItem = ({
         <textarea
           className="w-full text-[10px] text-gray-500 bg-white/60 p-2 rounded-md resize-none h-24 outline-none border border-transparent focus:border-gray-100 animate-in fade-in"
           value={entry.content}
-          placeholder="Enter lore entry content..."
+          placeholder="Enter World Book content..."
           onChange={(e) =>
             setWorldBook((prev) =>
               prev.map((w) =>

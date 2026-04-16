@@ -2,29 +2,24 @@ import React from "react";
 import { Upload, RotateCcw, Asterisk, Type, Monitor, Grid } from "lucide-react";
 
 const PersonalizationPanel = ({
-  // --- 显示Settings Props ---
   isFullscreen,
   toggleFullScreen,
-
-  // --- 字体Settings Props ---
   fontName,
   handleResetFont,
   handleFontUrlSubmit,
   inputUrl,
   setInputUrl,
-
-  // --- Icon Customization Props ---
-  appList, // App list (从App.jsx传入，确保两边数据一致)
-  customIcons, // Current的Custom图标Status { appId: base64Str }
-  handleAppIconUpload, // Upload处理函数
-  handleResetIcon, // Reset处理函数
+  appList,
+  customIcons,
+  handleAppIconUpload,
+  handleResetIcon,
 }) => {
   return (
     <div className="space-y-8 pt-4 pb-20 px-1">
-      {/* ---------------- SECTION 1: Display & Layout ---------------- */}
+      {/* ---------------- SECTION 1: Display ---------------- */}
       <section>
         <h3 className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-3 border-b border-gray-200/50 pb-1 flex items-center gap-2">
-          <Monitor size={10} /> Display & Layout
+          <Monitor size={10} /> Display
         </h3>
 
         {/* Immersive Mode */}
@@ -34,7 +29,7 @@ const PersonalizationPanel = ({
               Immersive Mode
             </label>
             <p className="text-[10px] text-gray-400">
-              Hide browser address bar and status bar
+              Hides browser address bar and status bar
             </p>
           </div>
           <button
@@ -51,7 +46,7 @@ const PersonalizationPanel = ({
           </button>
         </div>
 
-        {/* 字体Settings */}
+        {/* Font Settings */}
         <div className="glass-card p-4 rounded-xl space-y-3">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-2">
@@ -64,7 +59,7 @@ const PersonalizationPanel = ({
               onClick={handleResetFont}
               className="text-[10px] text-red-500 hover:underline flex items-center gap-1"
             >
-              <RotateCcw size={8} /> Reset to default
+              <RotateCcw size={8} /> Reset
             </button>
           </div>
 
@@ -96,13 +91,11 @@ const PersonalizationPanel = ({
 
         <div className="grid grid-cols-4 gap-y-6 gap-x-2">
           {appList.map((app) => {
-            // [关键修改] 1. 将组件引用赋值给大写变量
             const Icon = app.icon;
 
             return (
               <div key={app.id} className="flex flex-col items-center gap-2">
                 <div className="w-12 h-12 rounded-[16px] bg-white border border-gray-200 flex items-center justify-center overflow-hidden relative group cursor-pointer shadow-sm">
-                  {/* 显示Current图标 (Custom 或 默认) */}
                   {customIcons[app.id] ? (
                     <img
                       src={customIcons[app.id]}
@@ -110,12 +103,10 @@ const PersonalizationPanel = ({
                       alt={app.label}
                     />
                   ) : (
-                    // [关键修改] 2. 使用这个大写变量进行渲染
-                    // 还要加个判断，防止 Icon 为空导致报错
                     Icon && <Icon size={20} className="text-gray-400" />
                   )}
 
-                  {/* 悬停Upload遮罩 */}
+                  {/* Hover upload overlay */}
                   <label className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity cursor-pointer">
                     <Upload size={16} className="text-white" />
                     <input
@@ -132,7 +123,6 @@ const PersonalizationPanel = ({
                     {app.label}
                   </span>
 
-                  {/* 仅在有Custom图标时显示“还原”按钮 */}
                   {customIcons[app.id] && (
                     <button
                       onClick={() => handleResetIcon(app.id)}

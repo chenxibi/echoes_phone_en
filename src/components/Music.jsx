@@ -16,7 +16,7 @@ import {
   CheckCircle2,
 } from "lucide-react";
 
-// --- 1. 工具函数：解析 LRC ---
+// --- 1. Utility: Parse LRC ---
 const parseLRC = (lrcText) => {
   if (!lrcText) return [];
   const lines = lrcText.split("\n");
@@ -36,7 +36,7 @@ const parseLRC = (lrcText) => {
   return result.sort((a, b) => a.time - b.time);
 };
 
-// --- 2. 动态字号适配 ---
+// --- 2. Dynamic font size ---
 const getLyricTextSize = (text, isActive) => {
   const len = text?.length || 0;
   if (isActive) {
@@ -48,7 +48,7 @@ const getLyricTextSize = (text, isActive) => {
   return "text-[11px] opacity-75 text-gray-500";
 };
 
-// --- 3. 组件：黑胶唱片 ---
+// --- 3. Vinyl Record Component ---
 const VinylRecord = ({ isPlaying, coverUrl }) => (
   <div className="relative shrink-0 w-40 h-40 flex items-center justify-center">
     <div className="absolute w-36 h-36 rounded-full bg-black/10 shadow-[0_8px_25px_rgba(0,0,0,0.2)]"></div>
@@ -78,7 +78,7 @@ const VinylRecord = ({ isPlaying, coverUrl }) => (
   </div>
 );
 
-// --- 4. 组件：连接Status ---
+// --- 4. Connection Header ---
 const ConnectionHeader = ({
   isPlaying,
   userAvatar,
@@ -145,7 +145,7 @@ const ConnectionHeader = ({
   </div>
 );
 
-// --- 5. 主组件 ---
+// --- 5. Main Component ---
 const MusicApp = ({
   persona,
   userAvatar,
@@ -189,7 +189,6 @@ const MusicApp = ({
   const lastCommentTime = useRef(0);
   const lastTriggeredLrc = useRef("");
 
-  // --- 关键顺序：先定义数据，再定义 Effect ---
   const currentTrack = useMemo(
     () => playlistTracks[currentTrackIndex] || null,
     [playlistTracks, currentTrackIndex],
@@ -199,7 +198,7 @@ const MusicApp = ({
     [currentTrack?.lrcText],
   );
 
-  // 1. 播放进度监听与 AI :00评触发
+  // 1. Playback progress + AI commentary
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
@@ -235,7 +234,7 @@ const MusicApp = ({
     };
   }, [currentLrc, activeLrcIndex, audioRef]);
 
-  // 2. Lyrics居中滚动
+  // 2. Lyric auto-scroll
   useEffect(() => {
     if (activeLrcIndex <= 0) return;
     const container = lrcScrollRef.current;
@@ -251,7 +250,7 @@ const MusicApp = ({
     return () => clearTimeout(t);
   }, [activeLrcIndex]);
 
-  // 3. 气泡同步
+  // 3. Bubble sync
   useEffect(() => {
     if (chatHistory?.length > 0) {
       const last = chatHistory[chatHistory.length - 1];
@@ -316,14 +315,14 @@ const MusicApp = ({
     if (!contextLines || contextLines === lastTriggeredLrc.current) return;
     lastCommentTime.current = now;
     lastTriggeredLrc.current = contextLines;
-    const musicPrompt = `[SYSTEM_NOTE: {{char}}and{{user}}are now listening together to "${currentTrack?.title}". Current lyrics: “${contextLines}”。Follow the guidelines below: 1. Prioritize aesthetics - comment on the mood, imagery, or vibe of the melody. 2. STRICTLY FORBIDDEN to force-map the song onto \${user}'s past experiences or inner secrets, e.g. 'this song is like you', 'you're exactly like this', 'why do you like this song' - avoid all such statements. 3. Moderately express \${char}'s own listening impressions. 4. You don't have to talk about the song itself - maintain natural casual conversation when appropriate. 5. Keep it under 30 words.]`;
+    const musicPrompt = `[SYSTEM_NOTE: {{char}}和{{user}}正在一起听一首叫做《${currentTrack?.title}》的歌曲。当前歌词："${contextLines}"。请遵循以下尺度：1.审美优先，点评意境或旋律氛围。2.严禁强行将歌曲映射为 ${user} 的过往经历或内心秘密，如"这首歌像你""你就是这样""你为什么喜欢这种歌，是不是因为你也想...""你听这首歌是因为在歌词里看到了自己吧"等言论，需要避免。3.适度表达 ${char} 自己的听感。4.不一定非要谈论歌曲本身，也可根据情况保持自然的日常交流。5.不超过 30 字。]`;
     triggerAIResponse(null, musicPrompt);
   };
 
   const handleUserReply = () => {
     const content = replyContent.trim();
     if (!content) return;
-    const musicContext = `[{{char}}and{{user}}are now listening together to "${currentTrack?.title}". Current lyrics: ${currentLrc[activeLrcIndex]?.text || "..."}]`;
+    const musicContext = `[{{char}}和{{user}}正在一起听一首叫做《${currentTrack?.title}》的歌曲。当前歌词：${currentLrc[activeLrcIndex]?.text || "..."}]`;
     triggerAIResponse(content, "", musicContext, { source: "music_app" });
     setReplyContent("");
     setShowQuickReply(false);
@@ -388,7 +387,7 @@ const MusicApp = ({
                 userBubble={userBubble}
               />
               <h3 className="text-xs font-bold text-gray-800 truncate mt-3 w-full text-center px-4">
-                {currentTrack?.title || "Select a song"}
+                {currentTrack?.title || "Waiting to select a song"}
               </h3>
             </div>
             <div
@@ -407,7 +406,7 @@ const MusicApp = ({
                 ))
               ) : (
                 <div className="h-full flex flex-col items-center justify-center opacity-30 text-[10px]">
-                  Upload audio and lyrics
+                  Upload audio and lyrics to begin
                 </div>
               )}
             </div>
@@ -489,7 +488,7 @@ const MusicApp = ({
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-gray-500 font-bold text-sm">
-                  Playlist Cover (optional)
+                  Playlist Cover (uploadable)
                 </div>
               )}
               <input
@@ -525,7 +524,7 @@ const MusicApp = ({
                           audioRef.current?.play();
                           setIsPlaying(true);
                         }, 100);
-                      } else showToast("error", "Upload audio first");
+                      } else showToast("error", "Please upload music first");
                     }}
                   >
                     {isEditing ? (
@@ -623,7 +622,7 @@ const MusicApp = ({
                 }
                 className="w-full py-3 border border-dashed border-gray-300 rounded-lg text-gray-300 text-[10px] transition-all"
               >
-                + Add Song
+                + Add Track
               </button>
             </div>
           </div>
@@ -634,7 +633,7 @@ const MusicApp = ({
           <input
             autoFocus
             className="flex-grow bg-gray-50 rounded-xl px-4 py-2 text-xs outline-none"
-            placeholder={`Say something to ${persona?.name || "TA"}...`}
+            placeholder={`Say something to ${persona?.name || "them"}...`}
             value={replyContent}
             onChange={(e) => setReplyContent(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleUserReply()}

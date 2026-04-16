@@ -14,19 +14,19 @@ const generateContent = async (params, apiConfig, onError, signal) => {
         { role: "user", content: prompt },
       ];
 
-      console.group("📝 [Echoes Debug] Full data sent to AI");
+      console.group("📝 [Echoes Debug] 发送给 AI 的完整数据");
       console.log(
-        "%cSystem command (System Prompt):",
+        "%c系统指令 (System Prompt):",
         "color: blue; font-weight: bold;",
       );
       console.log(systemInstruction);
       console.log(
-        "%cUser command (User Prompt):",
+        "%c用户指令 (User Prompt):",
         "color: green; font-weight: bold;",
       );
       console.log(prompt);
       console.log(
-        "%c Full message structure (Messages Array):",
+        "%c完整消息结构 (Messages Array):",
         "color: purple; font-weight: bold;",
         messages,
       );
@@ -86,13 +86,13 @@ const generateContent = async (params, apiConfig, onError, signal) => {
       content = data.choices[0].message?.content;
       console.log("[Echoes] Content extracted:", content);
     } else {
-      throw new Error("API not configured. Please enter Base URL and Key in Settings.");
+      throw new Error("未配置 API 信息。请在设置中输入 Base URL 和 Key。");
     }
   } catch (error) {
     if (error.name === "AbortError" || error.name === "TimeoutError") {
       console.log("[Echoes] Generation aborted or timed out");
       // Only show toast if it's a timeout, abort is manual
-      if (error.name === "TimeoutError" && onError) onError("Request timeout (360s)");
+      if (error.name === "TimeoutError" && onError) onError("请求超时 (360s)");
       return null;
     }
 
@@ -103,7 +103,7 @@ const generateContent = async (params, apiConfig, onError, signal) => {
   }
 
   if ((!content || !String(content).trim()) && onError) {
-    onError("API returned empty content (or whitespace only)");
+    onError("API 返回内容为空 (或仅含空白符)");
     return null;
   }
 
@@ -113,7 +113,7 @@ const generateContent = async (params, apiConfig, onError, signal) => {
     } catch (e) {
       console.error("[Echoes] SafeJSONParse failed:", e);
       if (onError)
-        onError(`Parse failed: ${e.message}\nContent: ${content.substring(0, 20)}...`);
+        onError(`解析失败: ${e.message}\n内容: ${content.substring(0, 20)}...`);
       return null;
     }
   }

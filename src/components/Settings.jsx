@@ -19,30 +19,22 @@ import {
 } from "lucide-react";
 
 const SettingsPanel = ({
-  // --- Connection Settings params ---
   apiConfig,
   setApiConfig,
   connectionStatus,
-
   isFetchingModels,
   fetchModels,
   availableModels,
   testConnection,
   close,
-
-  // --- Context params ---
   contextLimit,
   setContextLimit,
-
-  // --- Long-term memory params ---
   memoryConfig,
   setMemoryConfig,
   longMemory,
   setLongMemory,
   triggerSummary,
   isSummarizing,
-
-  // --- Chat Settings params ---
   chatStyle,
   setChatStyle,
   interactionMode,
@@ -56,48 +48,38 @@ const SettingsPanel = ({
   stickerInputRef,
   handleStickerUpload,
   setEditingSticker,
-
-  // --- Instruction params ---
   prompts,
   setPrompts,
-
-  // receives fullscreen param
   isFullscreen,
   toggleFullScreen,
-
-  // --- Data backup params ---
   onExportChat,
   onImportChat,
-
   addStickerGroup,
   deleteStickerGroup,
   renameStickerGroup,
   handleBulkImport,
   customPrompt,
-
-  // --- Font params ---
-  fontName, // current font filename
-  handleResetFont, // reset to default function
+  fontName,
+  handleResetFont,
   handleFontUrlSubmit,
   inputUrl,
   setInputUrl,
-
   simpleMode = false,
 }) => (
   <div className="flex flex-col h-full">
     <div className="space-y-10 overflow-y-auto custom-scrollbar flex-grow px-1 pb-10">
       {/* ---------------------------------------------------------
-          Connection Settings
+          Connection
          --------------------------------------------------------- */}
       <section>
         <h3 className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-4 border-b border-gray-200/50 pb-2">
-          Connection Settings
+          Connection
         </h3>
         <div className="glass-card p-4 rounded-xl space-y-4">
           {/* API Base URL */}
           <div>
             <label className="block text-[10px] uppercase text-gray-500 mb-1.5 font-bold">
-              API URL
+              API Base URL
             </label>
             <input
               type="text"
@@ -142,7 +124,7 @@ const SettingsPanel = ({
                     className="w-full p-3.5 bg-gray-50 border border-gray-200 rounded-xl text-xs font-mono focus:border-black outline-none transition-colors appearance-none cursor-pointer"
                   >
                     <option value="" disabled>
-                      Select model...
+                      Select a model...
                     </option>
                     {availableModels.map((m) => (
                       <option key={m} value={m}>
@@ -183,7 +165,7 @@ const SettingsPanel = ({
             </div>
           </div>
 
-          {/* Test ConnectionButton */}
+          {/* Test Connection Button */}
           <div className="pt-2">
             <button
               onClick={testConnection}
@@ -206,12 +188,12 @@ const SettingsPanel = ({
               {connectionStatus === "success" && <CheckCircle2 size={14} />}
               {connectionStatus === "error" && <AlertCircle size={14} />}
               {connectionStatus === "testing"
-                ? "Testing..."
+                ? "Connecting..."
                 : connectionStatus === "success"
                   ? "Connected"
                   : connectionStatus === "error"
                     ? "Connection failed"
-                    : "Test Connection"}
+                    : "Test & Save"}
             </button>
           </div>
         </div>
@@ -229,10 +211,10 @@ const SettingsPanel = ({
             <div className="glass-card p-4 rounded-xl flex items-center justify-between">
               <div>
                 <label className="block text-xs font-bold text-gray-700 mb-1">
-                  Context Turns
+                  Context Memory (turns)
                 </label>
                 <p className="text-[10px] text-gray-400">
-                  Counts consecutive messages from the same person as 1 turn.
+                  Counts by conversation turns. Multiple consecutive messages from the same person count as 1 turn.
                 </p>
               </div>
               <div className="flex items-center gap-2">
@@ -260,10 +242,9 @@ const SettingsPanel = ({
               <h3 className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
                 Long-term Memory
               </h3>
-              {/* toggle on the title line */}
               <div className="flex items-center gap-2">
                 <span className="text-[10px] text-gray-400">
-                  {memoryConfig.enabled ? "On" : "Off"}
+                  {memoryConfig.enabled ? "Enabled" : "Disabled"}
                 </span>
                 <button
                   onClick={() =>
@@ -283,10 +264,10 @@ const SettingsPanel = ({
             </div>
 
             <div className="glass-card p-4 rounded-xl space-y-4">
-              {/* threshold */}
+              {/* Threshold */}
               <div className="flex items-center justify-between">
                 <label className="text-xs font-bold text-gray-600">
-                  Auto Summarize
+                  Auto Summary
                 </label>
                 <div className="flex items-center gap-2">
                   <input
@@ -302,15 +283,15 @@ const SettingsPanel = ({
                     }
                     className="w-16 p-2 bg-white border border-gray-200 rounded-lg text-center text-xs font-mono outline-none focus:border-black"
                   />
-                  <span className="text-[10px] text-gray-400">turns to trigger</span>
+                  <span className="text-[10px] text-gray-400">messages to trigger</span>
                 </div>
               </div>
 
-              {/* memory text and manual button */}
+              {/* Memory Text + Manual Button */}
               <div>
                 <div className="flex justify-between items-end mb-2">
                   <label className="text-[10px] uppercase font-bold text-gray-400">
-                    Memory Detail
+                    Memory Details (Prompt)
                   </label>
                   <button
                     onClick={triggerSummary}
@@ -329,7 +310,7 @@ const SettingsPanel = ({
                   value={longMemory}
                   onChange={(e) => setLongMemory(e.target.value)}
                   className="w-full h-32 p-3 bg-white/50 border border-gray-200 rounded-xl text-xs leading-relaxed resize-none focus:border-black outline-none custom-scrollbar transition-colors focus:bg-white"
-                  placeholder="When enabled, the character will accumulate long-term memory about you here..."
+                  placeholder="When enabled, the character will automatically build long-term memories about you here..."
                 />
               </div>
             </div>
@@ -354,12 +335,12 @@ const SettingsPanel = ({
                       {
                         id: "dialogue",
                         label: "Chat",
-                        desc: "Realistic chat",
+                        desc: "Realistic messaging",
                       },
                       {
                         id: "novel",
                         label: "Novel",
-                        desc: "Long prose",
+                        desc: "Long narrative",
                       },
                       {
                         id: "brackets",
@@ -391,7 +372,7 @@ const SettingsPanel = ({
                   </div>
                 </div>
 
-                {/* interaction mode */}
+                {/* Interaction Mode */}
                 <div>
                   <label className="block text-[10px] font-bold uppercase text-gray-500 mb-2">
                     Mode
@@ -420,13 +401,12 @@ const SettingsPanel = ({
                   </div>
                 </div>
 
-                {/* Sticker management */}
+                {/* Sticker Management */}
                 <div>
                   <div className="flex items-center gap-2 mb-3">
                     <label className="text-[10px] font-bold uppercase text-gray-500 mr-auto">
-                      Sticker Library
+                      Character Sticker Library
                     </label>
-                    {/* Add Single Button */}
                     <button
                       onClick={() => stickerInputRef.current.click()}
                       className="flex items-center justify-center gap-1 p-0 text-[10px] text-gray-400 hover:text-[#7A2A3A] transition-colors"
@@ -436,14 +416,13 @@ const SettingsPanel = ({
                       <span>Upload</span>
                     </button>
 
-                    {/* bulk import button */}
                     <button
                       onClick={async () => {
-                        const input = await customPrompt("Enter sticker URL to import", "", "Bulk Import");
+                        const input = await customPrompt("Enter sticker URLs for bulk import", "", "Bulk Import");
                         if (input) handleBulkImport(input, "char");
                       }}
                       className="flex items-center justify-center gap-1 pl-1 pr-3 text-[10px] text-gray-400 hover:text-blue-500 transition-colors"
-                      title="Import from URL"
+                      title="One-click import via link"
                     >
                       <Download size={10} />
                       <span>Bulk</span>
@@ -465,7 +444,6 @@ const SettingsPanel = ({
 
                   {stickersEnabled && (
                     <div className="space-y-4">
-                      {/* [replaced] use StickerGroup component */}
                       {getGroups(stickers).map((group) => (
                         <StickerGroup
                           key={group}
@@ -480,7 +458,6 @@ const SettingsPanel = ({
                         />
                       ))}
 
-                      {/* upload area */}
                       <input
                         type="file"
                         ref={stickerInputRef}
@@ -500,22 +477,20 @@ const SettingsPanel = ({
             </h3>
             <div className="glass-card p-4 rounded-xl space-y-3">
               <p className="text-[9px] text-gray-400 mb-2">
-                Export chat history to a file, or restore from a file.
+                Export your chat history as a file, or restore from a backup.
               </p>
               <div className="flex gap-3">
-                {/* ExportButton */}
                 <button
                   onClick={onExportChat}
                   className="flex-1 py-3 bg-black text-white rounded-xl text-xs font-bold hover:bg-gray-800 transition-colors flex items-center justify-center gap-2 shadow-md"
                 >
                   <Download size={14} />
-                  Export
+                  Export Backup
                 </button>
 
-                {/* import button (tied to hidden input) */}
                 <label className="flex-1 py-3 bg-white border border-gray-200 text-gray-700 rounded-xl text-xs font-bold hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-sm">
                   <Upload size={14} />
-                  Import
+                  Import Backup
                   <input
                     type="file"
                     accept=".json"
@@ -526,32 +501,6 @@ const SettingsPanel = ({
               </div>
             </div>
           </section>
-
-          {/*<section>
-        <h3 className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-4 border-b border-gray-200/50 pb-2">
-          指令
-        </h3>
-        {prompts &&
-          Object.keys(prompts).map((k) => (
-            <div key={k} className="mb-4">
-              <label
-                className="text-[9px] uppercase font-bold text-gray-400 mb-1 block"
-                htmlFor={`prompt-${k}`}
-              >
-                {k}
-              </label>
-              <textarea
-                id={`prompt-${k}`}
-                name={`prompt-${k}`}
-                className="w-full h-20 p-2 text-[10px] font-mono bg-white/40 border border-gray-200 rounded-lg resize-y focus:bg-white transition-colors outline-none"
-                value={prompts[k]}
-                onChange={(e) =>
-                  setPrompts((p) => ({ ...p, [k]: e.target.value }))
-                }
-              />
-            </div>
-          ))}
-      </section>*/}
         </>
       )}
     </div>
@@ -571,7 +520,7 @@ const StickerEditorModal = ({ sticker, onSave, onDelete, onClose }) => {
         </div>
         <div>
           <label className="text-[10px] font-bold uppercase text-gray-400">
-            Description (character uses this to decide when to send)
+            Description (character picks stickers by this)
           </label>
           <textarea
             className="w-full h-20 p-2 text-xs border border-gray-200 rounded-lg mt-1 resize-none focus:border-black outline-none"
@@ -604,8 +553,7 @@ const StickerEditorModal = ({ sticker, onSave, onDelete, onClose }) => {
   );
 };
 
-// StickerGroup component (feature + visual)
-
+// Sticker Group Component
 const StickerGroup = ({
   group,
   stickers,
@@ -615,9 +563,8 @@ const StickerGroup = ({
   renameStickerGroup,
   handleStickerUpload,
 }) => {
-  const [isExpanded, setIsExpanded] = useState(false); // collapsed by default
+  const [isExpanded, setIsExpanded] = useState(false);
 
-  // filter current group stickers, exclude placeholders
   const groupStickers = stickers.filter((s) => s.group === group);
   const visibleStickers = groupStickers.filter((s) => !s.isPlaceholder);
 
@@ -625,9 +572,8 @@ const StickerGroup = ({
 
   return (
     <div className="bg-gray-50 rounded-xl p-3 border border-gray-100 transition-all mb-3">
-      {/* header */}
+      {/* Header */}
       <div className="flex justify-between items-center h-6">
-        {/* left: collapse + title */}
         <div
           className="flex items-center gap-2 cursor-pointer h-full"
           onClick={() => setIsExpanded(!isExpanded)}
@@ -647,30 +593,26 @@ const StickerGroup = ({
           </span>
         </div>
 
-        {/* right: action buttons */}
+        {/* Action Buttons */}
         <div className="flex items-center gap-2">
-          {/* rename */}
           <button
             onClick={() => renameStickerGroup(group)}
             className="text-gray-300 hover:text-blue-500 p-1 transition-colors"
-            title="Rename group"
+            title="Rename Library"
           >
             <Edit2 size={12} />
           </button>
 
-          {/* Delete */}
           <button
             onClick={() => deleteStickerGroup(group)}
             className="text-gray-300 hover:text-red-500 p-1 transition-colors"
-            title="Delete group"
+            title="Delete Library"
           >
             <Trash2 size={12} />
           </button>
 
-          {/* divider */}
           <div className="w-px h-3 bg-gray-200 mx-1"></div>
 
-          {/* toggle */}
           <div
             className="flex items-center gap-1 cursor-pointer"
             onClick={(e) => {
@@ -690,7 +632,7 @@ const StickerGroup = ({
         </div>
       </div>
 
-      {/* sticker grid (collapsed area) */}
+      {/* Sticker Grid */}
       {isExpanded && (
         <div
           className={`pt-3 mt-2 border-t border-gray-200/50 transition-all animate-in slide-in-from-top-1 ${
@@ -701,7 +643,7 @@ const StickerGroup = ({
         >
           {visibleStickers.length === 0 && (
             <div className="text-center py-4 text-[10px] text-gray-400 italic">
-              No stickers yet. Upload some.
+              No stickers yet, upload some
             </div>
           )}
 
@@ -714,18 +656,16 @@ const StickerGroup = ({
               >
                 <img src={s.url} className="w-full h-full object-cover" />
 
-                {/* selected/disabled mask */}
                 {!s.enabled && (
                   <div className="absolute inset-0 bg-white/60 backdrop-blur-[1px]" />
                 )}
               </div>
             ))}
 
-            {/* [modified] in-group upload button */}
             <label
               className="
-                    aspect-square border border-dashed border-gray-300 rounded-xl 
-                    flex flex-col items-center justify-center cursor-pointer 
+                    aspect-square border border-dashed border-gray-300 rounded-xl
+                    flex flex-col items-center justify-center cursor-pointer
                     text-gray-400 hover:text-[#7A2A3A] hover:border-[#7A2A3A] hover:bg-white
                     transition-all duration-300 relative
                 "
@@ -735,9 +675,7 @@ const StickerGroup = ({
                 type="file"
                 className="hidden"
                 accept="image/*"
-                // key: when calling handleStickerUpload, pass current group name
                 onChange={(e) => handleStickerUpload(e, "char", group)}
-                // on click clear to allow uploading the same image repeatedly
                 onClick={(e) => (e.target.value = null)}
               />
             </label>

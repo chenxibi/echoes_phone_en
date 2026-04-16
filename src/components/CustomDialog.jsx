@@ -5,7 +5,7 @@ const CustomDialog = ({ config, onClose }) => {
   const [inputValue, setInputValue] = useState(config.defaultValue || "");
   const inputRef = useRef(null);
 
-  // 自动聚焦Enter框
+  // Auto-focus input
   useEffect(() => {
     if (config.type === "prompt" && inputRef.current) {
       inputRef.current.focus();
@@ -34,7 +34,7 @@ const CustomDialog = ({ config, onClose }) => {
   return (
     <div className="fixed inset-0 z-[200] bg-black/40 backdrop-blur-sm flex items-center justify-center p-6 animate-in fade-in duration-200">
       <div className="bg-white/90 backdrop-blur-xl w-full max-w-xs rounded-2xl shadow-2xl p-5 border border-white/50 animate-in zoom-in-95 duration-200 flex flex-col gap-4">
-        {/* Title与Content */}
+        {/* Title & Content */}
         <div className="text-center space-y-2">
           {config.title && (
             <h3 className="text-base font-bold text-gray-800">
@@ -48,7 +48,7 @@ const CustomDialog = ({ config, onClose }) => {
           )}
         </div>
 
-        {/* Enter框 (仅 Prompt Mode) */}
+        {/* Input (Prompt mode only) */}
         {config.type === "prompt" && (
           <input
             ref={inputRef}
@@ -56,12 +56,12 @@ const CustomDialog = ({ config, onClose }) => {
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             className="w-full p-3 bg-gray-100/50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:border-[#7A2A3A] outline-none transition-all text-center font-medium"
-            placeholder="Enter..."
+            placeholder="Enter something..."
             onKeyDown={(e) => e.key === "Enter" && handleConfirm()}
           />
         )}
 
-        {/* Button group */}
+        {/* Button Group */}
         <div className="flex gap-3 pt-2">
           {config.type !== "alert" && (
             <button
@@ -79,7 +79,7 @@ const CustomDialog = ({ config, onClose }) => {
                 : "bg-[#2C2C2C] hover:bg-black text-white"
             }`}
           >
-            {config.confirmText || "OK"}
+            {config.confirmText || "Confirm"}
           </button>
         </div>
       </div>

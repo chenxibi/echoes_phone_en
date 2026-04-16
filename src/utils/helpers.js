@@ -1,6 +1,6 @@
 import worldBook from "../components/WorldBook";
 
-// 解析批量Link文本
+// 解析批量链接文本
 export const parseStickerLinks = (text) => {
   if (!text) return [];
   return text
@@ -10,7 +10,7 @@ export const parseStickerLinks = (text) => {
       const parts = line.split(/[:：]/);
       if (parts.length >= 2) {
         const desc = parts[0].trim();
-        // 后面可能还有冒号（如 https://），所以合并剩余部min
+        // 后面可能还有冒号（如 https://），所以合并剩余部分
         const url = parts.slice(1).join(":").trim();
         if (desc && url.startsWith("http")) {
           return {
@@ -60,20 +60,20 @@ export const safeJSONParse = (text) => {
     const repairedText = jsonrepair(clean);
     return JSON.parse(repairedText);
   } catch (e) {
-    console.error("[Echoes] JSON parse failed:", e);
-    console.log("[Echoes] Problem text:", text);
+    console.error("[Echoes] JSON 解析失败:", e);
+    console.log("[Echoes] 问题文本:", text);
     try {
       const simpleRepair = jsonrepair(text);
       return JSON.parse(simpleRepair);
     } catch (err2) {
-      throw new Error(`Format parse failed: ${e.message.slice(0, 30)}...`);
+      throw new Error(`格式解析失败: ${e.message.slice(0, 30)}...`);
     }
   }
 };
 
 export const compressImage = (file, maxWidth = 500, quality = 0.7) => {
   return new Promise((resolve, reject) => {
-    // 如果是 GIF，直接Back原始 DataURL，不经过 Canvas 压缩以保留动图
+    // 如果是 GIF，直接返回原始 DataURL，不经过 Canvas 压缩以保留动图
     if (file.type === "image/gif") {
       const reader = new FileReader();
       reader.onload = (e) => resolve(e.target.result);
@@ -112,7 +112,7 @@ export const formatTime = (date) =>
     hour12: false,
   });
 export const formatDate = (date) =>
-  date.toLocaleDateString("en-US", {
+  date.toLocaleDateString("zh-CN", {
     month: "long",
     day: "numeric",
     weekday: "short",
@@ -121,36 +121,51 @@ export const formatDate = (date) =>
 export const replacePlaceholders = (text, charName, userName) => {
   if (!text) return "";
   return text
-    .replace(/\{\{char\}\}/gi, charName) // gi 表示global + case-insensitive
+    .replace(/\{\{char\}\}/gi, charName) // gi 表示全局+忽略大小写
     .replace(/\{\{user\}\}/gi, userName);
 };
 
-// --- 辅助函数：根据Time生成话题引导 ---
+// --- 辅助函数：根据时间生成话题引导 ---
 export const getTimeBasedGuidance = (dateObj) => {
   const hour = dateObj.getHours();
-  const month = dateObj.getMonth() + 1;
+  const month = dateObj.getMonth() + 1; // 0-11 转 1-12
 
   let timeVibe = "";
   let seasonalVibe = "";
 
+  // 1. 时间段判断
   if (hour >= 23 || hour < 5) {
-    timeVibe = "Late Night: Emo/Emotional venting, Urban legends, Insomnia thoughts.";
+    // 深夜：EMO、成人话题、怪谈、失眠
+    timeVibe =
+      "Late Night (深夜): Emo/Emotional venting, Adult topics/NSFW hints, Urban legends, Insomnia thoughts.";
   } else if (hour >= 6 && hour < 10) {
-    timeVibe = "Morning: Morning rush/Commute, Breakfast, Waking up, sleepy.";
+    // 早晨：早高峰、早八、上班打卡、早餐、起床气
+    timeVibe =
+      "Morning (早晨): Morning rush/Commute, Breakfast choices, Waking up, sleepy.";
   } else if (hour >= 11 && hour <= 13) {
-    timeVibe = "Lunch Time: Food delivery, 'What to eat?', Office break.";
+    // 午饭点：外卖、纠结吃什么、探店、美食推荐
+    timeVibe =
+      "Lunch Time (午饭): Food delivery, 'What to eat?', Hunger, Office break.";
   } else if (hour >= 17 && hour <= 20) {
-    timeVibe = "Dinner Time: Cooking/Recipes, Dining out, Relaxing after work, Night life starting.";
+    // 晚饭点：做饭、聚餐、团建、下班
+    timeVibe =
+      "Dinner Time (晚饭): Cooking/Recipes, Dining out, Relaxing after work, Night life starting.";
   } else {
-    timeVibe = "Daily Life: Slacking off at work/school, Afternoon tea, Random gossip.";
+    // 其他时间：摸鱼、日常
+    timeVibe =
+      "Daily Life (日常): Slacking off at work/school, Afternoon tea, Random gossip.";
   }
 
+  // 2. 月份/季节判断 (仅作氛围参考)
   if (month === 12) {
-    seasonalVibe = "Winter/December. (Keywords: Cold, Christmas vibes, End of year).";
+    seasonalVibe =
+      " Season: Winter/December. (Keywords: Cold, Christmas vibes, End of year).";
   } else if (month === 1 || month === 2) {
-    seasonalVibe = "Winter/New Year. (Keywords: Holidays, Family, Cold).";
+    seasonalVibe =
+      " Season: Winter/New Year. (Keywords: Holidays, Family, Cold).";
   } else if (month >= 6 && month <= 8) {
-    seasonalVibe = "Summer. (Keywords: Heat waves, Air conditioning, Ice cream, Rainstorms).";
+    seasonalVibe =
+      " Season: Summer. (Keywords: Heat waves, Air conditioning, Ice cream, Rainstorms).";
   }
 
   return `
@@ -166,7 +181,7 @@ export const getTimeBasedGuidance = (dateObj) => {
 
 let notificationSetter = null;
 
-// new一个初始化函数
+// 新增一个初始化函数
 export const initNotification = (setter) => {
   notificationSetter = setter;
 };
@@ -187,7 +202,7 @@ export const getCurrentTimeObj = (settings) => {
     : new Date(`${settings.customDate}T${settings.customTime}`);
 };
 
-// --- 新增辅助函数：按轮次获取最近Message ---
+// --- 新增辅助函数：按轮次获取最近消息 ---
 export const getRecentTurns = (history, limit) => {
   if (history.length === 0) return [];
 
@@ -198,18 +213,18 @@ export const getRecentTurns = (history, limit) => {
   // 从后往前遍历，计算轮次
   for (let i = history.length - 1; i >= 0; i--) {
     const msg = history[i];
-    // 如果Send者变了（或者是最后一条Message），轮次+1
+    // 如果发送者变了（或者是最后一条消息），轮次+1
     if (msg.sender !== currentSender) {
       turnsFound++;
       currentSender = msg.sender;
     }
 
-    // 如果轮次超过限制，停止，Current i + 1 就是截取:00
+    // 如果轮次超过限制，停止，当前 i + 1 就是截取点
     if (turnsFound > limit) {
       startIndex = i + 1;
       break;
     }
-    // 如果Done经遍历到头了，startIndex 保持 0
+    // 如果已经遍历到头了，startIndex 保持 0
   }
 
   return history.slice(startIndex);
@@ -220,17 +235,17 @@ export const getFormattedMessageText = (m, userName, persona, chatStyle) => {
   let content = m.text || "";
 
   if (m.isVoice) {
-    content = `(Sent a voice message): ${m.text.replace("[Voice message] ", "")}`;
+    content = `(发送了一条语音): ${m.text.replace("[语音消息] ", "")}`;
   }
   if (m.sticker) {
     if (!content || !content.trim()) {
-      content = `[Sent sticker: ${m.sticker.desc}]`;
+      content = `[发送了表情包: ${m.sticker.desc}]`;
     }
   }
   if (m.isForward && m.forwardData) {
     const fwd = m.forwardData;
-    content += ` [Forwarded ${
-      fwd.type === "post" ? "Post" : "Comment"
+    content += ` [转发了${
+      fwd.type === "post" ? "帖子" : "评论"
     }: "${fwd.content.slice(0, 50)}..."]`;
   }
 
@@ -289,26 +304,26 @@ export const getStickerInstruction = (list = charStickers, stickersEnabled) => {
     3. To send a sticker, use "stickerId" field in JSON. Otherwise, set it to null.`;
 };
 
-/* --- UTILS --- 部min的 cleanCharacterJson 函数Replace with： */
+/* --- UTILS --- 部分的 cleanCharacterJson 函数替换为： */
 
 export const cleanCharacterJson = (jsonContent) => {
   try {
     const rawObj =
       typeof jsonContent === "string" ? JSON.parse(jsonContent) : jsonContent;
 
-    // 1. min别获取外层和内层数据
+    // 1. 分别获取外层和内层数据
     const outerData = rawObj;
     const innerData = rawObj.data || {};
 
     // 2. 智能提取 Description
-    // 逻辑：如果 innerDesc 包含"same as above" 或 长度明显短于 outerDesc，就使用 outerDesc
+    // 逻辑：如果 innerDesc 包含"同上" 或 长度明显短于 outerDesc，就使用 outerDesc
     const outerDesc = outerData.description || outerData.persona || "";
     const innerDesc = innerData.description || innerData.persona || "";
 
     let finalDesc = innerDesc;
     if (
       !innerDesc ||
-      innerDesc.includes("same as above") ||
+      innerDesc.includes("同上") ||
       innerDesc.includes("same as") ||
       (outerDesc.length > innerDesc.length && outerDesc.length > 50)
     ) {
@@ -319,7 +334,7 @@ export const cleanCharacterJson = (jsonContent) => {
     const name = innerData.name || outerData.name || "Unknown";
 
     // 4. 清洗 Description (处理 XML 标签)
-    // 很多时候 Prompt 会生成 <character> 包裹的Content，这里提取出来
+    // 很多时候 Prompt 会生成 <character> 包裹的内容，这里提取出来
     let richDescription = finalDesc;
     const charTagMatch = finalDesc.match(/<character>([\s\S]*?)<\/character>/i);
     if (charTagMatch) richDescription = charTagMatch[1].trim();
@@ -332,8 +347,8 @@ export const cleanCharacterJson = (jsonContent) => {
     // 5. 组合最终文本 Key
     let cleanText = `Name: ${name}\n\nDescription:\n${richDescription}`;
 
-    // 6. 处理 WorldBook (Lore Book)
-    // 同样优先取有Content的那一边
+    // 6. 处理 WorldBook (世界书)
+    // 同样优先取有内容的那一边
     let rawEntries = [];
     if (
       innerData.character_book &&
@@ -351,7 +366,7 @@ export const cleanCharacterJson = (jsonContent) => {
         name: entry.comment || entry.keys?.[0] || entry.name || `Entry`,
         content: entry.content,
         enabled: entry.enabled !== false,
-        group: entry.group || name || "default",
+        group: entry.group || name || "默认分组",
       }))
       .filter((e) => e.content);
 

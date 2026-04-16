@@ -15,7 +15,7 @@ import useStickyState from "../hooks/useStickyState";
 import { PRESET_LOCATION_IMAGES } from "../constants/assets";
 import { compressImage, formatTime, getCurrentTimeObj } from "../utils/helpers";
 
-// --- 子组件：心声折叠面板 ---
+// --- Sub-component: Collapsible Thought Panel ---
 const CollapsibleThought = ({ text, label }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   if (!text) return null;
@@ -27,18 +27,18 @@ const CollapsibleThought = ({ text, label }) => {
         className="flex items-center gap-1 text-[10px] uppercase font-bold text-gray-400 hover:text-blue-500 transition-colors"
       >
         {isExpanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
-        {isExpanded ? "Hide thoughts" : label}
+        {isExpanded ? "Hide Thoughts" : label}
       </button>
       {isExpanded && (
         <div className="mt-2 p-3 bg-blue-50/50 rounded-lg border border-blue-100 text-[11px] italic text-gray-600 leading-relaxed animate-in fade-in slide-in-from-top-1">
-          “ {text} ”
+          "{text}"
         </div>
       )}
     </div>
   );
 };
 
-// --- 地图布局常量 ---
+// --- Map Layout Constants ---
 const MAP_LAYOUTS = {
   4: [
     { top: "25%", side: "left", arm: 12 },
@@ -80,7 +80,7 @@ const SmartWatch = ({
   getContextString,
   showToast,
 }) => {
-  // --- 持久化Status ---
+  // --- Persisted State ---
   const [smartWatchLocations, setSmartWatchLocations] = useStickyState(
     [],
     "echoes_sw_locations",
@@ -90,7 +90,7 @@ const SmartWatch = ({
     "echoes_sw_logs",
   );
 
-  // --- UI 交互Status ---
+  // --- UI Interaction State ---
   const [swFilter, setSwFilter] = useState("all");
   const [isEditingMap, setIsEditingMap] = useState(false);
   const [loading, setLoading] = useState({
@@ -99,7 +99,7 @@ const SmartWatch = ({
   });
 
   return (
-    <AppWindow isOpen={isOpen} title="LiveTracker" onClose={onClose}>
+    <AppWindow isOpen={isOpen} title="Smart Home" onClose={onClose}>
       <div className="pb-20">
         {/* Header Actions */}
         <div className="flex justify-between items-center px-4 pt-4 mb-4">
@@ -131,16 +131,16 @@ const SmartWatch = ({
         <div className="relative w-full h-[550px] bg-[#F5F5F7] border-y border-gray-200 overflow-y-auto custom-scrollbar mb-6">
           {smartWatchLocations.length === 0 ? (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-center px-6">
-              <p className="text-xs text-gray-400">No tracking data yet</p>
+              <p className="text-xs text-gray-400">No monitoring data</p>
               <p className="text-[10px] text-gray-300">
-                Enable Lore Book first, then initialize
+                Make sure World Book is enabled, then initialize the system
               </p>
               <button
                 onClick={initSmartWatch}
                 disabled={loading.smartwatch}
                 className="px-6 py-2 bg-black text-white text-xs rounded-lg active:scale-95 transition-transform disabled:bg-gray-400"
               >
-                {loading.smartwatch ? "Initializing..." : "Initialize System"}
+                {loading.smartwatch ? "Initializing..." : "Initialize Monitoring"}
               </button>
             </div>
           ) : (
@@ -277,7 +277,7 @@ const SmartWatch = ({
               {!smartWatchLogs[0]?.locationId && smartWatchLogs.length > 0 && (
                 <div className="absolute bottom-4 left-0 right-0 text-center">
                   <span className="bg-black/70 backdrop-blur text-white text-[10px] px-3 py-1 rounded-full">
-                    📍 Currently at: {smartWatchLogs[0].locationName}
+                    📍 Current location: {smartWatchLogs[0].locationName}
                   </span>
                 </div>
               )}
@@ -296,7 +296,7 @@ const SmartWatch = ({
                 onClick={() => setSwFilter("all")}
                 className="text-[9px] text-blue-500 flex items-center hover:underline"
               >
-                <X size={10} className="mr-1" /> Clear filter
+                <X size={10} className="mr-1" /> Clear Filter
               </button>
             )}
           </div>
@@ -331,7 +331,7 @@ const SmartWatch = ({
                   </div>
 
                   <div className="space-y-2">
-                    <CollapsibleThought text={log.thought} label="View thoughts" />
+                    <CollapsibleThought text={log.thought} label="View Thoughts" />
                     {log.avData && (
                       <details className="group/details">
                         <summary className="list-none cursor-pointer flex items-center gap-1 text-[10px] uppercase font-bold text-gray-400 hover:text-red-500 transition-colors mt-2">
@@ -343,7 +343,7 @@ const SmartWatch = ({
                             size={12}
                             className="hidden group-open/details:block"
                           />
-                          <span>{log.avData ? "AV Data" : "No signal"}</span>
+                          <span>{log.avData ? "Audio/Video Data" : "No Signal"}</span>
                         </summary>
                         <div className="mt-2 p-3 bg-black/5 rounded-lg border border-black/10 text-[10px] leading-relaxed text-gray-600 animate-in slide-in-from-top-1">
                           <div className="flex items-center gap-1 text-red-500 mb-1 font-bold animate-pulse">
@@ -370,7 +370,7 @@ const SmartWatch = ({
               ))}
             {smartWatchLogs.length === 0 && (
               <div className="text-center text-gray-400 text-xs py-8">
-                No log entries yet
+                No logs yet
               </div>
             )}
           </div>

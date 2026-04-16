@@ -23,10 +23,10 @@ import {
   DEFAULT_USER_STICKERS,
 } from "./constants/stickers";
 import {
-  DEFAULT_PROMPTS_EN,
+  DEFAULT_PROMPTS,
+  STYLE_PROMPTS as stylePrompts,
   CHARACTER_CREATION_PROMPT,
-} from "./constants/prompts_en";
-import { STYLE_PROMPTS_EN as stylePrompts } from "./constants/prompts_en";
+} from "./constants/prompts";
 import mapBg from "./map_bg.png";
 import {
   Wifi,
@@ -112,8 +112,8 @@ import {
   Eye,
   Sparkle,
   Check, // Bot Icon for Char Reply
-  Circle, // [new]
-  Sparkles, // [new]
+  Circle, // [新增]
+  Sparkles, // [新增]
   Calendar,
   FolderInput,
   ArrowRightToLine,
@@ -159,11 +159,11 @@ const App = () => {
     "echoes_user_stickers",
   );
 
-  // batchImportSticker function
+  // Bulk Import表情包函数
   const handleBulkImport = (
     text,
     type = "char",
-    targetGroup = "Custom",
+    targetGroup = "Custom Stickers",
   ) => {
     const lines = text.split("\n");
     const newStickers = [];
@@ -193,12 +193,12 @@ const App = () => {
         setUserStickers((prev) => [...prev, ...newStickers]);
       }
       if (typeof showToast === "function")
-        // add first arg "success"
-        showToast("success", `Successfully imported ${newStickers.length} Sticker`);
+        // 加上第一个参数 "success"
+        showToast("success", `Successfully imported ${newStickers.length} stickers`);
     } else {
       if (typeof showToast === "function")
-        // move "error" to front
-        showToast("error", "Format error (use: Description: Link)");
+        // 把 "error" 挪到前面
+        showToast("error", "Invalid format (should be: description: url)");
     }
   };
   // -- PERSISTENT STATE --
@@ -232,7 +232,7 @@ const App = () => {
       document.head.appendChild(styleTag);
     }
 
-    // directly put url in, Browser will auto-download
+    // 这里直接把 url 放进去即可，浏览器会自动去下载
     styleTag.innerHTML = `
     @font-face { font-family: '${name}'; src: url('${url}'); font-display: swap; }
     body { --app-font: '${name}' !important; }
@@ -245,52 +245,52 @@ const App = () => {
       const savedFontName = await echoesDB.getItem("custom-font-name");
       if (savedFontUrl) {
         applyFont("UserCustomFont", savedFontUrl);
-        setFontName(savedFontName || "Custom font");
+        setFontName(savedFontName || "Custom Font");
       }
     };
     loadFont();
   }, []);
 
   const handleFontUrlSubmit = async () => {
-    const url = inputUrl.trim(); // use the defined inputUrl status
+    const url = inputUrl.trim(); // 使用你定义好的 inputUrl 状态
     if (url) {
       applyFont("UserCustomFont", url);
-      setFontName("Custom font");
+      setFontName("Custom Font");
       await echoesDB.setItem("custom-font-url", url);
-      await echoesDB.setItem("custom-font-name", "Custom font");
-      // setShowFontInput(false); // add if this status exists
+      await echoesDB.setItem("custom-font-name", "Custom Font");
+      // setShowFontInput(false); // 如果有这个状态就加上
       showToast("success", "Font applied");
     } else {
-      showToast("error", "Enter font URL");
+      showToast("error", "Please enter a font URL");
     }
   };
 
   const handleResetFont = async () => {
-    // add async
-    // Remove custom font
+    // 加上 async
+    // 移除自定义字体
     const styleElement = document.getElementById("UserCustomFont");
     if (styleElement) styleElement.remove();
     document.body.style.fontFamily = "";
-    setFontName("Default font");
+    setFontName("Default Font");
     await echoesDB.removeItem("custom-font-url");
     await echoesDB.removeItem("custom-font-name");
-    showToast("info", "Restored default font");
+    showToast("info", "Reset to default font");
   };
 
-  // [new] Custom闁搞儳鍋撻悥顤檛atus
+  // [新增] 自定义图标状态
   const [customIcons, setCustomIcons, customIconsLoaded] = useStickyState(
     {},
     "echoes_custom_icons",
   );
 
   const handleAppIconUpload = async (e, appId) => {
-    // add async
+    // 加上 async
     const file = e.target.files[0];
     if (!file) return;
 
     const reader = new FileReader();
     reader.onload = async (event) => {
-      // anonymous callback here also needs async
+      // 这里的匿名回调也要加 async
       const base64 = event.target.result;
       const newIcons = { ...customIcons, [appId]: base64 };
       setCustomIcons(newIcons);
@@ -300,9 +300,9 @@ const App = () => {
     reader.readAsDataURL(file);
   };
 
-  // [new] Reset闁搞儳鍋撻悥?
+  // [新增] 重置图标
   const handleResetIcon = async (appId) => {
-    if (await customConfirm("Confirm reset icon?", "Restore icon")) {
+    if (await customConfirm("Reset icon to default?", "Restore Icon")) {
       setCustomIcons((prev) => {
         const newState = { ...prev };
         delete newState[appId];
@@ -314,29 +314,29 @@ const App = () => {
   // --- CUSTOM DIALOG STATE ---
   const [dialogConfig, setDialogConfig] = useState(null);
 
-  // Helper: wraps Promise to wait for user action
+  // Helper: 封装 Promise 以等待用户操作
   const showDialog = (options) => {
     return new Promise((resolve) => {
       setDialogConfig({ ...options, resolve });
     });
   };
 
-  // replace window.alert
+  // 替代 window.alert
   const customAlert = (message, title = "Notice") => {
     return showDialog({ type: "alert", title, message });
   };
 
-  // replace window.confirm
+  // 替代 window.confirm
   const customConfirm = (message, title = "Confirm", danger = false) => {
     return showDialog({ type: "confirm", title, message, danger });
   };
 
-  // replace window.prompt
+  // 替代 window.prompt
   const customPrompt = (message, defaultValue = "", title = "Enter") => {
     return showDialog({ type: "prompt", title, message, defaultValue });
   };
 
-  // 1. Memory-related State
+  // 1. Memory 相关的 State
   const [memoryConfig, setMemoryConfig, memoryConfigLoaded] = useStickyState(
     {
       enabled: true,
@@ -396,7 +396,7 @@ const App = () => {
   const [browserHistory, setBrowserHistory, browserHistoryLoaded] =
     useStickyState([], "echoes_browser");
 
-  // Tracker-related state
+  // 追踪器相关状态
   const [userFacts, setUserFacts, userFactsLoaded] = useStickyState(
     [],
     "echoes_user_facts",
@@ -416,7 +416,7 @@ const App = () => {
   );
 
   // Settings
-  const prompts = DEFAULT_PROMPTS_EN;
+  const prompts = DEFAULT_PROMPTS;
   // const [prompts, setPrompts] = useStickyState(DEFAULT_PROMPTS,"echoes_prompts");
   const [customRules, setCustomRules, customRulesLoaded] = useStickyState(
     "No special rules",
@@ -430,7 +430,7 @@ const App = () => {
   const [stickersEnabled, setStickersEnabled, stickersEnabledLoaded] =
     useStickyState(true, "echoes_stickers_enabled");
 
-  // context memory count
+  // 上下文记忆条数
   const [contextLimit, setContextLimit, contextLimitLoaded] = useStickyState(
     10,
     "echoes_context_limit",
@@ -444,14 +444,14 @@ const App = () => {
       "Send Transfer",
     );
     if (!amount || isNaN(amount) || parseFloat(amount) <= 0) {
-      if (amount) showToast("error", "Enter valid amount");
+      if (amount) showToast("error", "Please enter a valid amount");
       return;
     }
 
-    // Note
+    // 备注
     const noteInput = await customPrompt(
-      "Add a note (optional):",
-      "Treat yourself",
+      "Add transfer note (optional):",
+      "Go treat yourself",
       "Transfer Note",
     );
     const note = noteInput === null ? "" : noteInput;
@@ -464,18 +464,18 @@ const App = () => {
     const msg = newHistory[index];
     if (!msg.transfer || msg.transfer.status !== "pending") return;
 
-    // UpdateStatus
+    // 更新状态
     msg.transfer.status = action === "accept" ? "accepted" : "rejected";
 
     const amount = msg.transfer.amount;
-    const actionText = action === "accept" ? "accepted" : "returned";
+    const actionText = action === "accept" ? "Received" : "Refunded";
 
-    // 闁汇垻鍠愰崹姘卞寲閼姐倗鍩燤essage
+    // 生成系统消息
     const notificationMsg = {
       id: `sys_${Date.now()}`,
       sender: "me",
       isSystem: true,
-      text: `You${actionText} ¥${amount}`,
+      text: `You ${actionText === "Received" ? "received" : "refunded"} ¥${amount}`,
       time: formatTime(getCurrentTimeObj()),
     };
 
@@ -488,59 +488,61 @@ const App = () => {
     setPendingHint(hint);
   };
 
-  // [new] 闁哄秶顭堢缓楣冨炊閻愯　鍋撻埀顒勬焻閺勫繒甯嗛柨娑欑閻楁挳骞戦悽鍗恠sage ID Delete閻庣懓鍟伴弫鎾诲箣閹邦喗鐣遍柟纰樺亾闁?Facts 闁?Events
+  // [新增] 核心回退逻辑：根据消息 ID Delete它生成的所有 Facts 和 Events
   const rollbackTrackerData = (sourceMsgId) => {
     if (!sourceMsgId) return;
 
-    // 1. rollback User Facts
+    // 1. 回退 User Facts
     setUserFacts((prev) => {
       const filtered = prev.filter((item) => item.sourceMsgId !== sourceMsgId);
       if (filtered.length !== prev.length) {
         console.log(
-          `[Echoes] Rolled back associated User Facts (${
-            prev.length - filtered.length
-          })`,
+          "[Echoes] Rolled back User Facts (" +
+          (prev.length - filtered.length) +
+          ")",
         );
       }
       return filtered;
     });
 
-    // 2. rollback Char Facts
+    // 2. 回退 Char Facts
     setCharFacts((prev) => {
       const filtered = prev.filter((item) => item.sourceMsgId !== sourceMsgId);
       if (filtered.length !== prev.length) {
         console.log(
-          `[Echoes] Rolled back associated Char Facts (${
-            prev.length - filtered.length
-          })`,
+          "[Echoes] Rolled back Char Facts (" +
+          (prev.length - filtered.length) +
+          ")",
         );
       }
       return filtered;
     });
 
-    // 3. rollback Shared Events (pending status)
+    // 3. 回退 Shared Events (pending 状态的)
     setSharedEvents((prev) => {
       const filtered = prev.filter((item) => item.sourceMsgId !== sourceMsgId);
       if (filtered.length !== prev.length) {
         console.log(
-          `[Echoes] Rolled back associated Events (${prev.length - filtered.length})`,
+          "[Echoes] Rolled back Events (" +
+          (prev.length - filtered.length) +
+          ")",
         );
       }
       return filtered;
     });
   };
 
-  // 3. 濞戞挸鐡ㄥ?UI Status
-  const [editingSticker, setEditingSticker] = useState(null); // CurrentNow...Edit闁汇劌鍤猼icker
-  const [showUserStickerPanel, setShowUserStickerPanel] = useState(false); // user sticker panel toggle
-  const [isUserStickerEditMode, setIsUserStickerEditMode] = useState(false); // user StickerEditMode toggle
-  const [isVoiceMode, setIsVoiceMode] = useState(false); // voice mode toggle
+  // 3. 临时 UI 状态
+  const [editingSticker, setEditingSticker] = useState(null); // 当前正在编辑的表情包
+  const [showUserStickerPanel, setShowUserStickerPanel] = useState(false); // 用户表情面板开关
+  const [isUserStickerEditMode, setIsUserStickerEditMode] = useState(false); // 用户表情包Edit Mode开关
+  const [isVoiceMode, setIsVoiceMode] = useState(false); // 语音模式开关
   const [showLocationModal, setShowLocationModal] = useState(false);
   const [isLocGenerating, setIsLocGenerating] = useState(false);
 
   const [showMediaMenu, setShowMediaMenu] = useState(false);
 
-  // [new] 闁稿繈鍔岄惈鍝爐atus闁硅矇鍐ㄧ厬
+  // [新增] 全屏状态控制
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   const toggleFullScreen = () => {
@@ -552,7 +554,7 @@ const App = () => {
         })
         .catch((e) => {
           console.log(e);
-          showToast("error", "Fullscreen mode denied by browser");
+          showToast("error", "Fullscreen was denied by the browser");
         });
     } else {
       if (document.exitFullscreen) {
@@ -563,7 +565,7 @@ const App = () => {
     }
   };
 
-  // listen for native fullscreen changes闁挎稑鐗婇惁顔戒繆閸屾粍鏆忛柟鎾敱鐎垫窊SC闂侇偀鍋撻柛鎴犲皑缁辨岸鏁嶇仦鑺ュ€辨慨婵勫劜鐎垫粓鏌﹂悽濯tus
+  // 监听原生全屏变化（比如用户按ESC退出），同步按钮状态
   useEffect(() => {
     const handleFsChange = () => {
       setIsFullscreen(!!document.fullscreenElement);
@@ -604,12 +606,12 @@ const App = () => {
   const [regenerateTarget, setRegenerateTarget] = useState(null);
   const [regenHint, setRegenHint] = useState("");
   const [expandedMusicHistory, setExpandedMusicHistory] = useState(null);
-  const [activeMenuIndex, setActiveMenuIndex] = useState(null); // which message currently shows Menu
+  const [activeMenuIndex, setActiveMenuIndex] = useState(null); // 当前哪个消息显示了菜单
   const [pendingHint, setPendingHint] = useState(null);
-  const [editIndex, setEditIndex] = useState(null); // which message is currently being edited
-  const [editContent, setEditContent] = useState(""); // Edit box content
+  const [editIndex, setEditIndex] = useState(null); // 当前正在编辑哪条消息
+  const [editContent, setEditContent] = useState(""); // 编辑框的内容
   const longPressTimerRef = useRef(null);
-  const [isSummarizing, setIsSummarizing] = useState(false); // Loading Status
+  const [isSummarizing, setIsSummarizing] = useState(false); // Loading 状态
 
   // NEW: State to track which message has its status expanded
   const [expandedChatStatusIndex, setExpandedChatStatusIndex] = useState(null);
@@ -625,16 +627,16 @@ const App = () => {
   const stickerInputRef = useRef(null);
   const chatScrollRef = useRef(null);
 
-  // === new state ===
+  // === 新增状态 ===
   const [showCreationAssistant, setShowCreationAssistant] = useState(false);
   const [creationInput, setCreationInput] = useState("");
   const [isGeneratingCharacter, setIsGeneratingCharacter] = useState(false);
   const [generatedPreview, setGeneratedPreview] = useState(null);
 
-  // === character generation function ===
+  // === Character生成函数 ===
   const generateCharacterFromDescription = async () => {
     if (!creationInput.trim()) {
-      showToast("error", "Enter character description");
+      showToast("error", "Please enter a character description");
       return;
     }
 
@@ -645,7 +647,7 @@ const App = () => {
         {
           prompt: `User description: "${creationInput}"
 
-          Based on the above brief description, generate a complete, detailed character card. Make sure all details are logically supported.`,
+          Based on this brief description,generate a complete and detailed character card. Ensure all details are logically supported.`,
           systemInstruction: CHARACTER_CREATION_PROMPT,
           isJson: true,
         },
@@ -655,7 +657,7 @@ const App = () => {
 
       if (result) {
         setGeneratedPreview(result);
-        showToast("success", "Character created!");
+        showToast("success", "Character generated!");
       }
     } catch (error) {
       showToast("error", "Generation failed: " + error.message);
@@ -664,20 +666,20 @@ const App = () => {
     }
   };
 
-  // === applied generated character ===
+  // === 应用生成的Character ===
   const applyGeneratedCharacter = () => {
     if (!generatedPreview) return;
 
     const cleaned = cleanCharacterJson(generatedPreview);
     const finalDescription = generatedPreview.description || cleaned.rawText;
-    // priority: generatedPreview.name > cleaned.name > regex from description > "Unknown"
-    // support standard format "Name: xxx" and YAML format "Name:\n  name:"
+    // 优先级：generatedPreview.name > cleaned.name > 从description正则提取 > "Unknown"
+    // 支持标准格式 "Name: xxx" 和 YAML 格式 "Character名:\n  Chinese_name:"
     const raw = finalDescription || "";
-    // standard Name: xxx format
+    // 标准 Name: xxx 格式
     const nameFromStandard = raw.match(/^Name:\s*(.+)/m);
-    // YAML format: first "Name:\n" in description followed by name
+    // YAML 格式：取 description 里第一个 "Character名:\n" 后紧跟 Chinese_name 的模式
     const nameFromYaml = raw.match(/^([^\n:]{2,20}):\s*\n\s+Chinese_name:/m);
-    // fallback: take first line of description (after stripping <info> tags)
+    // 兜底：直接取 description 第一行（去掉 <info> 等标签后的第一行内容）
     const firstLineRaw = raw.replace(/<[^>]+>/g, "").split("\n").find(l => l.trim().length > 0);
     const nameFromFirstLine = firstLineRaw ? firstLineRaw.trim().match(/^([^\n:]{2,20})$/) : null;
     const finalName =
@@ -694,19 +696,19 @@ const App = () => {
     });
     setInputKey(finalDescription);
 
-    // 5. SettingsLore Book (濠碘€冲€归悘澶愬嫉?
+    // 5. 设置World Book (如果有)
     const groupedWorldBook = (cleaned.worldBook || []).map((entry) => ({
       ...entry,
-      group: finalName, // 濞达綀娉曢弫顥﹉aracter闁告艾绉崇紞鏃€绋夌弧寮恛up
+      group: finalName, // 使用Character名作为分组
     }));
     setWorldBook(groupedWorldBook);
 
-    // 6. reset generator UI
+    // 6. 重置生成器 UI
     setShowCreationAssistant(false);
     setGeneratedPreview(null);
     setCreationInput("");
 
-    // ResetStatus
+    // 重置状态
     setShowCreationAssistant(false);
     setGeneratedPreview(null);
     setCreationInput("");
@@ -714,7 +716,7 @@ const App = () => {
   };
 
   const handleOpenLocationModal = () => {
-    setShowMediaMenu(false); // CloseMenu
+    setShowMediaMenu(false); // Close菜单
     setShowLocationModal(true);
   };
 
@@ -736,18 +738,18 @@ const App = () => {
       .join("\n---\n");
     const pendingEvents = sharedEvents.filter((e) => e.type === "pending");
 
-    // prepare data for Prompt
+    // 准备数据传给 Prompt
     const pendingEventsStr = JSON.stringify(
       pendingEvents.map((e) => ({ id: e.id, content: e.content })),
     );
     const userFactsStr = JSON.stringify(userFacts.map((f) => f.content));
-    const charFactsStr = JSON.stringify(charFacts.map((f) => f.content)); // [new]
+    const charFactsStr = JSON.stringify(charFacts.map((f) => f.content)); // [新增]
 
     const prompt = prompts.tracker_update
       .replaceAll("{{HISTORY}}", recentHistory)
       .replaceAll("{{PENDING_EVENTS}}", pendingEventsStr)
       .replaceAll("{{USER_FACTS}}", userFactsStr)
-      .replaceAll("{{CHAR_FACTS}}", charFactsStr) // [new]
+      .replaceAll("{{CHAR_FACTS}}", charFactsStr) // [新增]
       .replaceAll("{{USER_NAME}}", userName || "User")
       .replaceAll("{{NAME}}", persona.name);
 
@@ -759,33 +761,33 @@ const App = () => {
       );
 
       if (data) {
-        // 1. process User Facts
+        // 1. 处理 User Facts
         if (data.newUserFacts && data.newUserFacts.length > 0) {
           const newEntries = data.newUserFacts.map((f) => ({
             id: `ufact_${Date.now()}_${Math.random()}`,
             content: f.content,
             comment: f.comment,
             time: formatDate(getCurrentTimeObj()),
-            sourceMsgId: sourceMsgId, // <--- [闁稿繑濞婇弫顓㈠棘閺夋鏉籡 閻犱焦婢樼紞宥夊级閵夛妇鐖盡essageID
+            sourceMsgId: sourceMsgId, // <--- [关键新增] 记录来源消息ID
           }));
           setUserFacts((prev) => [...newEntries, ...prev]);
-          showToast("success", `Learned about you: ${newEntries.length} facts`);
+          showToast("success", `Remembered ${newEntries.length} things about you`);
         }
 
-        // 2. process Char Facts
+        // 2. 处理 Char Facts
         if (data.newCharFacts && data.newCharFacts.length > 0) {
           const newEntries = data.newCharFacts.map((f) => ({
             id: `cfact_${Date.now()}_${Math.random()}`,
             content: f.content,
             comment: f.comment,
             time: formatDate(getCurrentTimeObj()),
-            sourceMsgId: sourceMsgId, // <--- [闁稿繑濞婇弫顓㈠棘閺夋鏉籡
+            sourceMsgId: sourceMsgId, // <--- [关键新增]
           }));
           setCharFacts((prev) => [...newEntries, ...prev]);
-          showToast("success", `Character facts updated (${newEntries.length})`);
+          showToast("success", `Updated character settings (${newEntries.length} items)`);
         }
 
-        // 3. process Events
+        // 3. 处理 Events
         if (data.newEvents && data.newEvents.length > 0) {
           const newEntries = data.newEvents.map((e) => ({
             id: `evt_${Date.now()}_${Math.random()}`,
@@ -793,12 +795,12 @@ const App = () => {
             type: e.type || "pending",
             comment: e.comment,
             time: formatDate(getCurrentTimeObj()),
-            sourceMsgId: sourceMsgId, // <--- [闁稿繑濞婇弫顓㈠棘閺夋鏉籡
+            sourceMsgId: sourceMsgId, // <--- [关键新增]
           }));
           setSharedEvents((prev) => [...newEntries, ...prev]);
         }
 
-        // 4. Done events (logic unchanged)
+        // 4. Done事件 (逻辑不变)
         if (data.completedEventIds && data.completedEventIds.length > 0) {
           setSharedEvents((prev) =>
             prev.map((evt) => {
@@ -826,15 +828,15 @@ const App = () => {
   // --- TRACKER HANDLERS ---
 
   const handleDeleteTrackerItem = async (type, id) => {
-    if (!(await customConfirm("Confirm delete this entry?"))) return;
+    if (!(await customConfirm("Delete this record?"))) return;
 
-    // fix: compat "fact" (User Facts) and "userFact"
+    // 修复点：兼容 "fact" (User Facts) 和 "userFact"
     if (type === "userFact" || type === "fact") {
       setUserFacts((prev) => prev.filter((i) => i.id !== id));
     } else if (type === "charFact") {
       setCharFacts((prev) => prev.filter((i) => i.id !== id));
     } else {
-      // the else here corresponds to events
+      // 这里的 else 对应 events
       setSharedEvents((prev) => prev.filter((i) => i.id !== id));
     }
   };
@@ -847,7 +849,7 @@ const App = () => {
           prev.map((i) => (i.id === id ? { ...i, content: newContent } : i)),
         );
       } else if (type === "charFact") {
-        // [new] 濞戞柨顑呮晶鐘差煶韫囧海鍟婇弶鈺傜崱in闁衡偓椤栥倗绀夐悗浣冨閸?CharFacts Edit濞村吋淇虹粣鍥礆?else 闂佹彃鑻獮鎾诲绩?SharedEvents
+        // [新增] 之前漏了这个分支，导致 CharFacts 编辑会跑到 else 里去改 SharedEvents
         setCharFacts((prev) =>
           prev.map((i) => (i.id === id ? { ...i, content: newContent } : i)),
         );
@@ -860,18 +862,18 @@ const App = () => {
     }
   };
 
-  // Switch闂佹澘绉堕悿鍡楊嚕閳ь剟宕?
+  // 切换配置开关
   const toggleTrackerConfig = (key) => {
     setTrackerConfig((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
-  // DeleteStatus Log闁告垼濮ら弳?
+  // Delete状态记录函数
   const handleDeleteStatus = async (index) => {
-    if (await customConfirm("Confirm delete this status log?")) {
+    if (await customConfirm("Delete this status record?")) {
       const newHistory = [...statusHistory];
       newHistory.splice(index, 1);
       setStatusHistory(newHistory);
-      showToast("success", "Status log deleted");
+      showToast("success", "Status record deleted");
     }
   };
 
@@ -901,25 +903,25 @@ const App = () => {
     }
   }, [chatHistory, activeApp, loading.chat, isTyping]);
 
-  // --- [闁哄倹婢橀·鍍?闁轰胶澧楀畵浣虹磼閹惧鈧垱娼绘担鐩掆晠鏁嶅鍐叉闁告柣鍔庣划浼村籍瑜庨弳鐔煎箲椤旂厧顫ｅ☉鎾愁殢roup ---
+  // --- [新增] 数据结构迁移：自动给旧数据加上分组 ---
   useEffect(() => {
-    // 1. 閺夆晙鑳朵簺Sticker
+    // 1. 迁移表情包
     setCharStickers((prev) =>
       prev.map((s) => ({
         ...s,
-        group: s.group || "Default",
+        group: s.group || "Diary",
         enabled: s.enabled !== undefined ? s.enabled : true,
       })),
     );
 
-    // 2. 閺夆晙鑳朵簺Lore Book
+    // 2. 迁移World Book
     setWorldBook((prev) =>
       prev.map((w) => ({
         ...w,
         group: w.group || "Ungrouped",
       })),
     );
-  }, []); // 闁告瑯浜滃﹢顏嗙磼閸曨亝顐介柟绋垮€藉ù鍥籍閼搁潧鈷旈悶娑樺缁?
+  }, []); // 只在组件挂载时执行一次
 
   // --- FIXED MESSAGE QUEUE LOGIC ---
   // Effect 1: Trigger typing state when there are messages
@@ -963,7 +965,7 @@ const App = () => {
             const { rawText, worldBook, name } = cleanCharacterJson(json);
             setInputKey(rawText);
             setWorldBook(worldBook);
-            showToast("success", "Character card loaded successfully");
+            showToast("success", "Character card loaded");
           } catch (err) {
             showToast("error", "JSON parse failed: " + err.message);
           }
@@ -973,17 +975,17 @@ const App = () => {
     }
   };
 
-  // 1. 闁兼儳鍢茶ぐ鍥箥閳ь剟寮垫径濠冩殰濞戞挴鍋撻柣銊ュ殨roup闁?
+  // 1. 获取所有唯一的分组名
   const getGroups = (list) => {
-    const groups = new Set(list.map((i) => i.group || "Custom"));
+    const groups = new Set(list.map((i) => i.group || "Custom Stickers"));
     return Array.from(groups);
   };
 
-  // 2. MoveLore Book闁烩晩鍠栭崺宀勫棘閻у窎oup
+  // 2. 移动World Book条目到新分组
   const moveWorldBookEntry = async (id, newGroup) => {
     let finalGroup = newGroup;
     if (newGroup === "NEW_GROUP_TRIGGER") {
-      const name = await customPrompt("Enter new Group name:", "", "New Group");
+      const name = await customPrompt("Enter new group name:", "", "New Group");
       if (!name) return;
       finalGroup = name;
     }
@@ -995,9 +997,9 @@ const App = () => {
     );
   };
 
-  // RenameLore BookGroup
+  // 重命名World Book分组
   const renameWorldBookGroup = async (oldName) => {
-    const newName = await customPrompt("Rename Group:", oldName);
+    const newName = await customPrompt("Rename group:", oldName);
     if (!newName || newName.trim() === "" || newName === oldName) return;
 
     setWorldBook((prev) =>
@@ -1007,11 +1009,11 @@ const App = () => {
     );
   };
 
-  // [new] DeleteLore BookGroup (SupportCustom鐎殿喖婀遍悰?
+  // [新增] DeleteWorld Book分组 (支持自定义弹窗)
   const deleteWorldBookGroup = async (groupName) => {
     if (
       await customConfirm(
-        `Confirm delete group "${groupName}"" and all its entries?`,
+        `Delete all entries in group "${groupName}"?`,
         "Delete Group",
       )
     ) {
@@ -1021,10 +1023,10 @@ const App = () => {
   };
 
   const addStickerGroup = async () => {
-    const name = await customPrompt("Enter new sticker group name:", "", "New Library");
+    const name = await customPrompt("Enter new sticker library name:", "", "New Library");
     if (!name || name.trim() === "") return;
 
-    // 婵☆偀鍋撻柡灞诲劜濡叉悂宕ラ〃鐚硁e閻庢稒锚濠€?
+    // 检查是否已存在
     const exists = charStickers.some((s) => s.group === name);
     if (exists) {
       showToast("error", "This group already exists");
@@ -1033,7 +1035,7 @@ const App = () => {
 
     setCharStickers((prev) => [
       ...prev,
-      // Add濞戞挴鍋撻柛妤冨С缂嶅懐绮敂鑲╃缁绢収鍠曠换娆竢oup闁煎疇濮ゅΟ澶岀矆閸濆嫬姣夐柡?
+      // 添加一个占位符，确保分组能显示出来
       {
         id: `placeholder_${Date.now()}`,
         group: name,
@@ -1044,21 +1046,21 @@ const App = () => {
     ]);
   };
 
-  // [new] Delete Sticker閹?
+  // [新增] DeleteSticker Library
   const deleteStickerGroup = async (groupName) => {
     if (
       await customConfirm(
-        `Confirm delete library "${groupName}"" and all its stickers?`,
-        "Delete sticker group",
+        `Delete library "${groupName}" and all its stickers?`,
+        "Delete Sticker Library",
       )
     ) {
       setCharStickers((prev) => prev.filter((s) => s.group !== groupName));
     }
   };
 
-  // [new] Rename Sticker閹?
+  // [新增] 重命名Sticker Library
   const renameStickerGroup = async (oldName) => {
-    const newName = await customPrompt("Rename sticker group:", oldName);
+    const newName = await customPrompt("Rename sticker library:", oldName);
     if (!newName || newName.trim() === "" || newName === oldName) return;
 
     setCharStickers((prev) =>
@@ -1066,11 +1068,11 @@ const App = () => {
     );
   };
 
-  // [濞ｅ浂鍠楅弫绯?SwitchGroup鐎殿喒鍋撻柛?(闂侇偅妲掔欢顐ｇ┍濠靛洤鐦☉鎾崇Т瑜?
+  // [修改] 切换分组开关 (逻辑保持不变)
   const toggleStickerGroup = (groupName, isEnabled) => {
     setCharStickers((prev) =>
       prev.map((s) =>
-        (s.group || "Custom") === groupName
+        (s.group || "Custom Stickers") === groupName
           ? { ...s, enabled: isEnabled }
           : s,
       ),
@@ -1100,16 +1102,16 @@ const App = () => {
             );
           }
 
-          const baseTime = Date.now(); // 闁圭粯鍔曡ぐ鍢me闁规潙鍟块崺灞筋嚗椤忓棗绠氬?
+          const baseTime = Date.now(); // 提取时间戳到循环外
           const defaultGroupName =
             file.name.replace(".json", "") ||
             `Import-${new Date().toLocaleDateString()}`;
 
           const formattedEntries = newEntries
             .map((entry, index) => {
-              let name = entry.comment || entry.name || "Untitled Entry";
+              let name = entry.comment || entry.name || "Unnamed Entry";
 
-              if (!name || name === "Untitled Entry") {
+              if (!name || name === "Unnamed Entry") {
                 const k = entry.key || entry.keys;
                 if (Array.isArray(k) && k.length > 0) name = k[0];
                 else if (typeof k === "string") name = k;
@@ -1137,10 +1139,10 @@ const App = () => {
             setWorldBook((prev) => [...prev, ...formattedEntries]);
             showToast(
               "success",
-              `Imported ${formattedEntries.length} to "${defaultGroupName}"`,
+              `Imported ${formattedEntries.length} entries to "${defaultGroupName}"`,
             );
           } else {
-            showToast("error", "No valid Lore Book entries found");
+            showToast("error", "No valid World Book entries found");
           }
         } catch (err) {
           console.error(err);
@@ -1158,9 +1160,9 @@ const App = () => {
       try {
         const compressedBase64 = await compressImage(file);
         setter(compressedBase64);
-        showToast("success", "Avatar loaded successfully");
+        showToast("success", "Avatar loaded");
       } catch (err) {
-        console.error("Image Processing... Error", err);
+        console.error("Image Processing Error", err);
         showToast("error", "Image processing failed, please retry");
       }
     }
@@ -1173,51 +1175,51 @@ const App = () => {
   ) => {
     const file = event.target.files[0];
     if (file) {
-      // 闁哄洦瀵у畷?window.prompt
+      // 替换 window.prompt
       const desc = await customPrompt(
         "Enter sticker description (AI decides when to send based on this):",
-        "happy",
+        "Happy",
         "Add Sticker",
       );
       if (!desc) {
-        // 濠㈣泛瀚幃濂€ancel (null)
+        // 处理Cancel (null)
         event.target.value = "";
         return;
       }
 
       try {
-        // 2. 闁告ê顑囩紓濉坢age
+        // 2. 压缩图片
         const compressedBase64 = await compressImage(file);
 
-        // 3. [闁稿繑濞婇弫顓熺┍椤旇姤鏆璢 ConfirmGroup闁挎稒鑹鹃々褔寮稿鍕畳濞磋偐濮撮崣?targetGroup 閻忓繗浜弫銈団偓鐟板枦缁辨繈宕ラ敃鈧崹顖炴偨閵娾晝甯涢悹浣靛€曢埀?
-        const finalGroup = targetGroup || "Custom";
+        // 3. [关键修改] 确定分组：如果有传入 targetGroup 就用它，否则用默认值
+        const finalGroup = targetGroup || "Custom Stickers";
 
         const newSticker = {
           id: `s${Date.now()}`,
           url: compressedBase64,
           desc: desc,
-          group: finalGroup, // [濞达綀娉曢弫顥﹐nfirm闁汇劌鍤時oup]
+          group: finalGroup, // [使用确定的分组]
           enabled: true,
         };
 
-        // 4. Save闁轰胶澧楀畵?
+        // 4. 保存数据
         if (type === "char") {
           setCharStickers((prev) => [...prev, newSticker]);
         } else {
           setUserStickers((prev) => [...prev, newSticker]);
         }
 
-        showToast("success", "Sticker added successfully");
+        showToast("success", "Sticker added");
       } catch (err) {
-        console.error("Sticker upload error:", err);
+        console.error("Sticker upload failed:", err);
         showToast("error", "Sticker processing failed: " + (err.message || "Unknown error"));
       }
     }
-    // 5. Reset input value 闁稿繋娴囬蹇涙煂瀹ュ拋妲籙pload闁告艾濂旂粩鎾棘閸ワ附顐?
+    // 5. 重置 input value 允许重复上传同一文件
     event.target.value = "";
   };
 
-  // SaveSticker濞ｅ浂鍠楅弫?
+  // 保存表情包修改
   const handleSaveSticker = (id, newDesc) => {
     if (editingSticker?.source === "user") {
       setUserStickers((prev) =>
@@ -1232,9 +1234,9 @@ const App = () => {
     showToast("success", "Changes saved");
   };
 
-  // DeleteSticker
+  // Delete表情包
   const handleDeleteSticker = async (id) => {
-    if (await customConfirm("Confirm delete this sticker?")) {
+    if (await customConfirm("Delete this sticker?")) {
       if (editingSticker?.source === "user") {
         setUserStickers((prev) => prev.filter((s) => s.id !== id));
       } else {
@@ -1274,7 +1276,7 @@ const App = () => {
     showToast("success", "Chat history exported");
   };
 
-  // [new] Import闁煎崬锕ら妵澶屾媼閺夎法绉?
+  // [新增] 导入聊天记录
   const importChatData = (event) => {
     const file = event.target.files[0];
     if (!file) return;
@@ -1284,11 +1286,11 @@ const App = () => {
       try {
         const data = JSON.parse(e.target.result);
         if (data.history && Array.isArray(data.history)) {
-          // 缂佺姭鍋撻柛妤佹礃閻楀孩顨ョ仦鑲╊伇濞戞挸顑嗛悧绋款嚕?
+          // 简单校验一下格式
           if (
             await customConfirm(
-              `Overwrite current chat history?\nFile contains ${data.history.length}  messages.\n(Recommend backing up current record first)`,
-              "Import backup",
+              `Overwrite current chat history?\nFile contains ${data.history.length} messages.\n(Recommended: back up current history first)`,
+              "Import Backup",
               true,
             )
           ) {
@@ -1296,7 +1298,7 @@ const App = () => {
             showToast("success", "Chat history restored");
           }
         } else {
-          showToast("error", "Invalid file format, history not found");
+          showToast("error", "Invalid file format, no history found");
         }
       } catch (err) {
         console.error(err);
@@ -1304,13 +1306,13 @@ const App = () => {
       }
     };
     reader.readAsText(file);
-    // Reset input value闁挎稑鑻崢鎴犳媼閹间礁娅㈠璺轰笉mport闁告艾濂旂粩鎾棘閸ワ附顐?
+    // 重置 input value，允许重复导入同一个文件
     event.target.value = "";
   };
 
   const fetchModelsList = async () => {
     if (!apiConfig.baseUrl || !apiConfig.key) {
-      showToast("error", "Please fill in API URL and Key");
+      showToast("error", "Please fill in API address and key");
       return;
     }
     setIsFetchingModels(true);
@@ -1330,7 +1332,7 @@ const App = () => {
       if (data.data && Array.isArray(data.data)) {
         const ids = data.data.map((m) => m.id);
         setAvailableModels(ids);
-        showToast("success", `Fetched ${ids.length} Model`);
+        showToast("success", `Fetched ${ids.length} models`);
 
         if (!ids.includes(apiConfig.model)) {
           const newDefault = ids[0] || "";
@@ -1342,7 +1344,7 @@ const App = () => {
       }
     } catch (e) {
       console.error("Fetch Models Failed", e);
-      showToast("error", "Failed to fetch models, please check config");
+      showToast("error", "Failed to fetch models, check configuration");
     } finally {
       setIsFetchingModels(false);
     }
@@ -1350,7 +1352,7 @@ const App = () => {
 
   const testConnection = async () => {
     if (!apiConfig.baseUrl || !apiConfig.key) {
-      showToast("error", "Enter full config");
+      showToast("error", "Please fill in all configuration");
       return;
     }
     setConnectionStatus("testing");
@@ -1370,12 +1372,12 @@ const App = () => {
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       setConnectionStatus("success");
-      showToast("success", "Connection success, config saved");
+      showToast("success", "Connected, configuration saved");
       setTimeout(() => setShowLockSettings(false), 1000);
     } catch (e) {
       console.error("Connection Test Failed", e);
       setConnectionStatus("error");
-      showToast("error", "Connection failed, please check address or key");
+      showToast("error", "Connection failed, check address or key");
     }
   };
 
@@ -1388,7 +1390,7 @@ const App = () => {
     setLoading({});
     setMessageQueue([]);
     setIsTyping(false);
-    showToast("info", "Cancelled generation");
+    showToast("info", "Generation cancelled");
   };
 
   // Generator Actions
@@ -1402,7 +1404,7 @@ const App = () => {
     abortControllerRef.current = abortController;
 
     // Fix: Use replaceAll to ensure all instances are replaced
-    // Fallback logic: If userName is empty, use "You" (natural in Chinese) or "User"
+    // Fallback logic: If userName is empty, use "你" (natural in Chinese) or "User"
     const effectiveUserName = userName || "You";
 
     const cleanCharDesc = replacePlaceholders(
@@ -1453,7 +1455,7 @@ const App = () => {
         } else {
           setter((prev) => [data, ...prev]);
         }
-        showToast("success", "Content generated successfully");
+        showToast("success", "Content generated");
       }
     } finally {
       setLoading((prev) => ({ ...prev, [type]: false }));
@@ -1469,7 +1471,7 @@ const App = () => {
   const generateBrowser = () =>
     runGenerator("browser", setBrowserHistory, prompts.browser);
 
-  // 濞存粌顑勫▎銏㈡喆閿曗偓瑜颁慷in闁哄鍔х槐鐧縤n闁哄鍔樻禍鐗堝緞閳轰礁鍧婇柛娆掝嚋缁辨繈宕橀崘鑼毎閻熸瑱绠戣ぐ鍌炲传椤忓啰鏄傞幖瀛樻⒒閺侇椈pdate
+  // 事件触发分析：分析聊天历史，决定触发哪些应用更新
   const triggerAppEvents = async () => {
     if (!persona) return;
     const charName = persona.name || "Character";
@@ -1490,7 +1492,7 @@ const App = () => {
       );
 
       if (data) {
-        // 闁革负鍔岀槐鎾愁潰閵夈劎娈堕柣顫妼婢х嚞ave闁圭鍋撻柡鍫濐樀濞撳墎鎲版担鐑樼暠闁稿﹦銆嬬槐婵嬫焼閸喖甯抽梻鍌ゅ幖鐎垫﹢姊婚鈧。?
+        // 在异步调用前保存所有需要的值，避免闭包问题
         const savedPersonaName = persona?.name || "Character";
         const savedCharName = charName;
         const savedUserName = effectiveUserName;
@@ -1503,7 +1505,7 @@ const App = () => {
         const savedCustomRules = customRules;
         const savedInputKey = inputKey;
 
-        // LocationMove閻熸瑱绠戣ぐ?闁?UpdateLiveTracker闁挎稑鐬奸弫鎾诲箣閹仜ne闁告艾楠搁懘濠勭玻?
+        // 位置移动触发 → 更新智能家，生成Done后弹窗
         if (data.triggerLocation) {
           setTimeout(() => {
             const doUpdate = async () => {
@@ -1524,7 +1526,7 @@ const App = () => {
               try {
                 const abortCtrl = new AbortController();
                 await generateContent({ prompt, systemInstruction: systemPrompt }, apiConfig, (err) => {}, abortCtrl.signal);
-                if (typeof showToast === "function") showToast("info", `${savedCharName}'s live location updated`);
+                if (typeof showToast === "function") showToast("info", `${savedCharName}'s real-time location updated`);
               } finally {
                 setLoading((prev) => ({ ...prev, sw_update: false }));
               }
@@ -1532,32 +1534,32 @@ const App = () => {
             doUpdate();
           }, 1000);
         }
-        // 闂佹彃绉烽々锔界鐎ｂ晜顐介悷娆欑畱瑜?闁?闁告劖顭絠ary闁挎稑鐬奸弫鎾诲箣閹仜ne闁告艾楠搁懘濠勭玻?
+        // 重要事件触发 → 写日记，生成Done后弹窗
         if (data.triggerDiary) {
           setTimeout(() => {
             const doDiary = async () => {
               await runGenerator("diary", setDiaries, prompts.diary);
-              if (typeof showToast === "function") showToast("info", `${savedCharName} wrote a new diary entry`);
+              if (typeof showToast === "function") showToast("info", `${savedCharName} wrote a diary entry`);
             };
             doDiary();
           }, 2000);
         }
-        // BrowserSearch閻熸瑱绠戣ぐ?闁?UpdateBrowser闁告ê妫楄ぐ鍫曟晬瀹€鈧弫鎾诲箣閹仜ne闁告艾楠搁懘濠勭玻?
+        // 浏览器搜索触发 → 更新浏览器历史，生成Done后弹窗
         if (data.triggerBrowser) {
           setTimeout(() => {
             const doBrowser = async () => {
               await runGenerator("browser", setBrowserHistory, prompts.browser);
-              if (typeof showToast === "function") showToast("info", `${savedCharName}'s browser history updated`);
+              if (typeof showToast === "function") showToast("info", `${savedCharName}'s browsing history updated`);
             };
             doBrowser();
           }, 3000);
         }
-        // 閻犳劦鍘炬晶璺ㄦ喆閿曗偓瑜?闁?UpdateReceipts闁挎稑鐬奸弫鎾诲箣閹仜ne闁告艾楠搁懘濠勭玻?
+        // 购物触发 → 更新账单，生成Done后弹窗
         if (data.triggerReceipt) {
           setTimeout(() => {
             const doReceipt = async () => {
               await runGenerator("receipt", setReceipts, prompts.receipt);
-              if (typeof showToast === "function") showToast("info", `${savedCharName}'s receipts updated`);
+              if (typeof showToast === "function") showToast("info", `${savedCharName}'s transaction history updated`);
             };
             doReceipt();
           }, 4000);
@@ -1573,7 +1575,7 @@ const App = () => {
       name: "Char",
       enName: null,
       title: "Connected Soul",
-      bio: "Manual mode. All settings must be entered manually.",
+      bio: "Manual mode: all settings must be entered manually.",
       mbti: null,
       tags: [],
     };
@@ -1583,50 +1585,50 @@ const App = () => {
 
   const unlockDevice = async () => {
     if (!inputKey) return;
-    // 濞戞挸绉撮崯鈧俊顐熷亾闁?apiConfig闁挎稑濂旂弧鍐╃▔瀹勫…ttings isConnecting Status闁挎稑鑻悿鍕偝閹殿噮娼＄€殿喒鍋?
+    // 不再检查 apiConfig，也不设置 isConnecting 状态，实现秒开
     try {
-      // 1. 闁哄牜鍓欏﹢瀵哥不閳ь剟寮伴幘鍓愭帡寮?(闁告瑯浜濊ぐ渚€宕ｉ弽褎鍊抽悗?
+      // 1. 本地简易解析 (只提取名字)
       let extractedName = "Unknown";
-      // 閻忓繑绻嗛惁顖炲礌瑜版帒甯?Name: xxx
+      // 尝试匹配 Name: xxx
       const nameMatch = inputKey.match(/^Name:\s*(.+?)(\n|$)/i);
       if (nameMatch) {
         extractedName = nameMatch[1].trim();
       } else {
-        // 濠碘€冲€归悘澶娾柦閳ュ啿鐖遍梺鏉跨Т閸╁矂鏁嶇仦鐣屾閻犲洦娲滈弫?JSON 閻熸瑱绲鹃悗浠嬫儑鐎ｎ剚绠欓柛妯煎枑濠€浼存儍?name 閻庢稒顨嗛?
+        // 如果没匹配到，尝试用 JSON 解析看看原本的 name 字段
         try {
           const temp = JSON.parse(inputKey);
           if (temp.name) extractedName = temp.name;
         } catch (e) {}
       }
 
-      // 2. 闁哄瀚伴埀顒傚Т閻斺偓缁绢厸鍋?Persona闁挎稑鑻獮鎾绘⒔閵堝棙锟ラ柡浣哥墕閻⊙冣枔?
+      // 2. 构造基础 Persona，去除无效字段
       const localPersona = {
         name: extractedName,
-        enName: null, // 閻犱礁褰炵拹?null闁挎稑顒疘閻忕偛鍊风槐浼村礆閵堝棙鐒藉☉鎾崇У濡绮?
+        enName: null, // 设为 null，UI层会判断不显示
         title: "Connected Soul",
-        bio: "Profile loaded. Detailed settings will be used directly for conversation generation.",
-        mbti: null, // 閻犱礁褰炵拹?null
-        tags: [], // 缂佸瞼鍎ら弳鐔虹磼?
+        bio: "Profile loaded. Detailed settings will be used for dialogue generation.",
+        mbti: null, // 设为 null
+        tags: [], // 空数组
       };
 
       setPersona(localPersona);
       setIsLocked(false);
       showToast("success", "Terminal unlocked");
 
-      // 婵炲鍔嶉崜浼存晬濞嗙ne缂佸顭峰▍搴ㄦ嚊椤忓嫬袟闁汇垻鍠愰崹娆皍dio闁汇劌瀚伴埀顒佹缁?
+      // 注意：已移除自动生成音乐的逻辑
     } catch (e) {
       console.error("Unlock Error", e);
-      showToast("error", "Parse failed, please check file");
+      showToast("error", "Parse failed, please check the file");
     }
   };
 
   const handleLogout = async () => {
-    // add async
+    // 加上 async
     if (
       !(await customConfirm(
-        // 闁哄洦瀵у畷?window.confirm
-        "Confirm sign out? This will completely clear all local data for the current character and cannot be restored.",
-        "Clear data",
+        // 替换 window.confirm
+        "Log out? This will permanently clear all local data for the current character, unrecoverable.",
+        "Clear Data",
       ))
     ) {
       return;
@@ -1674,11 +1676,11 @@ const App = () => {
     setUserAvatar(null);
     setSmartWatchLocations([]);
     setSmartWatchLogs([]);
-    setForumData({ name: "Local Feed", posts: [], isInitialized: false });
+    setForumData({ name: "Local Forum", posts: [], isInitialized: false });
     setForumSettings({
-      userNick: "RealMe",
-      smurfNick: "JustBrowsing",
-      charNick: "AnonUser",
+      userNick: "User",
+      smurfNick: "Not an alt",
+      charNick: "Anonymous",
     });
     setUserFacts([]);
     setCharFacts([]);
@@ -1688,33 +1690,33 @@ const App = () => {
     // Lock
     setIsLocked(true);
     setActiveApp(null);
-    showToast("success", "Reset character data");
+    showToast("success", "Character data reset");
   };
 
   const handleSendFakeImage = async () => {
-    // 1. 闁告梻濮崇粭?async
+    // 1. 加上 async
     const desc = await customPrompt(
-      "Enter image description:", // Notice閻?
-      "", // 濮掓稒顭堥濠氬磹闂傜绀嬬紒?
-      "Send Image", // Title
+      "请输入图片描述：", // 提示语
+      "", // 默认值为空
+      "发送图片", // 标题
     );
 
     if (!desc || desc.trim() === "") return;
 
     const msgContent = `${IMG_TAG_START}${desc}`;
 
-    // 濠㈣泛绉堕弫銈夋偝閻楀牊绠掗柣銊ュ毆end闂侇偅妲掔欢?
+    // 复用现有的发送逻辑
     handleUserSend(msgContent, "text");
 
     setShowMediaMenu(false);
   };
 
-  // 缂備胶鍠嶇粩鎾偨閻旂鐏嘢ystem command闁汇劌瀚欢鐔煎礉閳轰礁姣愰柡?
+  // 统一生成系统指令的辅助函数
   const getFinalSystemPrompt = () => {
     if (!persona) return "";
     const effectiveUserName = userName || "You";
 
-    // 1. 濠㈣泛瀚幃濂僥scription闁告粌顒歰re Book濞戞搩鍘惧▓?{{user}}/{{char}} 闁哄洦瀵у畷?
+    // 1. 处理描述和World Book中的 {{user}}/{{char}} 替换
     const cleanCharDesc = replacePlaceholders(
       inputKey,
       persona.name,
@@ -1726,7 +1728,7 @@ const App = () => {
       effectiveUserName,
     );
 
-    // 2. 闁哄洦瀵у畷鑼寲閼姐倗鍩犳俊顖楀墲濠㈡ɑ绋夐鐘崇暠闁圭鍋撻柡鍫濐槸閵囧檮tems闁告濮崇紞鍛箔?
+    // 2. 替换系统模板中的所有大项占位符
     return prompts.system
       .replaceAll("{{NAME}}", persona.name)
       .replaceAll(
@@ -1746,7 +1748,7 @@ const App = () => {
     if (isGhostwriting) return;
 
     if (!apiConfig?.key) {
-      alert("Please configure API Key in Settings first");
+      alert("Please configure API Key in settings first");
       return;
     }
     if (!persona) return;
@@ -1772,18 +1774,18 @@ const App = () => {
           const senderName = m.sender === "me" ? effectiveUserName : charName;
           let content = m.text || "";
 
-          // 濠㈣泛瀚幃濠勬嫚椤撱垻鍙?
+          // 处理语音
           if (m.isVoice) {
             content = `(Sent a Voice Message): ${m.text.replace(
-              "[Voice message] ",
+              "[Voice] ",
               "",
             )}`;
           }
-          // 濠㈣泛瀚幃濂icker
+          // 处理表情包
           if (m.sticker && (!content || !content.trim())) {
             content = `[Sent a Sticker: ${m.sticker.desc}]`;
           }
-          // 濠㈣泛瀚幃濠冩姜椤掆偓瑜?
+          // 处理转发
           if (m.isForward && m.forwardData) {
             const fwd = m.forwardData;
             content += ` [Forwarded ${
@@ -1821,15 +1823,15 @@ ${longMemory || "None."}
 
 [Literary Style Requirements] Literary Style: Warm, Plain, and Grounded.
 1. Narrative Voice: Adopt a calm, leisurely, and kind observer's perspective. Tell the story slowly with warmth, avoiding dramatic or judgmental tones. Maintain a third-person perspective for {{char}} (referring to them by Name/He/She), and a first-person perspective for {{user}} (addressing {{user}} as 'I' or 'me').
-2. Diction ("Plain Sketch"): Use simple, unadorned spoken language. Avoid flowery adjectives. Rely on precise verbs and nouns to create a clean, "fresh water" texture.
+2. Diction ("Bai Miao/Simple Description"): Use simple, unadorned spoken language. Avoid flowery adjectives. Rely on precise verbs and nouns to create a clean, "fresh water" texture.
 3. Atmosphere: Focus on the "smoke and fire" of daily life. Deeply engage the senses-describe the specific smell of food, the texture of objects, and ambient sounds to make the scene tangible.
 4. Emotional Restraint: Do NOT state emotions directly. Reveal deep feelings solely through subtle physical actions, micro-expressions, and environmental details. Keep the emotional temperature constant and gentle.
 5. Rhythm: Mimic the bouncy, elastic rhythm of natural speech. Use short, crisp sentences mixed with relaxed narration.
-6. Output Structure: This must be a unified, cohesive narrative stream. Output the entire response as **ONE SINGLE, CONTINUOUS** message (IMPORTANT). At least 500 words.`;
+6. Output Structure: This must be a unified, cohesive narrative stream. Output the entire response as **ONE SINGLE, CONTINUOUS** message (IMPORTANT). At least 300 Chinese characters.`;
 
       let userTask = "";
 
-      // 闁告柣鍔嶉埀顑跨劍閻庮垰顕?Context 闂侇喒鏆昳n
+      // 动态构建 Context 部分
       const contextSection = `
 Current Date: ${getCurrentTimeObj().toLocaleString()}
 ${modeInstruction}
@@ -1839,7 +1841,7 @@ ${historyText}
 `;
 
       if (chatInput.trim()) {
-        // [闁圭鏅涢崯鎻梠de]
+        // [扩写模式]
         userTask = `
 ${contextSection}
 
@@ -1854,7 +1856,7 @@ Requirements:
 - Output ONLY the rewritten text.
 `;
       } else {
-        // [闁汇垻鍠愰崹姝乷de]
+        // [生成模式]
         userTask = `
 ${contextSection}
 
@@ -1875,13 +1877,13 @@ Requirements:
           isJson: false,
         },
         apiConfig,
-        (err) => alert(`Ghostwrite error: ${err}`),
+        (err) => alert(`Writing error: ${err}`),
       );
 
-      // --- 7. 濠靛鍋勯崣鍡欑磼閹惧浜?---
+      // --- 7. 填入结果 ---
       if (result) {
         setChatInput(result.trim());
-        // 闁煎浜滄慨鈺冩嫬閸愨晜娈诲Δ鍌浢€?
+        // 自动调整高度
         setTimeout(() => {
           const el = document.getElementById("chat-input");
           if (el) {
@@ -1907,13 +1909,13 @@ Requirements:
     const stickerId = sticker?.id;
 
     if (type === "voice") {
-      displayText = `[Voice message] ${content}`;
+      displayText = `[Voice] ${content}`;
     } else if (type === "sticker") {
-      displayText = `[Sticker] ${sticker?.desc || "Image"}`;
+      displayText = `[Sticker] ${sticker?.desc || "image"}`;
     } else if (type === "transfer") {
-      // [new] 闁哄倸娲﹀﹢浼村炊閻愯　鍋撻埀顒勫及閸撗佷粵闁告牕鎳庨幆鍦te
+      // [新增] 文本回退显示包含备注
       const note = extraData?.note ? ` (${extraData.note})` : "";
-      displayText = `[Transfer] 濡?{content}${note}`;
+      displayText = `[Transfer] ¥${content}${note}`;
     } else if (type === "location") {
       displayText = `[Location] ${extraData?.name || content}`;
     } else {
@@ -1925,14 +1927,14 @@ Requirements:
       text: displayText,
       isVoice: type === "voice",
 
-      // [new] Transfer闁轰胶澧楀畵浣虹磼閹惧鈧柗pdate
+      // [新增] 转账数据结构更新
       isTransfer: type === "transfer",
       transfer:
         type === "transfer"
           ? {
               amount: content,
               status: "pending",
-              note: extraData?.note || "", // 閻庢稒锚閸欏搳ote
+              note: extraData?.note || "", // 存入备注
             }
           : null,
 
@@ -1957,15 +1959,15 @@ Requirements:
     setShowUserStickerPanel(false);
   };
 
-  // 2. 閻熸瑱绠戣ぐ?AI 闁搞儳鍋涢ˇ?(閻庣懓鏈弳锝夊即閹稿骸搴婇柣?
+  // 2. 触发 AI 回复 (完整替换版)
   const triggerAIResponse = async (
-    param1 = null, // 闁告瑯鍨禍鎺楀及閻ょ尃generate缂佷究鍨圭槐?number)闁挎稑濂旂弧鍐矗椤栨瑤绨伴柡鍕靛灡閺屽essageContent(string)
+    param1 = null, // 可以是重生成索引(number)，也可以是新消息内容(string)
     hint = "",
     overrideContext = null,
   ) => {
     if (!persona) return;
 
-    // --- 1. 闁告瑥鍊归弳鐔煎疾妤﹀灝鍘撮悷娆欑稻閻庤姤绋夊鐢sage濡澘瀚ˇ鈺呮偠?---
+    // --- 1. 参数智能解析与消息预处理 ---
     const userContent = typeof param1 === "string" ? param1 : null;
     const regenIndex = typeof param1 === "number" ? param1 : null;
 
@@ -1978,11 +1980,11 @@ Requirements:
     const backupHistory = [...chatHistory];
     let newHistory = [...chatHistory];
 
-    // 濠碘€冲€归悘澶愬及閻ょ尃generate闁挎稑鑻ú鏍ь煥濮橆剙鍧婇柛?
+    // 如果是重生成，回滚历史
     if (regenIndex !== null) {
       newHistory = chatHistory.slice(0, regenIndex);
     }
-    // 濠碘€冲€归悘澶愬及椤栨氨鏁–ontent閻熸瑱绠戣ぐ鍌炴晬閸喐闄嶉柤椋庡珪udio缂佹稑顦遍弲顐︽椤喚绀嗛柨娑樿嫰閸樻盯骞撻幒鎴濆汲闁活潿鍔嶉崺姹砮ssage
+    // 如果是带内容触发（来自音乐等界面），先插入用户消息
     else if (userContent) {
       const userMsg = {
         id: `msg_${Date.now()}_u`,
@@ -1993,7 +1995,7 @@ Requirements:
       newHistory = [...newHistory, userMsg];
     }
 
-    // 缂佹柨顑呭畵鍡涘触鐏炵虎鍔凷tatus闁挎稑鐬奸垾妯荤┍?UI 闁告粌鑻幃妤冪磼椤撯懇鍋撻弰蹇曞竼闁糕晞妗ㄧ花鐞媏w闁汇劌鍤梚story
+    // 立即同步状态，确保 UI 和后续逻辑基于最新的历史记录
     setChatHistory(newHistory);
 
     setLoading((prev) => ({ ...prev, chat: true }));
@@ -2006,7 +2008,7 @@ Requirements:
 
     const effectiveUserName = userName || "You";
 
-    // --- 2. 闁哄秶鍘х槐锟犲礌閺堟姕story (闁活潿鍔嬬花鐞抏nd缂?AI) ---
+    // --- 2. 格式化历史记录 (用于发送给 AI) ---
     const historyText = getRecentTurns(newHistory, contextLimit)
       .map((m) => {
         const senderName =
@@ -2014,16 +2016,16 @@ Requirements:
         let content = m.text || "";
 
         if (m.isVoice) {
-          content = `(Sent a voice message): ${m.text.replace("[Voice message] ", "")}`;
+          content = `(sent a voice message): ${m.text.replace("[Voice] ", "")}`;
         }
         if (m.sticker) {
           if (!content || !content.trim()) {
-            content = `[Sent sticker: ${m.sticker.desc}]`;
+            content = `[sent a sticker: ${m.sticker.desc}]`;
           }
         }
         if (m.isForward && m.forwardData) {
           const fwd = m.forwardData;
-          content += ` [Forwarded ${fwd.type === "post" ? "Post" : "Comment"}: "${fwd.content.slice(0, 50)}..."]`;
+          content += ` [forwarded a ${fwd.type === "post" ? "post" : "comment"}: "${fwd.content.slice(0, 50)}..."]`;
         }
         return `${senderName}: ${content}`;
       })
@@ -2041,8 +2043,8 @@ Requirements:
       currentUserName,
     );
 
-    // --- 3. 闁哄瀚紓?Prompt ---
-    // --- 3. 闁哄瀚紓?Prompt ---
+    // --- 3. 构建 Prompt ---
+    // --- 3. 构建 Prompt ---
     const stickerInst = getStickerInstruction(charStickers, stickersEnabled);
     let styleInst = stylePrompts[chatStyle];
 
@@ -2053,7 +2055,7 @@ Requirements:
       styleInst += `\n\n[FORMATTING OVERRIDE]: You have switched to a NEW writing style (${chatStyle}). IGNORE the formatting patterns of previous messages in history. You must strictly adhere to the new style defined above immediately.`;
     }
 
-    // 闁哄秶顭堢缓鐐┍椤旂⒈妲婚柨娑欑摂ay something to finalHint 閺夆晜绋栭、鎴﹀础閻樿京绉寸紒妤嬮檮濞存盯骞戦姀鐙€妲遍柣?
+    // 核心修复：对 finalHint 进行占位符替换处理
     if (finalHint) {
       const processedHint = replacePlaceholders(
         finalHint,
@@ -2064,7 +2066,7 @@ Requirements:
     }
 
     const rawForwardContext = overrideContext || forwardContext;
-    // 闁哄秶顭堢缓鐐┍椤旂⒈妲婚柨娑欑摂ay something to forwardContext 閺夆晜绋栭、鎴﹀础閻樿京绉寸紒妤嬮檮濞存盯骞戦姀鐙€妲遍柣?
+    // 核心修复：对 forwardContext 进行占位符替换处理
     const finalForwardSection = rawForwardContext
       ? `\n**Forwarded Content Context**: ${replacePlaceholders(rawForwardContext, persona.name, userName || "You")}`
       : "";
@@ -2111,7 +2113,7 @@ Requirements:
         longMemory || "No long-term memory established yet.",
       );
 
-    // --- 4. 閻犲鍟伴弫?API ---
+    // --- 4. 调用 API ---
     try {
       const responseData = await generateContent(
         { prompt, systemInstruction: systemPrompt, isJson: true },
@@ -2123,7 +2125,7 @@ Requirements:
       if (responseData) {
         setForwardContext(null);
 
-        // 濠㈣泛瀚幃濂ansfer闂侇偅妲掔欢?
+        // 处理转账逻辑
         if (responseData.transfer_action) {
           const lastUserTransferIndex = [...newHistory]
             .reverse()
@@ -2153,7 +2155,7 @@ Requirements:
           }
         }
 
-        // UpdateStatus闁告ê妫楄ぐ?
+        // 更新状态历史
         if (responseData.status) {
           setStatusHistory((prev) => [
             ...prev,
@@ -2164,7 +2166,7 @@ Requirements:
           ]);
         }
 
-        // 濠㈣泛瀚幃?AI Back闁汇劌鍤渆ssageContent
+        // 处理 AI 返回的消息内容
         if (responseData.messages && Array.isArray(responseData.messages)) {
           const newMsgs = responseData.messages.map((item, index) => {
             let actualText =
@@ -2184,7 +2186,7 @@ Requirements:
             };
           });
 
-          // 濠㈣泛瀚幃濂icker
+          // 处理表情包
           if (responseData.stickerId) {
             const sticker = charStickers.find(
               (s) => s.id === responseData.stickerId,
@@ -2200,7 +2202,7 @@ Requirements:
             }
           }
 
-          // 濠㈣泛瀚幃?AI 闁告瑦鍨奸幑锝夋儍閸戠穽ansfer
+          // 处理 AI 发起的转账
           if (responseData.transfer && responseData.transfer.amount) {
             if (newMsgs.length > 0 && newMsgs[newMsgs.length - 1].status) {
               delete newMsgs[newMsgs.length - 1].status;
@@ -2227,10 +2229,10 @@ Requirements:
           setIsTyping(false);
           setMessageQueue(finalizedMsgs);
 
-          // 闁诡垰锕ら弸鈺呮焻閺勫繒甯嗛柨娑欑椤┭囨偝閸ヮ€洟宕ｉ幈鐎榮t
+          // 惊喜逻辑：概率触发发帖
           if (forumData.isInitialized && Math.random() < 0.9) {
             const charName = persona?.name || "Character";
-            if (typeof showToast === "function") showToast("info", `${charName} posted on Feed`);
+            if (typeof showToast === "function") showToast("info", `${charName} posted in the forum`);
             setTimeout(() => {
               if (window.__forumGenerateChatEventPost) {
                 window.__forumGenerateChatEventPost(true);
@@ -2238,14 +2240,14 @@ Requirements:
             }, 5000);
           }
 
-          // 闁诡垰锕ら弸鈺呮焻閺勫繒甯?闁挎稒纰嶉々褔鎮抽崶顎洟宕ｉ幈纭僷濞存粌顑勫▎顢籶date闁挎稑婀cation/Diary/Browser/Receipts闁?
+          // 惊喜逻辑2：概率触发app事件更新（位置/日记/浏览器/账单）
           if (Math.random() < 0.1) {
             setTimeout(() => {
               triggerAppEvents();
             }, 5000);
           }
 
-          // 閻庤纰嶅鍌毼涢埀顒勫蓟閵夛负鈧倸顩奸崷鐬ate濞戞挸瀛╅埀顒冨吹缁?
+          // 定时检查档案更新与总结
           setTimeout(() => {
             const fullConversation = [...newHistory, ...finalizedMsgs];
             let userTurnCount = 0;
@@ -2295,7 +2297,7 @@ Requirements:
   const handleTouchStart = (index) => {
     longPressTimerRef.current = setTimeout(() => {
       setActiveMenuIndex(index);
-    }, 500); // 500ms 閻熸瑥妫旂拹鐔兼⒐閹稿骸鐦?
+    }, 500); // 500ms 视为长按
   };
 
   const handleTouchEnd = () => {
@@ -2306,25 +2308,25 @@ Requirements:
   };
 
   const handleContextMenu = (e, index) => {
-    e.preventDefault(); // 闂傚啰绮姹owser濮掓稒顭堥濠氬矗閹惰姤鏆汳enu
+    e.preventDefault(); // 阻止浏览器默认右键菜单
     setActiveMenuIndex(index);
   };
 
-  // 2. Copy
+  // 2. 复制
   const handleCopy = (text) => {
     navigator.clipboard.writeText(text);
     showToast("success", "Copied");
     setActiveMenuIndex(null);
   };
 
-  // 3. 閺夆晜绋戦崣鍜礵itMode
+  // 3. 进入Edit Mode
   const startEdit = (index, text) => {
     setEditIndex(index);
     setEditContent(text);
     setActiveMenuIndex(null);
   };
 
-  // 4. SaveEdit
+  // 4. 保存编辑
   const saveEdit = (index) => {
     const newHistory = [...chatHistory];
     const msg = newHistory[index];
@@ -2334,13 +2336,13 @@ Requirements:
 
     if (msg.isTransfer && msg.transfer) {
       try {
-        // 婵繐绲介崹顖炲礌瑜版帒甯? 闁?濡?闁告艾閰ｅ浼存儍閸曨剚娈堕悗娑欘殣缁辨繃绂掗妷銉ユ尋闁告瑯鍨堕埀顒€顦卞▓鎴﹀箯椤掆偓瑜板潡宕橀崨顖涚暠Content
+        // 正则匹配: 找 ¥ 后面的数字，以及可选的括号内的内容
         const match = newText.match(/¥\s*([\d\.]+)(?:\s*\((.*)\))?/);
         if (match) {
           const newAmount = match[1];
-          const newNote = match[2] || ""; // 濠碘€冲€归悘澶娾柦閳╁啯绠掗柟濂夊墮瑜扮肪ontent闁挎稑鑻銊╁及椤栨壕鏁勯悗娑欘殘椤戜焦绋?
+          const newNote = match[2] || ""; // 如果没有括号内容，就是空字符串
 
-          // Update閹煎瓨娲栭惇浼村极閻楀牆绁﹂柨娑樼焷缁绘牠寮介柨瀣瘻婵炲鎽廔闁归潧绉崇槐浼村矗濮楀牏纾?
+          // 更新底层数据，这样BubbleUI才会变！
           msg.transfer = {
             ...msg.transfer,
             amount: newAmount,
@@ -2348,21 +2350,21 @@ Requirements:
           };
         }
       } catch (e) {
-        console.error("Parse transfer edit failed", e);
+        console.error("Transfer edit parse failed", e);
       }
     }
 
     newHistory[index].text = editContent;
     setChatHistory(newHistory);
     setEditIndex(null);
-    showToast("success", "Changes saved");
+    showToast("success", "Modified");
   };
 
-  // 5. 閻㈩垼姣刼nfirm闁汇劌鍤峞lete
+  // 5. 带确认的Delete
   const handleDeleteWithConfirm = async (index) => {
     const msgToDelete = chatHistory[index];
 
-    if (await customConfirm("Delete this message?", "Delete message")) {
+    if (await customConfirm("Delete this message?", "Delete Message")) {
       if (msgToDelete && msgToDelete.id) {
         rollbackTrackerData(msgToDelete.id);
       }
@@ -2387,8 +2389,8 @@ Requirements:
 
     if (
       await customConfirm(
-        `Delete selected ${selectedMsgs.size}  messages?`,
-        "Batch delete",
+        `Delete the selected ${selectedMsgs.size} messages?`,
+        "Batch Delete",
       )
     ) {
       selectedMsgs.forEach((index) => {
@@ -2402,7 +2404,7 @@ Requirements:
 
       setIsMultiSelectMode(false);
       setSelectedMsgs(new Set());
-      showToast("success", "DoneBatch delete");
+      showToast("success", "Batch deleted");
     }
   };
 
@@ -2478,17 +2480,17 @@ ${charFactsList || "None"}
         effectiveUserName,
       );
 
-      // --- [闁哄秶顭堢缓鐐┍椤旇姤鏆璢 濠㈣泛瀚幃濠囧嫉閳ь剚娼?5 闁煎崬锕ら妵澶屾媼閺夎法绉?---
+      // --- [核心修改] 处理最近 5 条聊天记录 ---
       const historyText = chatHistory
-        .slice(-5) // 闁告瑦鐗楀〒鍫曞触?5
+        .slice(-5) // 取最后 5 条
         .map((m) => {
-          // 闁告帇鍊栭弻鍢nd闁?
+          // 判断发送者
           const sender = m.sender === "me" ? effectiveUserName : charName;
-          // 闁告帇鍊栭弻鍢媜ntent (濠㈣泛瀚幃濠囧棘閸ャ劍鎷遍柕鍡曟祰椤曘垽妫呴悙瑙ｅ亾娑擃摮age闁靛棔淇痮cation缂佹稑顦粭澶愬触瀹€鈧悮顐﹀垂?
+          // 判断内容 (处理文本、语音、图片、位置等不同类型)
           let content = m.text || "";
           if (m.isVoice) content = "[Voice]";
           if (m.isLocation) content = `[Location: ${m.location.name}, Address: ${m.location.address}]`;
-          // 濠碘€冲€归悘澶娾柦閳╁啯绠掗柡鍌氭处濠€鐗堢▕閻斿摜姊鹃柡鍫濐槺婢规帒鈻撴繝鍕潶闁搞劌顑戠槐婵嬪矗椤栨繂鍘撮柡鍕靛灣閳?
+          // 如果没有文本也没有特殊类型，可能是空
           if (!content) content = "[Image/Sticker]";
 
           return `${sender}: ${content}`;
@@ -2501,8 +2503,8 @@ Context: Roleplay setting. Current World Info: ${cleanWorldInfo} Conversation Hi
 User Draft: "${draft || "A random interesting place"}"
 
 Requirements:
-1. Name: A realistic or atmospheric name fitting the draft (e.g., "La Crêmerie").
-2. Address: A detailed, realistic address (e.g., "42 Rue de Rivoli, 4th Arrondissement, Paris...").
+1. Name: A realistic or atmospheric name fitting the draft (e.g., "La Crêperie").
+2. Address: A detailed, realistic address (e.g., "123 Main Street, Downtown District...").
 3. Output Format: JSON ONLY. { "name": "...", "address": "..." }
 `;
 
@@ -2571,7 +2573,7 @@ Requirements:
     setLoading((prev) => ({ ...prev, smartwatch: true }));
 
     try {
-      // --- 闁稿繑濞婇弫顓熺┍椤旂⒈妲婚柨娑欎亢钘熼柛蹇嬪妼瀹曠増鎷呭鍥跺剨闁哄洦瀵у畷鏌ユ焻閺勫繒甯?---
+      // --- 关键修复：补全占位符替换逻辑 ---
       const effectiveUserName = userName || "User";
       const cleanCharDesc = replacePlaceholders(
         inputKey,
@@ -2586,25 +2588,25 @@ Requirements:
 
       const systemPrompt = prompts.system
         .replaceAll("{{NAME}}", persona.name)
-        // 濞ｅ浂鍠栭ˇ鏌ユ晬濞嗙櫜dCharacterDescription闁?Tracker Context
+        // 修复：添加Character描述和 Tracker 上下文
         .replaceAll(
           "{{CHAR_DESCRIPTION}}",
           cleanCharDesc + "\n" + charTrackerContext,
         )
-        // 濞ｅ浂鍠栭ˇ鏌ユ晬濞嗙櫜d闁活潿鍔嶉崺娑欑妤︽鍟?
+        // 修复：添加用户人设
         .replaceAll("{{USER_PERSONA}}", userPersona + "\n" + trackerContext)
         .replaceAll("{{USER_NAME}}", effectiveUserName)
-        // 濞ｅ浂鍠栭ˇ鏌ユ晬濞嗙櫜dCustom閻熸瑥瀚崹?
+        // 修复：添加自定义规则
         .replaceAll("{{CUSTOM_RULES}}", customRules)
         .replaceAll("{{WORLD_INFO}}", cleanWorldInfo)
-        // 濞ｅ浂鍠栭ˇ鏌ユ晬濞嗙櫜dLong-term Memory
+        // 修复：添加长期记忆
         .replaceAll("{{LONG_MEMORY}}", longMemory || "None");
 
       const genPrompt = prompts.smartwatch_step1_gen
         .replaceAll("{{NAME}}", persona.name)
         .replaceAll("{{USER_NAME}}", effectiveUserName);
 
-      // 缂佹鍏涚粩鎾矗閹达綆鍤炴慨鐟板亰缁变即鎮介悢绋跨亣Location
+      // 第一发请求：生成地点
       const step1Data = await generateContent(
         { prompt: genPrompt, systemInstruction: systemPrompt },
         apiConfig,
@@ -2616,19 +2618,19 @@ Requirements:
       }
 
       // --- STEP 2: Match Images ---
-      // 闁告垵妫楅ˇ鐞乵age閹煎瓨鎸搁悺褏绮敂鑳洬
+      // 准备图片库字符串
       const imageLibraryStr = PRESET_LOCATION_IMAGES.map(
         (img) => `ID: ${img.id}, Desc: ${img.desc}, Keywords: ${img.keywords}`,
       ).join("\n");
 
-      // 闁告垵妫楅ˇ顒勫礆濮橆厼顤呴柣銏㈠枑閸ㄦ岸鎯冮崙锕恈ation閻庢稒顨堥浣圭▔?
+      // 准备刚才生成的地点字符串
       const generatedLocsStr = JSON.stringify(step1Data.locations);
 
       const matchPrompt = prompts.smartwatch_step2_match
         .replaceAll("{{GENERATED_LOCATIONS}}", generatedLocsStr)
         .replaceAll("{{IMAGE_LIBRARY}}", imageLibraryStr);
 
-      // 缂佹鍏涚花鈺呭矗閹达綆鍤炴慨鐟板亰缁变即宕犺ぐ鎺戝赋Image
+      // 第二发请求：匹配图片
       const step2Data = await generateContent(
         {
           prompt: matchPrompt,
@@ -2754,38 +2756,38 @@ Requirements:
 
   // --- FORUM STATE ---
   const [forumData, setForumData, forumDataLoaded] = useStickyState(
-    { name: "Local Feed", posts: [], isInitialized: false }, // Added isInitialized
+    { name: "Local Forum", posts: [], isInitialized: false }, // Added isInitialized
     "echoes_forum_data",
   );
-  // FeedNicknameSettings
+  // 论坛昵称设置
   const [forumSettings, setForumSettings, forumSettingsLoaded] = useStickyState(
-    { userNick: "RealMe", smurfNick: "JustBrowsing", charNick: "AnonUser" },
+    { userNick: "User", smurfNick: "Not an alt", charNick: "Anonymous" },
     "echoes_forum_settings",
   );
-  // Feed鐎殿喗娲栭鐩tice閻?
+  // 论坛引导提示词
   const [forumGuidance, setForumGuidance] = useState("");
-  // Current闁哄被鍎冲﹢鍛存儍閸戠湐st ID
+  // 当前查看的帖子 ID
   const [activeThreadId, setActiveThreadId] = useState(null);
-  // Post鐎殿喖婀遍悰顧檛atus
+  // 发帖弹窗状态
   const [showPostModal, setShowPostModal] = useState(false);
-  const [showForumSettings, setShowForumSettings] = useState(false); // IDSettings鐎殿喖婀遍悰?
+  const [showForumSettings, setShowForumSettings] = useState(false); // ID设置弹窗
 
-  // Post閻炴稏鍔屽畷?(闁瑰嘲鏀瞚n闁艰棄顦遍…鍫ユ晬瀹€鍐冩帡宕橀崗鍛邦洬闁告瑤鍗冲Λ鑸碉紣?
+  // 发帖表单 (拆分草稿，解决串台问题)
   const [postTab, setPostTab] = useState("me"); // 'me' or 'char'
   const [postDrafts, setPostDrafts] = useState({
     me: { title: "", content: "" },
     char: { title: "", content: "", topic: "" },
   });
-  // 閺夌儐鍓欒ぐ渚皁ntent闁汇劌瀚径宥夊籍鐠鸿櫣鎽犻柛?(闁活潿鍔嬬花顒佸閻樼數鑸?Chat Prompt)
+  // 转发内容的临时存储 (用于传给 Chat Prompt)
   const [forwardContext, setForwardContext] = useState(null);
 
-  // Chat Multi-select State (闁煎崬锕ら妵濉杄lectStatus)
+  // Chat Multi-select State (聊天多选状态)
   const [isMultiSelectMode, setIsMultiSelectMode] = useState(false);
   const [selectedMsgs, setSelectedMsgs] = useState(new Set());
 
   /* --- MAIN RENDER --- */
 
-  // 闁瑰憡鍨块埀顒€顦板〒鍫曞礂閹惰姤鏆涢柣銊ュ閸ゆ垿寮悧鍫濈ウ濞达絾绮堢拹?闁告垵妫楅ˇ顒備焊鏉堚晛宕?闁汇劌瀚崹浠嬪棘椤撴繄璐╅柟?
+  // 挑选最关键的几个数据作为"准备就绪"的判断依据
   const isDataReady =
     personaLoaded &&
     chatHistoryLoaded &&
@@ -2797,7 +2799,7 @@ Requirements:
       <div className="h-screen w-full bg-[#F5F5F7] flex flex-col items-center justify-center gap-4">
         <RefreshCw className="animate-spin text-gray-400" size={32} />
         <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">
-          Now...Syncing local database...
+          Syncing local database...
         </p>
       </div>
     );
@@ -2902,7 +2904,7 @@ Requirements:
               </div>
               {!avatar && (
                 <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[9px] text-gray-400 tracking-widest uppercase opacity-60 whitespace-nowrap">
-                  Tap to upload avatar
+                  Click to upload avatar
                 </div>
               )}
             </div>
@@ -2948,7 +2950,7 @@ Requirements:
             </div>
 
             <div className="w-72 flex flex-col gap-4">
-              {/* min闂傚懏姊婚崵?*/}
+              {/* 分隔线 */}
               <div className="flex items-center gap-3">
                 <div className="flex-1 h-[1px] bg-gray-300/50"></div>
                 <span className="text-[9px] text-gray-400 uppercase tracking-wider">
@@ -2957,17 +2959,17 @@ Requirements:
                 <div className="flex-1 h-[1px] bg-gray-300/50"></div>
               </div>
 
-              {/* Character Creator闁圭顦甸幐?*/}
+              {/* Creation Assistant按钮 */}
               <button
                 onClick={() => {
                   console.log(
-                    "Before click showCreationAssistant:",
+                    "Before clicking showCreationAssistant:",
                     showCreationAssistant,
                   );
                   setShowCreationAssistant(true);
                   setTimeout(() => {
                     console.log(
-                      "After click showCreationAssistant:",
+                      "After clicking showCreationAssistant:",
                       showCreationAssistant,
                     );
                   }, 100);
@@ -2977,10 +2979,10 @@ Requirements:
                 <div className="flex flex-col items-start text-left">
                   {" "}
                   <span className="text-xs font-bold tracking-wide text-gray-600 group-hover:text-[#7A2A3A]">
-                    Character Creator
+                    Creation Assistant
                   </span>
                   <span className="text-[9px] text-gray-400 uppercase tracking-wider mt-1">
-                    Create a character from a sentence
+                    Generate a character with one sentence
                   </span>
                 </div>
                 <div className="p-2 rounded-full bg-gray-100 text-gray-400 group-hover:bg-[#7A2A3A]/10 group-hover:text-[#7A2A3A] transition-colors">
@@ -2988,13 +2990,13 @@ Requirements:
                 </div>
               </button>
 
-              {/* Enter directly */}
+              {/* Enter Directly */}
               <button
                 onClick={unlockDeviceDirect}
                 className="w-full text-center text-[11px] text-gray-400 hover:text-[#7A2A3A] transition-colors py-1"
                 style={{ textDecorationLine: "underline", textDecorationThickness: "1px", textUnderlineOffset: "4px" }}
               >
-                Enter directly
+                Enter Directly
               </button>
 
             </div>
@@ -3166,7 +3168,7 @@ Requirements:
                       <User />
                     )
                   }
-                  label={persona?.name || "Profile"}
+                  label={persona?.name || "Identity Profile"}
                   onClick={() => setActiveApp("identity")}
                 />
                 <AppIcon
@@ -3180,40 +3182,40 @@ Requirements:
                       <UserPen strokeWidth={1.5} />
                     )
                   }
-                  label={userName || "User Settings"}
+                  label={userName || "User Profile"}
                   onClick={() => setActiveApp("persona")}
                 />
               </div>
-              {/* --- 闁告柣鍔嶉埀顑跨缁ㄦ煡鎮介妸銉ョ仚閻?(SupportCustom闁搞儳鍋撻悥? --- */}
+              {/* --- 动态应用列表 (支持自定义图标) --- */}
               {APP_LIST.map((app) => (
                 <AppIcon
                   key={app.id}
                   label={app.label}
-                  // 闁哄秶顭堢缓楣冩焻閺勫繒甯嗛柨娑欒壘椤┭囧几濠婂嫭绠扖ustom闁搞儳鍋撻悥锝夋晬鐏炵偓鈻旂紒鈧弧鎶ge闁挎稒绋戦幆渚€宕氬▎鎰枖缂佲偓濞差亞甯涢悹?Lucide 闁搞儳鍋撻悥?
+                  // 核心逻辑：如果有自定义图标，显示图片；否则显示默认 Lucide 图标
                   icon={
                     customIcons[app.id] ? (
                       <img
                         src={customIcons[app.id]}
                         alt={app.label}
-                        className="w-full h-full object-cover rounded-[18px]" // 闁革箑妫滈～妤冩嫬閸愨晜娈诲ù鐘劚鐏忣噣鏌婂鍡樻濞达絾褰巘yle
+                        className="w-full h-full object-cover rounded-[18px]" // 圆角调整以匹配整体风格
                       />
                     ) : (
                       <app.icon strokeWidth={1.5} />
                     )
                   }
                   onClick={() => {
-                    // 闁绘顫夐悾鈺傚緞閸曨厽鍊為柨娑欒壘椤┭囧几濠婂嫭笑Settings闁挎稑顒╡set previousApp
+                    // 特殊处理：如果是设置，重置 previousApp
                     if (app.id === "settings") setPreviousApp(null);
                     setActiveApp(app.id);
                   }}
                 />
               ))}
 
-              {/* --- Sign Out闁圭顦甸幐?(濞ｅ洦绻冪€垫梹绋夊鍛秮闁挎稑鏈弬渚€宕烽妸銉ョ仚閻炴稏鍔嶅〒鑸电▔鐎ｎ偅鐓? --- */}
+              {/* --- 登出按钮 (保持不变，放在列表最下方) --- */}
               <div className="col-span-4 mt-2">
                 <AppIcon
                   icon={<LogOut strokeWidth={1.5} className="text-red-500" />}
-                  label="Sign Out"
+                  label="Log Out"
                   onClick={handleLogout}
                 />
               </div>
@@ -3230,7 +3232,7 @@ Requirements:
                     className="text-[#2C2C2C]"
                   />
                   <span className="text-sm font-bold text-gray-700 tracking-wide">
-                    Chat
+                    Communication
                   </span>
                 </div>
               </div>
@@ -3240,7 +3242,7 @@ Requirements:
           {/* APP: IDENTITY */}
           <AppWindow
             isOpen={activeApp === "identity"}
-            title="Profile"
+            title="Identity Profile"
             onClose={() => setActiveApp(null)}
           >
             {persona ? (
@@ -3273,13 +3275,13 @@ Requirements:
                   </span>
                 </div>
 
-                {/* --- 鐎殿喒鍋撳┑顔碱儜缁辩櫃rofile闁哄嫬澧介妵姘舵焻閺勫繒甯?(闁告牕鎳庨幆鍦梔it闁告粌鏈悡锟犳儑? --- */}
+                {/* --- Start：身份档案显示逻辑 (包含编辑和查看) --- */}
                 {showEditPersona ? (
-                  /* 1. EditMode (Edit Mode) */
+                  /* 1. Edit Mode (Edit Mode) */
                   <div className="glass-card p-4 rounded-2xl text-left space-y-3">
                     <div className="flex justify-between items-center border-b border-gray-200 pb-2">
                       <span className="text-xs font-bold uppercase text-gray-500">
-                        Edit raw data (JSON/Text)
+                        Edit Raw Data (JSON/Text)
                       </span>
                       <button onClick={() => setShowEditPersona(false)}>
                         <X
@@ -3294,24 +3296,24 @@ Requirements:
                       className="w-full h-48 bg-transparent text-xs text-gray-600 resize-none outline-none custom-scrollbar"
                       value={inputKey}
                       onChange={(e) => setInputKey(e.target.value)}
-                      placeholder="When entering manually, start with Name: CharacterName on the first line.
+                      placeholder="When entering character settings manually, start with Name: character name format."
                     />
                     <button
                       onClick={() => {
                         setShowEditPersona(false);
-                        unlockDevice(); // Save妤犵偛鐖奸崳鎼佸棘閹峰睗鎺楀几?
+                        unlockDevice(); // 保存并重新解析
                       }}
                       className="w-full py-2 bg-black text-white rounded-lg text-xs font-bold hover:bg-gray-800 transition-colors"
                     >
-                      Save and apply settings
+                      Save & Apply Settings
                     </button>
                   </div>
                 ) : (
-                  /* 2. 闁哄被鍎冲﹢鍖╫de (View Mode) - Changes saved濞戞挾鍎ゅΟ澶岀矆?Raw Prompt */
+                  /* 2. 查看模式 (View Mode) - 已修改为显示 Raw Prompt */
                   <>
                     <div className="text-center">
                       <h2 className="text-3xl text-gray-900">{persona.name}</h2>
-                      {/* 濞寸姴鎳庣紞瀣嫉婢跺骸顏伴柡鍌氭搐閹洟寮懜鍨枖缂佲偓?*/}
+                      {/* 仅当有英文名时显示 */}
                       {persona.enName && (
                         <p className="text-xs uppercase tracking-[0.2em] text-gray-400 mt-2">
                           {persona.enName}
@@ -3319,7 +3321,7 @@ Requirements:
                       )}
                     </div>
 
-                    {/* 闁哄秶顭堢缓鐐┍椤旇姤鏆柨娑欐皑濞插潡骞掗妷锔解枖缂佲偓?Raw Prompt (inputKey) */}
+                    {/* 核心修改：直接显示 Raw Prompt (inputKey) */}
                     <div className="space-y-2">
                       <div className="flex justify-between items-end px-1">
                         <span className="text-[10px] font-bold uppercase text-gray-400">
@@ -3329,26 +3331,26 @@ Requirements:
                           onClick={() => setShowEditPersona(true)}
                           className="text-[10px] text-[#7A2A3A] hover:underline flex items-center gap-1"
                         >
-                          <Edit2 size={10} /> Edit settings
+                          <Edit2 size={10} /> Edit Settings
                         </button>
                       </div>
 
                       <div
                         className="glass-card p-4 rounded-xl text-left max-h-60 overflow-y-auto custom-scrollbar border border-gray-200/50 cursor-pointer hover:bg-white/60 transition-colors"
-                        onClick={() => setShowEditPersona(true)} // Tap card to edit directly
-                        title="Tap to edit"
+                        onClick={() => setShowEditPersona(true)} // 点击卡片也能直接编辑
+                        title="Click to edit"
                       >
                         <p className="text-[10px] leading-relaxed text-gray-600 whitespace-pre-wrap">
                           {inputKey ||
-                            "No settings data yet, tap Edit to enter manually... "}
+                            "No settings data yet, click edit to enter manually... "}
                         </p>
                       </div>
                       <p className="text-[9px] text-gray-400 text-center">
-                        *This data is sent directly to the model. Tap to edit.
+                        *This info goes directly to the model, click card to edit
                       </p>
                     </div>
 
-                    {/* MBTI 缂佹稑顦甸·鍌涘緞閺嶏缚绻嗛柟顓у灟缁绘岸鎮惧▎娆戠濠碘€冲€归悘澶愬嫉婢跺本鐣遍悹鍥ㄧ箰缁?*/}
+                    {/* MBTI 等额外信息保留（如果有的话） */}
                     {persona.mbti && (
                       <div className="grid grid-cols-2 gap-3 mt-4">
                         <div className="glass-card p-4 rounded-xl text-left">
@@ -3367,14 +3369,14 @@ Requirements:
                     )}
                   </>
                 )}
-                {/* --- 缂備焦鎸诲?--- */}
+                {/* --- End --- */}
 
-                {/* --- [濞ｅ浂鍠楅弫濂稿触瀹?Profile闁伙絽鐭傚鐗堟償閺囥垹鍔ラ柨娑欑濡绮堢弧濂綼racter濞ｅ洠鍓濇导?(Char Facts) --- */}
+                {/* --- [修改后] 身份档案界面底部：显示Character信息 (Char Facts) --- */}
                 <div className="px-1 text-left mt-8">
                   <div className="flex justify-between items-center mb-3 border-b border-gray-200/50 pb-2">
                     <div className="flex items-center gap-2">
                       <h3 className="text-xs font-bold uppercase text-gray-700">
-                        All About Them
+                        Everything About TA
                       </h3>
                       <Sparkles size={12} className="text-[#7A2A3A]" />
                     </div>
@@ -3384,9 +3386,9 @@ Requirements:
                     {charFacts.length === 0 && (
                       <div className="text-center py-6 border border-dashed border-gray-300 rounded-xl">
                         <p className="text-[10px] text-gray-400">
-                          No information yet
+                          No information
                           <br />
-                          More will be revealed as you chat
+                          As conversations deepen, you'll learn their preferences and secrets
                         </p>
                       </div>
                     )}
@@ -3454,7 +3456,7 @@ Requirements:
                       My Avatar
                     </span>
                     <span className="text-[9px] text-gray-400">
-                      shown in chat
+                      Show in chat
                     </span>
                   </div>
                 </div>
@@ -3463,7 +3465,7 @@ Requirements:
                     className="block text-[9px] uppercase text-gray-400 mb-1 font-bold"
                     htmlFor="user-name-input"
                   >
-                    My name
+                    My Name
                   </label>
                   <input
                     id="user-name-input"
@@ -3496,7 +3498,7 @@ Requirements:
                     className="block text-[9px] uppercase text-gray-400 mb-1 font-bold"
                     htmlFor="custom-rules-input"
                   >
-                    World rules
+                    World Rules
                   </label>
                   <textarea
                     id="custom-rules-input"
@@ -3511,11 +3513,11 @@ Requirements:
                 <div className="flex justify-between items-center mb-3 px-1">
                   <div className="flex items-center gap-2">
                     <h3 className="text-xs font-bold uppercase text-gray-700">
-                      All About You
+                      Everything About You
                     </h3>
                     <Sparkles size={12} className="text-[#D4C5A9]" />
                   </div>
-                  {/* 鐎殿喒鍋撻柛?*/}
+                  {/* 开关 */}
                   <button
                     onClick={() => toggleTrackerConfig("facts")}
                     className={`w-8 h-4 rounded-full relative transition-colors ${
@@ -3535,9 +3537,9 @@ Requirements:
                     {userFacts.length === 0 && (
                       <div className="text-center py-6 border border-dashed border-gray-300 rounded-xl bg-white/30">
                         <p className="text-[10px] text-gray-400">
-                          No information yet
+                          No information
                           <br />
-                          They'll remember your preferences and habits
+                          TA will notice your preferences and habits
                         </p>
                       </div>
                     )}
@@ -3555,7 +3557,7 @@ Requirements:
                   </div>
                 ) : (
                   <div className="text-center py-4 bg-gray-50 rounded-xl">
-                    <p className="text-[10px] text-gray-400">Feature closed</p>
+                    <p className="text-[10px] text-gray-400">Feature is off</p>
                   </div>
                 )}
               </div>
@@ -3607,7 +3609,7 @@ Requirements:
                 <div className="absolute bottom-0 left-0 right-0 glass-panel p-4 z-[120] animate-in slide-in-from-bottom-10 rounded-t-2xl">
                   <div className="flex justify-between mb-2">
                     <span className="text-xs font-bold uppercase text-gray-500">
-                      Regenerate instruction
+                      Regenerate Instruction
                     </span>
                     <button onClick={() => setRegenerateTarget(null)}>
                       <X size={14} />
@@ -3618,7 +3620,7 @@ Requirements:
                     name="regen-hint"
                     autoFocus
                     type="text"
-                    placeholder="E.g.: gentler tone..."
+                    placeholder="e.g.: tone a bit gentler..."
                     value={regenHint}
                     onChange={(e) => setRegenHint(e.target.value)}
                     className="w-full p-2 bg-white/50 border border-gray-200 rounded-lg text-sm mb-2 outline-none"
@@ -3629,7 +3631,7 @@ Requirements:
                     }
                     className="w-full py-2 bg-black text-white text-xs rounded-lg font-bold"
                   >
-                    Confirm regenerate
+                    Confirm Regenerate
                   </button>
                 </div>
               )}
@@ -3651,7 +3653,7 @@ Requirements:
                       <div
                         key={i}
                         className="relative group flex justify-center my-4 animate-in fade-in duration-300"
-                        // 缂備焦鍨甸悾鐐鐎ｂ晜顐介柨娑橆劔upportMenu
+                        // 绑定事件，支持菜单
                         onContextMenu={
                           !isMultiSelectMode
                             ? (e) => handleContextMenu(e, i)
@@ -3677,7 +3679,7 @@ Requirements:
                           if (isMultiSelectMode) toggleMessageSelection(i);
                         }}
                       >
-                        {/* 闁煎疇娉涘▔顓㈠嫉椤戣法绉?*/}
+                        {/* Capsule Body */}
                         <div
                           className={`
                             bg-gray-200/60 backdrop-blur-sm text-gray-500 text-[10px] font-bold px-3 py-1 rounded-full shadow-sm cursor-pointer transition-all
@@ -3691,11 +3693,11 @@ Requirements:
                           {msg.text.replace("[System Notice] ", "")}
                         </div>
 
-                        {/* [闁哄倹婢橀·鍍?Menu (濠㈣泛绉堕弫銈夊储閻斿憡绠掗柣銊ュ殰enu濞寸媴绲块悥婊堟焻閺勫繒甯? */}
+                        {/* [新增] 菜单 (复用原有的菜单代码逻辑) */}
                         {!isMultiSelectMode && activeMenuIndex === i && (
                           <div className="absolute top-full mt-2 z-50 flex flex-col items-center animate-in fade-in zoom-in-95 duration-200">
                             <div className="bg-[#1a1a1a]/95 backdrop-blur-md text-white rounded-xl shadow-2xl p-1.5 flex gap-1 items-center border border-white/20">
-                              {/* 缂侇垵宕电划绡梕ssage闁告瑯浜〒鍓佹啺娑撳坏lete闁告粌顒玡lect */}
+                              {/* 系统消息只需要Delete和多选 */}
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
@@ -3718,7 +3720,7 @@ Requirements:
                                 <span className="text-[11px]">Delete</span>
                               </button>
                             </div>
-                            {/* 闂侇剦鍠氶崓?*/}
+                            {/* Mask */}
                             <div
                               className="fixed inset-0 z-[-1]"
                               onClick={(e) => {
@@ -3754,25 +3756,25 @@ Requirements:
                     <div
                       key={i}
                       onClick={() => {
-                        // 濠碘€冲€归悘澶愬捶閳笭lectMode濞戞挸顑戠槐?00闁告垼顔婇幑銏℃媴閺囩偞鍕鹃柡鍌氱秺閸忔﹢寮伴悿鐡€itch闂侇偄顦懙?
+                        // 如果在多选模式下，点击任何地方都是切换选中
                         if (isMultiSelectMode) toggleMessageSelection(i);
                       }}
                       className={`flex flex-col gap-1 ${
                         msg.sender === "me" ? "items-end" : "items-start"
                       } group relative animate-in fade-in slide-in-from-bottom-2 ${
-                        // SelectMode濞戞挸顑呴·鍐礉?00闁告垼顕х亸顖炲春閻旈攱瀚查柡宥呭槻缁鳖摂otice
+                        // 多选模式下增加点击区域和样式提示
                         isMultiSelectMode
                           ? "cursor-pointer hover:bg-gray-100/50 p-2 rounded-xl transition-colors"
                           : ""
                       }`}
                     >
-                      {/* --- 缂佹鍏涚粩瀵告偘瀹€瀣獥濠㈣埖娼欓崕?+ 婵ɑ姊归崷?+ (Restore)Status闁圭顦甸幐?--- */}
+                      {/* --- 第一行：Avatar + Bubble + (恢复)Status Button --- */}
                       <div
                         className={`flex gap-3 relative ${
                           msg.sender === "me" ? "flex-row-reverse" : "flex-row"
                         } max-w-full`}
                       >
-                        {/* [闁哄倹婢橀·鍍?SelectMode濞戞挸顑囧▓?Checkbox */}
+                        {/* [新增] 多选模式下的 Checkbox */}
                         {isMultiSelectMode && (
                           <div
                             className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
@@ -3786,7 +3788,7 @@ Requirements:
                             )}
                           </div>
                         )}
-                        {/* 1. 濠㈣埖娼欓崕?*/}
+                        {/* 1. Avatar */}
                         <div
                           className={`w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center overflow-hidden shadow-sm ${
                             msg.sender === "me"
@@ -3820,7 +3822,7 @@ Requirements:
                             msg.sender === "me" ? "items-end" : "items-start"
                           } max-w-[72%] relative`}
                         >
-                          {/* EditMode */}
+                          {/* Edit Mode */}
                           {editIndex === i ? (
                             <div className="flex flex-col gap-2 w-64 animate-in zoom-in-95">
                               <textarea
@@ -3844,7 +3846,7 @@ Requirements:
                               </div>
                             </div>
                           ) : (
-                            // 婵繐绲介悥鍫曞及閸撗佷粵Mode闁挎稒姘ㄧ划锔锯偓瑙勫哺閺嗛亶骞愭径澶岀殤濞?(濞达絽鐏濈欢鐩﹔ansfer濞戞梻鍠曢崗姗€姊归幐搴＄樆Delete)
+                            // 正常显示模式：绑定长按事件 (使得转账也能长按Delete)
                             <div
                               className={
                                 isMultiSelectMode ? "pointer-events-none" : ""
@@ -3871,9 +3873,9 @@ Requirements:
                                 !isMultiSelectMode ? handleTouchEnd : undefined
                               }
                             >
-                              {/* === Contentmin闁告瑦鍨块埀顒佹缁?=== */}
+                              {/* === Content Routing === */}
                               {(() => {
-                                // A. Transfer婵炴挸寮堕悡?(闁衡偓閹勮含闁哄牃鍋撳ù鍏济崢?
+                                // A. 转账渲染 (放在最优先)
                                 if (msg.isTransfer) {
                                   return (
                                     <TransferBubble
@@ -3886,7 +3888,7 @@ Requirements:
                                   );
                                 }
 
-                                // B. Image/Sticker闂侇偅妲掔欢?
+                                // B. 图片/表情包逻辑
                                 let stickerUrl = msg.sticker?.url;
                                 if (!stickerUrl && msg.stickerId) {
                                   let found = charStickers.find(
@@ -3910,7 +3912,7 @@ Requirements:
                                   );
                                 }
 
-                                // C. 闁稿妲榤age闂侇偅妲掔欢?
+                                // C. 假图片逻辑
                                 const isFakeImg = isImageMsg(msg.text);
 
                                 if (isFakeImg) {
@@ -3920,11 +3922,11 @@ Requirements:
                                     <div
                                       className="cursor-pointer overflow-hidden rounded-xl border-2 border-white shadow-sm bg-white relative group/img transition-transform active:scale-95"
                                       onClick={() =>
-                                        customAlert(imgDesc, "ImageContent")
+                                        customAlert(imgDesc, "Image Content")
                                       }
                                     >
                                       <img
-                                        src={PLACEHOLDER_IMG_BASE64} // 闁靛棙鍔栭弫濂稿Υ閹搭垳绐楅柛鎺斿У鐢偓闂侇叏绲肩粩鎾⒐婢舵瓕顩?Base64闁挎稑鐬煎ú鍧楀箳閵夈儻缍栭弶鈺傜懃瑜板鏌岃箛鎾村€?
+                                        src={PLACEHOLDER_IMG_BASE64} // 【改】：删掉那一长串 Base64，直接填这个变量名
                                         className="w-48 h-32 object-cover block bg-gray-200"
                                       />
                                     </div>
@@ -3949,7 +3951,7 @@ Requirements:
                                   );
                                 }
 
-                                // E. 闁哄拋鍣ｉ埀顒佺閺嬪啴寮?閺夌儐鍓欒ぐ鍌炲础閿涘嫬顣?(Fallback)
+                                // E. 普通文本/转发卡片 (Fallback)
                                 return (
                                   <div
                                     className={`px-4 py-2.5 rounded-2xl text-sm leading-relaxed shadow-sm whitespace-pre-wrap select-text ${
@@ -3984,7 +3986,7 @@ Requirements:
                             </div>
                           )}
 
-                          {/* --- 闂傗偓閹稿骸鐦荤€殿喚鎳撻崵顓㈡儍閸戠尃nu (Now閻庣數鐡梤ansfer濞戞梻鍠撻弫鎾诲极? --- */}
+                          {/* --- 长按弹出的菜单 (现在对转账也生效) --- */}
                           {!isMultiSelectMode && activeMenuIndex === i && (
                             <div
                               className="absolute top-full mt-2 z-[120] flex flex-col items-center animate-in fade-in zoom-in-95 duration-200"
@@ -3994,11 +3996,11 @@ Requirements:
                               }}
                             >
                               <div className="bg-[#1a1a1a]/95 backdrop-blur-md text-white rounded-xl shadow-2xl p-1.5 flex gap-1 items-center border border-white/20">
-                                {/* 1. Copy闁圭顦甸幐?(闁哄啰濮冲▎銏ゅ及閸撗佷粵) */}
+                                {/* 1. 复制按钮 (无条件显示) */}
                                 <button
                                   onClick={(e) => {
                                     e.stopPropagation();
-                                    handleCopy(msg.text); // TransferMessage濞戞梻鍠愬﹢?text闁挎稑鑻悾顒勫礂閵娿儱璁插ù鐙€妾硂py
+                                    handleCopy(msg.text); // 转账消息也有 text，完全可以复制
                                   }}
                                   className="flex flex-col items-center gap-1 p-2 hover:bg-white/20 rounded-lg min-w-[40px]"
                                 >
@@ -4007,11 +4009,11 @@ Requirements:
 
                                 <div className="w-[1px] h-4 bg-white/20"></div>
 
-                                {/* 2. Rewrite闁圭顦甸幐?(闁哄啰濮冲▎銏ゅ及閸撗佷粵) */}
+                                {/* 2. 改写按钮 (无条件显示) */}
                                 <button
                                   onClick={(e) => {
                                     e.stopPropagation();
-                                    startEdit(i, msg.text); // TransferMessage濞戞梻鍠庤ぐ鍙夌閵夈劎绠婚柛蹇ｆditMode
+                                    startEdit(i, msg.text); // 转账消息也可以进入Edit Mode
                                   }}
                                   className="flex flex-col items-center gap-1 p-2 hover:bg-white/20 rounded-lg min-w-[40px]"
                                 >
@@ -4020,7 +4022,7 @@ Requirements:
 
                                 <div className="w-[1px] h-4 bg-white/20"></div>
 
-                                {/* 3. Select闁圭顦甸幐?*/}
+                                {/* 3. 多选按钮 */}
                                 <button
                                   onClick={(e) => {
                                     e.stopPropagation();
@@ -4035,7 +4037,7 @@ Requirements:
 
                                 <div className="w-[1px] h-4 bg-white/20"></div>
 
-                                {/* 4. Delete闁圭顦甸幐?*/}
+                                {/* 4. Delete按钮 */}
                                 <button
                                   onClick={(e) => {
                                     e.stopPropagation();
@@ -4047,7 +4049,7 @@ Requirements:
                                 </button>
                               </div>
 
-                              {/* 闂侇剦鍠氶崓?*/}
+                              {/* Mask */}
                               <div
                                 className="fixed inset-0 z-[-1]"
                                 onClick={(e) => {
@@ -4059,7 +4061,7 @@ Requirements:
                           )}
                         </div>
 
-                        {/* 3. Status闁圭顦甸幐?*/}
+                        {/* 3. Status Button */}
                         {msg.sender === "char" && msg.status && (
                           <button
                             onClick={() =>
@@ -4078,7 +4080,7 @@ Requirements:
                         )}
                       </div>
 
-                      {/* --- 缂佹鍏涚花鈺冩偘瀹€瀣獥Time + 闂佹彃绉烽?--- */}
+                      {/* --- 第二行：时间 + 重说 --- */}
                       {!isMultiSelectMode && (
                         <div
                           className={`flex gap-3 mt-1 items-center opacity-0 group-hover:opacity-100 transition-opacity ${
@@ -4102,10 +4104,10 @@ Requirements:
                         </div>
                       )}
 
-                      {/* --- 缂佹鍏涚粭浣烘偘瀹€瀣獥StatusExpand闁告绱曟晶?--- */}
+                      {/* --- 第三行：状态展开卡片 --- */}
                       {expandedChatStatusIndex === i && msg.status && (
                         <div className="ml-12 mt-1 w-64 glass-card p-3 rounded-xl animate-in slide-in-from-top-2 border border-gray-200/50 relative z-10">
-                          {/* ... Status闁告绱曟晶鏈噊ntent ... */}
+                          {/* ... 状态卡片内容 ... */}
                           <div className="space-y-2">
                             <div className="flex items-start gap-2">
                               <Shirt
@@ -4164,13 +4166,13 @@ Requirements:
                       style={{ animationDelay: "0.4s" }}
                     ></div>
                     <span className="text-xs text-gray-400 ml-1">
-                      They are typing...
+                      Typing...
                     </span>
                   </div>
                 )}
               </div>
 
-              {/* 闁活潿鍔嶉崺姹紅ickers */}
+              {/* 用户表情包面板 */}
               {showUserStickerPanel && (
                 <div className="absolute bottom-16 left-4 right-4 h-48 bg-white/90 backdrop-blur-xl rounded-2xl shadow-2xl p-4 z-[110] overflow-y-auto custom-scrollbar border border-white animate-in slide-in-from-bottom-2">
                   <div className="flex justify-between items-center mb-2">
@@ -4179,12 +4181,12 @@ Requirements:
                     </span>
                     <div className="flex items-center gap-2.5">
                       <div className="flex items-center gap-2">
-                        {/* Edit闁圭顦甸幐?*/}
+                        {/* 编辑按钮 */}
                         <button
                           onClick={() =>
                             setIsUserStickerEditMode(!isUserStickerEditMode)
                           }
-                          // here闁瑰瓨鍨电紓鎾舵媼椤旇棄惟 px-1 闁衡偓鐟欏嫬鐏?px-2闁挎稑鐭佺换鏍冀閻ゎ垳顎€闁告艾閰ｅ鐗堢▔閵堝棗鐦婚梺绛嬪枛閵囧洨浜歌箛鏃€绾☉鎾亾闁肩柉鎻槐婕巓u闁告瑯鍨禍鎺楁儑鐎ｎ剚绠欓柡浣哥墛閻?
+                          // 这里我建议把 px-1 改成 px-2，这样跟后面两个按钮大小更一致，你可以看看效果
                           className={`text-[10px] px-2 py-1 rounded-full transition-colors ${
                             isUserStickerEditMode
                               ? "bg-red-50 text-red-500 font-bold"
@@ -4194,7 +4196,7 @@ Requirements:
                           {isUserStickerEditMode ? "Done" : "Edit"}
                         </button>
 
-                        {/* Upload闁圭顦甸幐?- 闁衡偓闁稖绀嬮梺顐㈢箲濡叉垿鎮橀幏灞筋棌Style */}
+                        {/* 上传按钮 - 改为透明灰色风格 */}
                         <label className="text-[10px] text-gray-600 hover:text-gray-400 px-2 py-1 rounded-full cursor-pointer transition-colors flex items-center gap-1">
                           <Plus size={10} /> Upload
                           <input
@@ -4204,15 +4206,15 @@ Requirements:
                           />
                         </label>
 
-                        {/* Bulk闁圭顦甸幐?- 闁衡偓闁稖绀嬮梺顐㈢箲濡叉垿鎮橀幏灞筋棌Style */}
+                        {/* 批量按钮 - 改为透明灰色风格 */}
                         <button
                           onClick={async () => {
-                            const input = await customPrompt("Enter link for bulk import", "", "Bulk Import");
+                            const input = await customPrompt("Enter links for bulk import", "", "Bulk Import");
                             if (input) handleBulkImport(input, "user", "My");
                           }}
                           className="text-[10px] text-gray-600 hover:text-gray-400 px-2 py-1 rounded-full cursor-pointer transition-colors flex items-center gap-1"
                         >
-                          {/* 婵炲鍔嶉崜浼存晬濮濇姪u闁告鍠嶉崬顒勬儘娴ｇ晫绠归梺鎻掔灱閺併倝鎯冮崟顒佇?Download 闁搞儳鍋撻悥锝夋晬鐏炴儳鐏夊ǎ鍥ㄧ箘閺嗏偓濞存粌妫寸槐婵囦繆閸屾稓浜梻鍥ｅ亾閻?Link 闁搞儳鍋撻悥锝囨嫚閻ゎ垰娈伴悶娑樻湰濞存盯骞?*/}
+                          {/* 注意：你原代码这里用的是 Download 图标，我保留了，如果需要 Link 图标请自行替换 */}
                           <Download size={10} /> Bulk
                         </button>
                       </div>
@@ -4229,10 +4231,10 @@ Requirements:
                         }`}
                         onClick={() => {
                           if (isUserStickerEditMode) {
-                            // EditMode闁?00闁告垶妲掔换姗€宕楅¨濯巌t闁挎稑鏈悥锝囨媼閻楀牊闄嶆繝褎鍔掔拹?user
+                            // Edit Mode：点击进入编辑，标记来源为 user
                             setEditingSticker({ ...s, source: "user" });
                           } else {
-                            // 婵繐绲介悥绂de闁挎稒鐡攅ndSticker
+                            // 正常模式：发送表情
                             handleUserSend(null, "sticker", s);
                           }
                         }}
@@ -4241,7 +4243,7 @@ Requirements:
                           src={s.url}
                           className="w-full h-full object-cover"
                         />
-                        {/* EditMode濞戞挸顑囧▓鎴︽焼椤旀儳鍏婇柛銉у亾閻?*/}
+                        {/* Edit Mode下的Mask图标 */}
                         {isUserStickerEditMode && (
                           <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
                             <Edit2
@@ -4254,17 +4256,17 @@ Requirements:
                     ))}
                     {userStickers.length === 0 && (
                       <p className="col-span-5 text-center text-xs text-gray-400 py-4">
-                        No stickers yet, please upload
+                        No stickers yet, upload some
                       </p>
                     )}
                   </div>
                 </div>
               )}
 
-              {/* --- 閹煎瓨娲熼崕纰媙ter闁?(V2: 闁圭顦甸幐宕囨暜閹间讲鏁?+ 闁告繂绉寸花鎻掝嚕韫囨挾顏撮悘鐐╁亾) --- */}
+              {/* --- 底部输入栏 (V2: 按钮常驻 + 响应式布局) --- */}
               <div className="p-3 glass-panel border-t border-white/50 shrink-0 relative z-[100]">
                 {isMultiSelectMode ? (
-                  /* SelectActions闁?*/
+                  /* 多选操作栏 */
                   <div className="flex items-center justify-between px-2 animate-in slide-in-from-bottom-2">
                     <button
                       onClick={() => {
@@ -4289,10 +4291,10 @@ Requirements:
                   </div>
                 ) : (
                   <div className="relative flex items-center gap-1.5 md:gap-2">
-                    {/* [闁哄倹婢橀·鍍?濠殿垱甯婄紞濠眅nu (缂備焦绻傞顔锯偓瑙勭煯缂嶅懘宕烽妸銈囩憪闁? */}
+                    {/* [新增] 媒体菜单 (绝对定位在上方) */}
                     {showMediaMenu && (
                       <div className="absolute bottom-14 left-0 bg-white/90 backdrop-blur-xl border border-gray-200 p-2 rounded-xl shadow-xl flex gap-4 animate-in slide-in-from-bottom-2 z-50">
-                        {/* Sticker闁圭顦甸幐?(闁圭⒈鍓欓崺灞炬交濞嗘挸娅″ù? */}
+                        {/* 表情按钮 (搬到这里了) */}
                         <button
                           onClick={() => {
                             setShowUserStickerPanel(!showUserStickerPanel);
@@ -4303,10 +4305,10 @@ Requirements:
                           <div className="p-2 bg-gray-100 rounded-full">
                             <Smile size={20} />
                           </div>
-                          <span className="text-[10px]">Sticker</span>
+                          <span className="text-[10px]">Stickers</span>
                         </button>
 
-                        {/* [闁哄倹婢橀·鍍?闁告瑦鍨靛ù姗€骞愭径鎰唉 */}
+                        {/* [新增] 发图按钮 */}
                         <button
                           onClick={handleSendFakeImage}
                           className="flex flex-col items-center gap-1 text-gray-600 hover:text-black min-w-[40px]"
@@ -4343,7 +4345,7 @@ Requirements:
                         onClick={stopGeneration}
                         className="w-full py-2.5 bg-red-50 text-red-500 rounded-full text-xs font-bold flex items-center justify-center gap-2 animate-pulse"
                       >
-                        <X size={14} /> Cancel generation
+                        <X size={14} /> Cancel Generation
                       </button>
                     ) : (
                       <>
@@ -4408,11 +4410,11 @@ Requirements:
                               isVoiceMode
                                 ? "Voice..."
                                 : chatStyle === "novel" && !chatInput
-                                  ? "Click right button for AI assist..."
-                                  : "Send message..."
+                                  ? "Click right button for AI writing..."
+                                  : "Send a message..."
                             }
                             rows={1}
-                            // 婵炲鍔嶉崜浼存晬濮樺磭绠归梺鎻掕嫰婵偞绂?w-full 闁?pr-10 (闁告瑥鍘栭弲鍫曟偩濞嗘垶顏ょ紓浣圭懄鐎垫粓鏌?闁挎稑鑻獮鎾诲箳婢跺鍟?flex-grow (闁搞儳濮崇拹鐔兼偉鐠轰警鍟囬柛锝傗偓鏄絥e缂備礁绻戝Σ?flex-grow)
+                            // 注意：这里加了 w-full 和 pr-10 (右侧留白给按钮)，去掉了 flex-grow (因为父容器已经是 flex-grow)
                             className={`w-full min-w-0 border rounded-2xl py-2.5 pl-4 pr-10 text-sm focus:outline-none transition-all shadow-inner resize-none custom-scrollbar ${
                               isVoiceMode
                                 ? "bg-[#7A2A3A]/10 border-[#7A2A3A]/30 text-[#7A2A3A] placeholder:text-[#7A2A3A]/50"
@@ -4434,10 +4436,10 @@ Requirements:
                           )}
                         </div>
 
-                        {/* 闁告瑥鍘栭弲鍫曟晬濮橆厼鐦婚梺绛嬪枤缁?(闁告瑯浜欑换姘舵偩濮楃灃nd/閻熸瑱绠戣ぐ鍌炲箰婢舵劖灏? */}
+                        {/* 右侧：按钮组 (只保留发送/触发按钮) */}
                         <div className="flex gap-1 shrink-0 items-end pb-1">
                           {chatInput.trim().length > 0 ? (
-                            /* Send闁圭顦甸幐?*/
+                            /* Send Button */
                             <button
                               onClick={() => {
                                 handleUserSend(
@@ -4455,11 +4457,11 @@ Requirements:
                               <Send size={18} strokeWidth={1.5} />
                             </button>
                           ) : (
-                            /* 閻熸瑱绠戣ぐ鍌炲炊閻愬樊妲婚柟绋款樀閹?*/
+                            /* Trigger Reply Button */
                             <button
                               onClick={() => triggerAIResponse()}
                               className="p-2 md:p-2.5 bg-[#2C2C2C] text-white rounded-full hover:bg-gray-200 border border-gray-200 transition-all active:scale-95"
-                              title="Trigger reply"
+                              title="Trigger a reply"
                             >
                               <MessageSquare size={18} strokeWidth={1.5} />
                             </button>
@@ -4476,7 +4478,7 @@ Requirements:
           {/* APP: SETTINGS */}
           <AppWindow
             isOpen={activeApp === "settings"}
-            title="Settings"
+            title="System Settings"
             onClose={() => setActiveApp(previousApp)}
           >
             <div className="h-full pt-4">
@@ -4490,17 +4492,17 @@ Requirements:
                 availableModels={availableModels}
                 testConnection={testConnection}
                 close={() => setActiveApp(previousApp)}
-                // 濞磋偐濮撮崣鍜皁ntext闂傚嫭鍔曢崺?
+                // 传入上下文限制
                 contextLimit={contextLimit}
                 setContextLimit={setContextLimit}
-                // Long Memory闁告瑥鍊归弳?
+                // 长记忆参数
                 memoryConfig={memoryConfig}
                 setMemoryConfig={setMemoryConfig}
                 longMemory={longMemory}
                 setLongMemory={setLongMemory}
                 triggerSummary={generateSummary}
                 isSummarizing={isSummarizing}
-                // 闁煎崬锕ら妵濉杄ttings
+                // 聊天设置
                 chatStyle={chatStyle}
                 setChatStyle={setChatStyle}
                 interactionMode={interactionMode}
@@ -4516,23 +4518,23 @@ Requirements:
                 handleStickerUpload={handleStickerUpload}
                 handleBulkImport={handleBulkImport}
                 customPrompt={customPrompt}
-                // 闁圭娲ｉ幎銈夊矗閸屾稒娈?
+                // 指令参数
                 prompts={prompts}
-                // 濞磋偐濞€閳ь剚甯掗崣蹇曚沪韫囨挸妫橀柡?
+                // 传递全屏参数
                 isFullscreen={isFullscreen}
                 toggleFullScreen={toggleFullScreen}
-                // 閻庢稒銇炵紞?
+                // 字体
                 fontName={fontName}
                 handleFontUrlSubmit={handleFontUrlSubmit}
                 handleResetFont={handleResetFont}
                 inputUrl={inputUrl}
                 setInputUrl={setInputUrl}
-                // 闁搞儳鍋撻悥?
+                // 图标
                 appList={APP_LIST}
                 customIcons={customIcons}
                 handleAppIconUpload={handleAppIconUpload}
                 handleResetIcon={handleResetIcon}
-                // ImportExport
+                // 导入导出
                 onExportChat={exportChatData}
                 onImportChat={importChatData}
                 addStickerGroup={addStickerGroup}
@@ -4546,12 +4548,12 @@ Requirements:
           {/* APP: JOURNAL (DIARY & EVENTS) */}
           <AppWindow
             isOpen={activeApp === "journal"}
-            title={showEventsInDiary ? "Shared Experiences" : "Diary"} // Title闂傚懎绮籺atus闁告瑦锚鐎?
+            title={showEventsInDiary ? "共同经历" : "日记"} // 标题随状态变化
             onClose={() => {
               setActiveApp(null);
-              setShowEventsInDiary(false); // Close闁哄啰螙eset
+              setShowEventsInDiary(false); // Close时重置
             }}
-            // [new] 闁告瑥鍘栫粭鍌滄喆閹垫亪tions闁圭顦甸幐?
+            // [新增] 右上角操作按钮
             actions={
               <button
                 onClick={() => setShowEventsInDiary(!showEventsInDiary)}
@@ -4560,9 +4562,9 @@ Requirements:
                     ? "bg-black text-white shadow-md"
                     : "bg-gray-100 text-gray-500 hover:bg-gray-200"
                 }`}
-                title="Switch Diary/Events"
+                title="Switch diary/experiences"
               >
-                {/* 濠碘€冲€归悘澶愬及閸撗佷粵缂備礁绻愬濠氭晬鐏炶姤绂堥柡宥呮搐瑜板骞嬮幀鎭慳ry闁?閻炴稏鍔庨妵?00閻庣懓鍟ぐ鍙夌閵夈儲绀€Diary)闁挎稒绋戝鑺ョ▕鐎ｂ晛顔婇柣?*/}
+                {/* 如果显示经历，图标变成日记本(表示点它可以回日记)；反之亦然 */}
                 {showEventsInDiary ? (
                   <Book size={16} />
                 ) : (
@@ -4572,11 +4574,11 @@ Requirements:
             }
           >
             <div className="space-y-6 pb-20 pt-4">
-              {/* === Content闁告牜灏ㄧ槐浼村冀鐟欏嫬绁︾€殿喒鍋撻柛蹇曠垽witch闁哄嫬澧介妵?=== */}
+              {/* === 内容区：根据开关切换显示 === */}
               {showEventsInDiary ? (
-                /* --- A. Shared Experiences闁告帗顨夐妴?(闁?Identity 闂佹彃鐬煎▓鎴炵閿濆洨鍨崇紒澶嬫缁诲啴寮? --- */
+                /* --- A. 共同经历列表 (原 Identity 里的代码移过来) --- */
                 <div className="animate-in slide-in-from-right-4">
-                  {/* 缂備胶鍠曢?*/}
+                  {/* Stats Bar */}
                   <div className="flex gap-2 mb-4">
                     <div className="flex-1 bg-white p-3 rounded-xl border border-gray-100 text-center">
                       <div className="text-lg font-bold text-black">
@@ -4605,7 +4607,7 @@ Requirements:
                   <div className="space-y-2">
                     {sharedEvents.length === 0 && (
                       <div className="text-center py-10 opacity-50">
-                        <p className="text-xs text-gray-400">None yetShared Experiences</p>
+                        <p className="text-xs text-gray-400">No shared experiences</p>
                       </div>
                     )}
 
@@ -4653,7 +4655,7 @@ Requirements:
                   </div>
                 </div>
               ) : (
-                /* --- B. 闁告鍠愬﹢渚€鎯冮崙鐎抋ry Entries --- */
+                /* --- B. 原有的日记列表 --- */
                 <div className="animate-in slide-in-from-left-4">
                   <button
                     onClick={generateDiary}
@@ -4665,12 +4667,12 @@ Requirements:
                     ) : (
                       <FileText size={14} />
                     )}{" "}
-                    Record this moment
+                    Record Now
                   </button>
 
                   {diaries.length === 0 && (
                     <p className="text-center text-gray-400 text-xs mt-10">
-                      No diary entries yet
+                      No diary entries
                     </p>
                   )}
 
@@ -4714,7 +4716,7 @@ Requirements:
           {/* APP: TRACES (Receipts) */}
           <AppWindow
             isOpen={activeApp === "traces"}
-            title="Activity Log"
+            title="Life Traces"
             onClose={() => setActiveApp(null)}
           >
             <div className="space-y-6 pb-20 pt-4">
@@ -4728,7 +4730,7 @@ Requirements:
                 ) : (
                   <Plus size={14} />
                 )}{" "}
-                Generate new spending record
+                Generate New Expense Record
               </button>
               {receipts.map((r, i) => (
                 <div
@@ -4775,12 +4777,12 @@ Requirements:
             onClose={() => setActiveApp(null)}
             persona={persona}
             userName={userName}
-            userPersona={inputKey} // or闁兼澘鎳忓Σ绔僶ur charDescription 闁告瑦锕㈤崳娲触?
+            userPersona={inputKey} // or者是你的 charDescription 变量名
             apiConfig={apiConfig}
             prompts={prompts}
             generateContent={generateContent}
             showToast={showToast}
-            worldInfoString={currentWorldInfoString} // 濞磋偐濮撮悺褏绮敂鑳洬閺夆晜绋戦獮?
+            worldInfoString={currentWorldInfoString} // 传字符串进去
             getCurrentTimeObj={getCurrentTimeObj}
             getContextString={getContextString}
             customConfirm={customConfirm}
@@ -4793,10 +4795,10 @@ Requirements:
             setForwardContext={setForwardContext}
             setActiveApp={setActiveApp}
           />
-          {/* APP: SMART WATCH (闁哄懘缂氶崗姗€鎯囩€ｎ剚绠? */}
+          {/* APP: SMART WATCH (智能看看) */}
           <AppWindow
             isOpen={activeApp === "smartwatch"}
-            title="LiveTracker"
+            title="Smart Home"
             onClose={() => setActiveApp(null)}
           >
             <div className="pb-20">
@@ -4810,7 +4812,7 @@ Requirements:
                       : "text-gray-400 border-gray-200"
                   }`}
                 >
-                  {isEditingMap ? "Done editing" : "Edit map"}
+                  {isEditingMap ? "Done Editing" : "Edit Map"}
                 </button>
                 <button
                   onClick={() => generateSmartWatchUpdate()}
@@ -4824,7 +4826,7 @@ Requirements:
                   ) : (
                     <ScanLine size={10} />
                   )}
-                  Update location
+                  Update Location
                 </button>
               </div>
 
@@ -4832,16 +4834,16 @@ Requirements:
               <div className="relative w-full h-[550px] bg-[#F5F5F7] border-y border-gray-200 overflow-y-auto custom-scrollbar mb-6">
                 {smartWatchLocations.length === 0 ? (
                   <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-center px-6">
-                    <p className="text-xs text-gray-400">No monitoring data yet</p>
+                    <p className="text-xs text-gray-400">No monitoring data</p>
                     <p className="text-[10px] text-gray-300">
-                      Please confirm Lore Book is enabled, then initialize system
+                      Make sure World Book is enabled, then initialize the system
                     </p>
                     <button
                       onClick={initSmartWatch}
                       disabled={loading.smartwatch}
                       className="px-6 py-2 bg-black text-white text-xs rounded-lg active:scale-95 transition-transform disabled:bg-gray-400"
                     >
-                      {loading.smartwatch ? "Initializing..." : "Initialize monitoring system"}
+                      {loading.smartwatch ? "Initializing..." : "Initialize Monitoring"}
                     </button>
                   </div>
                 ) : (
@@ -4984,7 +4986,7 @@ Requirements:
                       smartWatchLogs.length > 0 && (
                         <div className="absolute bottom-4 left-0 right-0 text-center">
                           <span className="bg-black/70 backdrop-blur text-white text-[10px] px-3 py-1 rounded-full">
-                            📍Currently at: {smartWatchLogs[0].locationName}
+                            📍 Current location: {smartWatchLogs[0].locationName}
                           </span>
                         </div>
                       )}
@@ -5003,7 +5005,7 @@ Requirements:
                       onClick={() => setSwFilter("all")}
                       className="text-[9px] text-blue-500 flex items-center hover:underline"
                     >
-                      <X size={10} className="mr-1" /> Clear filter
+                      <X size={10} className="mr-1" /> Clear Filter
                     </button>
                   )}
                 </div>
@@ -5043,7 +5045,7 @@ Requirements:
                         <div className="space-y-2">
                           <CollapsibleThought
                             text={log.thought}
-                            label="View thoughts"
+                            label="View Thoughts"
                           />
                           {log.avData && (
                             <details className="group/details">
@@ -5057,7 +5059,7 @@ Requirements:
                                   className="hidden group-open/details:block"
                                 />
                                 <span>
-                                  {log.avData ? "AV Data" : "No signal"}
+                                  {log.avData ? "Audio/Video Data" : "No Signal"}
                                 </span>
                               </summary>
                               <div className="mt-2 p-3 bg-black/5 rounded-lg border border-black/10 text-[10px] leading-relaxed text-gray-600 animate-in slide-in-from-top-1">
@@ -5085,7 +5087,7 @@ Requirements:
                     ))}
                   {smartWatchLogs.length === 0 && (
                     <div className="text-center text-gray-400 text-xs py-8">
-                      No activity records yet
+                      No logs yet
                     </div>
                   )}
                 </div>
@@ -5095,7 +5097,7 @@ Requirements:
           {/* APP: BROWSER */}
           <AppWindow
             isOpen={activeApp === "browser"}
-            title="Browser History"
+            title="Browsing History"
             onClose={() => setActiveApp(null)}
           >
             <div className="space-y-6 pb-20 pt-4">
@@ -5109,7 +5111,7 @@ Requirements:
                 ) : (
                   <Globe size={14} />
                 )}{" "}
-                Refresh log
+                Refresh Records
               </button>
 
               {browserHistory.map((session, i) => (
@@ -5146,7 +5148,7 @@ Requirements:
                       </div>
                       <CollapsibleThought
                         text={item.thought}
-                        label="View thoughts"
+                        label="View Thoughts"
                       />
                     </div>
                   ))}
@@ -5172,7 +5174,7 @@ Requirements:
                       </div>
                       <CollapsibleThought
                         text={item.thought}
-                        label="Peek at thoughts"
+                        label="Peek Thoughts"
                       />
                     </div>
                   ))}
@@ -5193,8 +5195,8 @@ Requirements:
               charAvatar={avatar}
               userName={userName}
               chatHistory={chatHistory}
-              useStickyState={useStickyState} // 濞磋偐濮撮崣鍝琽ur鐎殿喖鍊归鐐烘煢閳轰胶鎽?
-              echoesDB={echoesDB} // 濞磋偐濮撮崣鍝琽ur闁轰胶澧楀畵浣规償閹惧厖绱ｉ柛?
+              useStickyState={useStickyState} // 传入你的异步钩子
+              echoesDB={echoesDB} // 传入你的数据库工具
               triggerAIResponse={triggerAIResponse}
               showToast={showToast}
               audioRef={audioRef}
@@ -5210,23 +5212,23 @@ Requirements:
               onDelete={handleDeleteStatus}
             />
           </AppWindow>
-          {/* APP: PERSONALIZATION (Personalization) */}
+          {/* APP: PERSONALIZATION (个性化) */}
           <AppWindow
             isOpen={activeApp === "personalization"}
             title="Personalization"
             onClose={() => setActiveApp(null)}
           >
             <PersonalizationPanel
-              // 闁哄嫬澧介妵?
+              // 显示
               isFullscreen={isFullscreen}
               toggleFullScreen={toggleFullScreen}
-              // 閻庢稒銇炵紞?
+              // 字体
               fontName={fontName}
               handleResetFont={handleResetFont}
               handleFontUrlSubmit={handleFontUrlSubmit}
               inputUrl={inputUrl}
               setInputUrl={setInputUrl}
-              // 闁搞儳鍋撻悥?
+              // 图标
               appList={APP_LIST}
               customIcons={customIcons}
               handleAppIconUpload={handleAppIconUpload}
@@ -5266,7 +5268,7 @@ Requirements:
           onClose={() => setDialogConfig(null)}
         />
       )}
-      {/* [闁哄倹婢橀·鍍?LocationSend鐎殿喖婀遍悰?*/}
+      {/* [新增] 位置发送弹窗 */}
       {showLocationModal && (
         <div className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4 animate-in fade-in">
           <div className="bg-white rounded-2xl w-full max-w-sm p-6 shadow-2xl space-y-4">
@@ -5275,34 +5277,34 @@ Requirements:
               Send Location
             </h3>
 
-            {/* Enter闁告牕鎼悡?*/}
+            {/* Input Area */}
             <div className="space-y-3">
               <div className="relative">
                 {" "}
-                {/* 闁?relative 濞戞捁妗ㄧ花锟犲绩閻愵剙鐦婚梺?*/}
+                {/* 加 relative 为了放按钮 */}
                 <label className="block text-xs text-gray-500 mb-1">
-                  Location name
+                  Location Name
                 </label>
                 <input
                   id="loc-name-input"
-                  className="w-full bg-gray-50 border border-gray-200 rounded-lg p-2.5 pr-9 text-sm focus:border-[#7A2A3A] focus:outline-none transition-colors" // pr-9 闁伙絾鐟ラ崵顓㈠箰婢舵劖灏ocation
-                  placeholder="Enter location type e.g. restaurant, then click the button"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-lg p-2.5 pr-9 text-sm focus:border-[#7A2A3A] focus:outline-none transition-colors" // pr-9 留出按钮位置
+                  placeholder={'Enter location type like "Restaurant" and tap right button'}
                 />
-                {/* [濠㈣泛绉堕弫顦?Location鐎殿喖婀遍悰銉╂煂瀹€鈧▓鎴炵閿濆懎鏅搁柟绋款樀閹?*/}
+                {/* [复用] 位置弹窗里的Write for me按钮 */}
                 <GhostButton
-                  loading={isLocGenerating} // 闂傚洠鍋撻柛?App 闂佹彃鑻悾鐐▕婢跺鍔僑tatus
-                  className="absolute right-2 bottom-2" // 閻庤鐭紞鍛村捶閳ヮ櫞ter婵℃妫楄ぐ鍛婄▔鐎ｎ収娼?
+                  loading={isLocGenerating} // 需在 App 里定义此状态
+                  className="absolute right-2 bottom-2" // 定位在输入框右下角
                   onClick={() => {
                     const nameInput = document.getElementById("loc-name-input");
                     const addrInput = document.getElementById("loc-addr-input");
                     const draft = nameInput.value;
 
-                    // 閻犲鍟伴弫顥瞣cation濞寸媴绲介崯鎾绘焻閺勫繒甯?
+                    // 调用位置Write for me逻辑
                     handleGhostwriteLocation(
                       draft,
                       (n) => (nameInput.value = n),
                       (a) => (addrInput.value = a),
-                      setIsLocGenerating, // 濞磋偐濮撮崣鍝爀ttings闁告梻濮惧ù鍢atus闁汇劌瀚崵閬嶅极?
+                      setIsLocGenerating, // 传入设置加载状态的函数
                     );
                   }}
                 />
@@ -5310,7 +5312,7 @@ Requirements:
 
               <div>
                 <label className="block text-xs text-gray-500 mb-1">
-                  Detailed address
+                  Detailed Address
                 </label>
                 <input
                   id="loc-addr-input"
@@ -5320,7 +5322,7 @@ Requirements:
               </div>
             </div>
 
-            {/* 閹煎瓨娲熼崕鎾箰婢舵劖灏?*/}
+            {/* Bottom Buttons */}
             <div className="flex gap-2 pt-2">
               <button
                 onClick={() => setShowLocationModal(false)}
@@ -5332,7 +5334,7 @@ Requirements:
                 onClick={() => {
                   const name = document.getElementById("loc-name-input").value;
                   const addr = document.getElementById("loc-addr-input").value;
-                  if (!name) return alert("Enter location name");
+                  if (!name) return alert("Please enter Location Name");
 
                   handleUserSend(name, "location", null, {
                     name,
@@ -5374,15 +5376,15 @@ const AppIcon = ({ icon, label, onClick }) => (
 );
 
 const SoulLink = () => (
-  // 閻犲鍟弳锝夋晬濮橆剙绠甸柟鍝勵槹婢у秹寮垫径濠勬毎濞?class闁挎稑鑻ぐ褎绌卞┑鍫熸畬缂備焦绻傞顔锯偓瑙勭煯缂嶅懘宕仦鐣屾狗濞戞搩鍙忕槐婵堜焊閸濆嫷鍤熼柡鈧悷鎵瘓
+  // 调整：去掉所有定位 class，只保留绝对定位和居中，尺寸改小
   <div className="absolute left-[50%] top-[40%] -translate-x-1/2 -translate-y-1/2 z-0 pointer-events-none flex items-center justify-center">
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 24 24"
       fill="none"
-      // 濞ｅ浂鍠楅弫?闁挎稒顑媎d濮掓稒鍨兼竟濠囧箵韫囨氨鐝?
+      // 修改2：添加黑色描边
       stroke="black"
-      // 濞ｅ浂鍠楅弫?闁挎稒鐡攅ttings闁硅绻楃粩鐔衡偓纭呮鐎规娊鏁嶉崼婵嗚闁哄秷顫夊畵渚€妫侀埀顒傛啺娴ｉ晲绨抽悹瀣枦缁辨繃绗熺€ｎ亶娲?1 or 2闁?
+      // 修改3：设置描边宽度（可根据需要微调，例如 1 or 2）
       strokeWidth="1.5"
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -5397,7 +5399,7 @@ const SoulLink = () => (
 export default App;
 
 // ==========================================
-// [濞ｅ浂鍠楅弫濂稿触瀹?StickerGroup缂備礁瀚▎?(闁告梻鍠曢崗妯绘櫠閻愭彃绻?+ 閻熸瑥妫滈～搴㈠濡搫顕?
+// [修改后] 表情包分组组件 (功能增强 + 视觉优化)
 // ==========================================
 const StickerGroup = ({
   group,
@@ -5408,9 +5410,9 @@ const StickerGroup = ({
   renameStickerGroup,
   handleStickerUpload,
 }) => {
-  const [isExpanded, setIsExpanded] = React.useState(false); // 濮掓稒顭堥濠氬箮濡搫缍?
+  const [isExpanded, setIsExpanded] = React.useState(false); // 默认折叠
 
-  // 閺夆晛娲﹂幎銈夊礄缁″rrent缂備礁瀚▓鎱icker闁挎稑鑻懟鐔煎箳閹烘鐝熼柟鍝勵槸瀹曠増鎷呭鍥跺剨(isPlaceholder)
+  // 过滤出当前组的表情，并排除掉占位符(isPlaceholder)
   const groupStickers = stickers.filter((s) => s.group === group);
   const visibleStickers = groupStickers.filter((s) => !s.isPlaceholder);
 
@@ -5418,9 +5420,9 @@ const StickerGroup = ({
 
   return (
     <div className="bg-gray-50 rounded-xl p-3 border border-gray-100 transition-all mb-3">
-      {/* Title濠?*/}
+      {/* Title Header */}
       <div className="flex justify-between items-center h-6">
-        {/* 鐎归潻缂氶弲鍫曟晬濮橆厼顫戦柛?+ Title */}
+        {/* Left: Collapse + Title */}
         <div
           className="flex items-center gap-2 cursor-pointer h-full"
           onClick={() => setIsExpanded(!isExpanded)}
@@ -5440,13 +5442,13 @@ const StickerGroup = ({
           </span>
         </div>
 
-        {/* 闁告瑥鍘栭弲鍫曟晬濞嗙櫛tions闁圭顦甸幐宕囩磼?*/}
+        {/* Right: Action Buttons */}
         <div className="flex items-center gap-2">
-          {/* 闁衡偓閻熺増鍊?*/}
+          {/* 改名 */}
           <button
             onClick={() => renameStickerGroup(group)}
             className="text-gray-300 hover:text-blue-500 p-1 transition-colors"
-            title="Rename library"
+            title="Rename Library"
           >
             <Edit2 size={12} />
           </button>
@@ -5455,15 +5457,15 @@ const StickerGroup = ({
           <button
             onClick={() => deleteStickerGroup(group)}
             className="text-gray-300 hover:text-red-500 p-1 transition-colors"
-            title="Delete library"
+            title="Delete Library"
           >
             <Trash2 size={12} />
           </button>
 
-          {/* min闁告捁灏欓崵?*/}
+          {/* 分割线 */}
           <div className="w-px h-3 bg-gray-200 mx-1"></div>
 
-          {/* 鐎殿喒鍋撻柛?*/}
+          {/* 开关 */}
           <div
             className="flex items-center gap-1 cursor-pointer"
             onClick={(e) => {
@@ -5483,7 +5485,7 @@ const StickerGroup = ({
         </div>
       </div>
 
-      {/* Sticker缂傚啯鍨堕悧?(闁硅埖锚瑜版棃宕犻崫鍕幍) */}
+      {/* Sticker Grid (折叠区域) */}
       {isExpanded && (
         <div
           className={`pt-3 mt-2 border-t border-gray-200/50 transition-all animate-in slide-in-from-top-1 ${
@@ -5494,7 +5496,7 @@ const StickerGroup = ({
         >
           {visibleStickers.length === 0 && (
             <div className="text-center py-4 text-[10px] text-gray-400 italic">
-              No stickers yet, please upload
+              No stickers yet, upload some
             </div>
           )}
 
@@ -5507,14 +5509,14 @@ const StickerGroup = ({
               >
                 <img src={s.url} className="w-full h-full object-cover" />
 
-                {/* 闂侇偄顦懙?缂佸倷鑳堕弫銈夋焼椤旀儳鍏?*/}
+                {/* Selected/Disabled Overlay */}
                 {!s.enabled && (
                   <div className="absolute inset-0 bg-white/60 backdrop-blur-[1px]" />
                 )}
               </div>
             ))}
 
-            {/* [濞ｅ浂鍠楅弫绯?缂備礁瀚崬纰猵load闁圭顦甸幐?- 閻庣數鎳撶花鐫爑rrentGroup */}
+            {/* [修改] 组内上传按钮 - 对应当前分组 */}
             <label
               className="
                     aspect-square border border-dashed border-gray-300 rounded-xl
@@ -5528,9 +5530,9 @@ const StickerGroup = ({
                 type="file"
                 className="hidden"
                 accept="image/*"
-                // 闁稿繑濞婇弫?00闁挎稒淇洪惃鐔兼偨?handleStickerUpload 闁哄啳顔愮槐婵囧閻樻彃寮矯urrent闁?group 闁告艾绉撮悺?
+                // 关键点：调用 handleStickerUpload 时，传入当前的 group 名字
                 onChange={(e) => handleStickerUpload(e, "char", group)}
-                // :00闁告垹绮渚發ear闁挎稑鐬奸垾妯荤┍濠靛﹤鍘撮弶鈺冨仧閻㈢睓pload闁告艾濂旂粩鏉戭嚕閻樺弶绂?
+                // 点击时清空，确保能连续上传同一张图
                 onClick={(e) => (e.target.value = null)}
               />
             </label>
