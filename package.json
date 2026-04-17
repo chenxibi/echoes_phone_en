@@ -8,7 +8,7 @@
     "build": "vite build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "deploy": "gh-pages -d dist --repo https://github.com/chenxibi/echoes_phone.git"
+    "deploy": "gh-pages -d dist --repo https://github.com/chenxibi/echoes_phone_en.git"
   },
   "dependencies": {
     "jsonrepair": "^3.13.1",
