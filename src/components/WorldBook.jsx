@@ -41,12 +41,66 @@ const WorldBook = ({
       reader.onload = (ev) => {
         try {
           const json = JSON.parse(ev.target.result);
-          if (Array.isArray(json)) {
-            setWorldBook(json);
-            showToast("success", "World Book imported successfully");
+          let newEntries = [];
+
+          if (json.entries) {
+            if (Array.isArray(json.entries)) {
+              newEntries = json.entries;
+            } else {
+              newEntries = Object.values(json.entries);
+            }
+          } else if (Array.isArray(json)) {
+            newEntries = json;
+          } else {
+            newEntries = Object.values(json).filter(
+              (item) => typeof item === "object",
+            );
+          }
+
+          const baseTime = Date.now();
+          const defaultGroupName =
+            file.name.replace(".json", "") ||
+            `Import-${new Date().toLocaleDateString()}`;
+
+          const formattedEntries = newEntries
+            .map((entry, index) => {
+              let name = entry.comment || entry.name || "Unnamed entry";
+
+              if (!name || name === "Unnamed entry") {
+                const k = entry.key || entry.keys;
+                if (Array.isArray(k) && k.length > 0) name = k[0];
+                else if (typeof k === "string") name = k;
+              }
+
+              const isEnabled =
+                entry.disable !== undefined
+                  ? !entry.disable
+                  : entry.enabled !== false;
+
+              return {
+                id: `wb_${baseTime}_${index}_${Math.random()
+                  .toString(36)
+                  .substr(2, 9)}`,
+                name: name,
+                content: entry.content || "",
+                enabled: isEnabled,
+                group: entry.group || defaultGroupName,
+              };
+            })
+            .filter((e) => e.content);
+
+          if (formattedEntries.length > 0) {
+            setWorldBook((prev) => [...prev, ...formattedEntries]);
+            showToast(
+              "success",
+              `Imported ${formattedEntries.length} entries to "${defaultGroupName}"`,
+            );
+          } else {
+            showToast("error", "No valid lore entries found");
           }
         } catch (err) {
-          showToast("error", "Invalid JSON format");
+          console.error(err);
+          showToast("error", "JSON parse failed");
         }
       };
       reader.readAsText(file);
