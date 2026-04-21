@@ -5433,7 +5433,7 @@ Requirements:
           </div>
         </div>
       )}
-      <audio ref={audioRef} style={{ display: "none" }} />;
+      <audio ref={audioRef} style={{ display: "none" }} />
     </div>
   );
 };
