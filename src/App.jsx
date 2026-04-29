@@ -1787,7 +1787,7 @@ const App = () => {
       await echoesDB.setItem(imageKey, compressedBase64);
 
       // Send image message with imageData directly on the message for rendering
-      handleUserSend("[Real Image]", "image", null, {
+      handleUserSend("[Image]", "image", null, {
         imageKey,
         imageData: compressedBase64,
       });
@@ -2176,15 +2176,18 @@ Requirements:
         - Context: This scene takes place in the physical world (Real Life).
         - Style: Use descriptive, sensory narrative (Visuals, Sounds, Smells).`;
 
+    // In multimodal mode, history is already in messages array, don't duplicate in prompt
+    const historyForPrompt = historyMessages ? "" : historyText;
+
     const prompt = prompts.chat
       .replaceAll("{{NAME}}", persona.name)
       .replaceAll("{{TIME}}", getCurrentTimeObj().toLocaleString())
-      .replaceAll("{{HISTORY}}", historyText)
+      .replaceAll("{{HISTORY}}", historyForPrompt)
       .replaceAll(
         "{{LAST_MSG}}",
-        newHistory.length > 0
+        historyMessages ? "" : (newHistory.length > 0
           ? JSON.stringify(newHistory[newHistory.length - 1])
-          : "Start conversation...",
+          : "Start conversation..."),
       )
       .replaceAll("{{STYLE_INSTRUCTION}}", styleInst)
       .replaceAll("{{STICKER_INSTRUCTION}}", stickerInst)
