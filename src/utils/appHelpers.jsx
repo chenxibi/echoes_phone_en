@@ -286,31 +286,50 @@ export const replacePlaceholders = (text, charName, userName) => {
 
 /* --- API HANDLER --- */
 export const generateContent = async (params, apiConfig, onError, signal) => {
-  const { prompt, systemInstruction, isJson = true } = params;
+  const { prompt, systemInstruction, isJson = true, messages: customMessages } = params;
   let content = null;
 
   console.log(`[Echoes] Starting Generation. isJson: ${isJson}`);
 
   try {
     if (apiConfig.baseUrl && apiConfig.key) {
-      const messages = [
-        { role: "system", content: systemInstruction },
-        { role: "user", content: prompt },
-      ];
+      // Support two modes:
+      // 1. Pass messages array (multimodal/custom message format)
+      // 2. Traditional prompt + systemInstruction mode
+      const messages = customMessages
+        ? [
+            { role: "system", content: systemInstruction },
+            ...customMessages,
+          ]
+        : [
+            { role: "system", content: systemInstruction },
+            { role: "user", content: prompt },
+          ];
 
-      console.group("📝 [Echoes Debug] 发送给 AI 的完整数据");
+      // Check for multimodal content
+      const hasMultimodal = messages.some(
+        (m) => Array.isArray(m.content) && m.content.some((c) => c.type === "image_url"),
+      );
+
+      console.group("📝 [Echoes Debug] Data sent to AI");
+      if (hasMultimodal) {
+        console.log(
+          "%c🖼️ Multimodal mode: message contains images",
+          "color: orange; font-weight: bold; font-size: 14px;",
+        );
+      }
       console.log(
-        "%c系统指令 (System Prompt):",
+        "%cSystem Prompt:",
         "color: blue; font-weight: bold;",
       );
       console.log(systemInstruction);
       console.log(
-        "%c用户指令 (User Prompt):",
+        "%cUser Prompt:",
         "color: green; font-weight: bold;",
       );
       console.log(prompt);
       console.log(
-        "%c完整消息结构 (Messages Array):",
+        "%cFull Message Structure (Messages Array):",
         "color: purple; font-weight: bold;",
         messages,
       );

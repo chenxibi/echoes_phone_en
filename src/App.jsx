@@ -374,6 +374,8 @@ const App = () => {
   );
 
   const [inputUrl, setInputUrl] = useState("");
+  const [showImageModal, setShowImageModal] = useState(false);
+  const imageUploadRef = useRef(null);
 
   // Content
   const [chatHistory, setChatHistory, chatHistoryLoaded] = useStickyState(
@@ -1758,21 +1760,45 @@ const App = () => {
   };
 
   const handleSendFakeImage = async () => {
-    // 1. 加上 async
     const desc = await customPrompt(
-      "请输入图片描述：", // 提示语
-      "", // 默认值为空
-      "发送图片", // 标题
+      "Enter image description:",
+      "",
+      "Send Image",
     );
 
     if (!desc || desc.trim() === "") return;
 
     const msgContent = `${IMG_TAG_START}${desc}`;
-
-    // 复用现有的发送逻辑
     handleUserSend(msgContent, "text");
-
+    setShowImageModal(false);
     setShowMediaMenu(false);
+  };
+
+  // Upload real image
+  const handleSendRealImage = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    try {
+      const compressedBase64 = await compressImage(file);
+
+      // Store in IndexedDB (for AI) and on message object (for rendering)
+      const imageKey = `img_${Date.now()}`;
+      await echoesDB.setItem(imageKey, compressedBase64);
+
+      // Send image message with imageData directly on the message for rendering
+      handleUserSend("[Real Image]", "image", null, {
+        imageKey,
+        imageData: compressedBase64,
+      });
+      setShowImageModal(false);
+    } catch (err) {
+      console.error("Image processing failed:", err);
+      showToast("error", "Image processing failed, please try again");
+    }
+
+    // Reset input to allow selecting the same file again
+    event.target.value = "";
   };
 
   // 统一生成系统指令的辅助函数
@@ -2014,6 +2040,9 @@ Requirements:
       stickerId: stickerId,
       sticker: stickerId ? null : sticker,
       stickerSource: sticker ? "user" : null,
+      isImage: type === "image",
+      imageKey: extraData?.imageKey || null,
+      imageData: extraData?.imageData || null,
       time: formatTime(getCurrentTimeObj()),
     };
 
@@ -2120,13 +2149,15 @@ Requirements:
     }
 
     // 核心修复：对 finalHint 进行占位符替换处理
+    // Build Special Instruction separately (placed right before Directives for higher model attention)
+    let specialInst = "";
     if (finalHint) {
       const processedHint = replacePlaceholders(
         finalHint,
         persona.name,
         userName || "You",
       );
-      styleInst += `\n[Special Instruction]: ${processedHint}`;
+      specialInst = `\n**[USER OVERRIDE - HIGHEST PRIORITY]**: ${processedHint}\nYou MUST follow this instruction above all other style rules.`;
     }
 
     const rawForwardContext = overrideContext || forwardContext;
@@ -2160,7 +2191,8 @@ Requirements:
       .replaceAll("{{USER_PERSONA}}", userPersona + "\n" + trackerContext)
       .replaceAll("{{USER_NAME}}", effectiveUserName)
       .replaceAll("{{MODE_INSTRUCTION}}", modeInstruction)
-      .replaceAll("{{FORWARD_CONTEXT}}", finalForwardSection);
+      .replaceAll("{{FORWARD_CONTEXT}}", finalForwardSection)
+      .replaceAll("{{SPECIAL_INSTRUCTION}}", specialInst);
 
     const systemPrompt = prompts.system
       .replaceAll("{{NAME}}", persona.name)
@@ -2178,9 +2210,69 @@ Requirements:
       );
 
     // --- 4. 调用 API ---
+    // Check if history contains real images → use multimodal messages format
+    const recentTurns = getRecentTurns(newHistory, contextLimit);
+    const hasRealImages = recentTurns.some((m) => m.isImage);
+
+    let messagesParam = null;
+    if (hasRealImages) {
+      // Build multimodal messages array
+      const historyMessages = [];
+      for (const m of recentTurns) {
+        if (m.isImage && m.imageKey) {
+          // Load image from IndexedDB
+          let imageData = m.imageData;
+          if (!imageData) {
+            try {
+              imageData = await echoesDB.getItem(m.imageKey);
+            } catch (e) {
+              console.error("Failed to load image:", e);
+            }
+          }
+          if (imageData) {
+            historyMessages.push({
+              role: m.sender === "me" ? "user" : "assistant",
+              content: [
+                { type: "text", text: m.text || "[sent an image]" },
+                { type: "image_url", image_url: { url: imageData } },
+              ],
+            });
+          } else {
+            historyMessages.push({
+              role: m.sender === "me" ? "user" : "assistant",
+              content: m.text || "[sent an image]",
+            });
+          }
+        } else {
+          const senderName = m.sender === "me" ? (userName || "User") : persona.name;
+          let content = m.text || "";
+          if (m.isVoice) {
+            content = `(sent a voice message): ${m.text.replace("[Voice] ", "")}`;
+          }
+          if (m.sticker) {
+            if (!content || !content.trim()) {
+              content = `[sent a sticker: ${m.sticker.desc}]`;
+            }
+          }
+          historyMessages.push({
+            role: m.sender === "me" ? "user" : "assistant",
+            content: `${senderName}: ${content}`,
+          });
+        }
+      }
+      // Add current prompt
+      historyMessages.push({ role: "user", content: prompt });
+      messagesParam = historyMessages;
+    }
+
     try {
       const responseData = await generateContent(
-        { prompt, systemInstruction: systemPrompt, isJson: true },
+        {
+          prompt,
+          systemInstruction: systemPrompt,
+          isJson: true,
+          ...(messagesParam && { messages: messagesParam }),
+        },
         apiConfig,
         (err) => showToast("error", err),
         abortController.signal,
@@ -3995,7 +4087,26 @@ Requirements:
                                   );
                                 }
 
-                                // C. 假图片逻辑
+                                // C. Real Image
+                                if (msg.isImage) {
+                                  return (
+                                    <div className="cursor-pointer overflow-hidden rounded-xl border-2 border-white shadow-sm bg-white relative group/img transition-transform active:scale-95">
+                                      {msg.imageData ? (
+                                        <img
+                                          src={msg.imageData}
+                                          alt="Sent image"
+                                          className="w-48 max-h-64 object-cover rounded-xl"
+                                        />
+                                      ) : (
+                                        <div className="w-48 h-32 bg-gray-200 flex items-center justify-center">
+                                          <Camera size={24} className="text-gray-400" />
+                                        </div>
+                                      )}
+                                    </div>
+                                  );
+                                }
+
+                                // D. 假图片逻辑
                                 const isFakeImg = isImageMsg(msg.text);
 
                                 if (isFakeImg) {
@@ -4393,7 +4504,7 @@ Requirements:
 
                         {/* [新增] 发图按钮 */}
                         <button
-                          onClick={handleSendFakeImage}
+                          onClick={() => setShowImageModal(true)}
                           className="flex flex-col items-center gap-1 text-gray-600 hover:text-black min-w-[40px]"
                         >
                           <div className="p-2 bg-gray-100 rounded-full">
@@ -4423,6 +4534,47 @@ Requirements:
                         </button>
                       </div>
                     )}
+
+                    {/* Image Upload Modal */}
+                    {showImageModal && (
+                      <div className="mb-2 p-3 bg-white rounded-2xl border border-gray-200 shadow-lg">
+                        <div className="flex items-center justify-between mb-3">
+                          <h4 className="text-sm font-medium text-gray-700">Send Image</h4>
+                          <button onClick={() => setShowImageModal(false)}>
+                            <X size={16} className="text-gray-400" />
+                          </button>
+                        </div>
+
+                        {/* Upload real image */}
+                        <button
+                          onClick={() => imageUploadRef.current?.click()}
+                          className="w-full p-4 border-2 border-dashed border-gray-300 rounded-xl text-center text-gray-500 hover:border-blue-400 hover:text-blue-500 transition-colors mb-2"
+                        >
+                          <Camera size={24} className="mx-auto mb-2" />
+                          <span className="text-sm">Click to upload image</span>
+                          <span className="text-[10px] text-gray-400 block">JPG/PNG/GIF/WebP</span>
+                          <span className="text-[10px] text-amber-500 block">Please make sure your model supports image input</span>
+                        </button>
+                        <input
+                          ref={imageUploadRef}
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={handleSendRealImage}
+                        />
+
+                        <div className="text-center text-xs text-gray-400 my-2">or</div>
+
+                        {/* Fake image description (original) */}
+                        <button
+                          onClick={handleSendFakeImage}
+                          className="w-full p-3 bg-gray-50 rounded-xl text-center text-gray-500 hover:bg-gray-100 transition-colors"
+                        >
+                          <span className="text-sm">Or enter image description</span>
+                        </button>
+                      </div>
+                    )}
+
                     {loading.chat ? (
                       <button
                         onClick={stopGeneration}
@@ -5433,7 +5585,7 @@ Requirements:
           </div>
         </div>
       )}
-      <audio ref={audioRef} style={{ display: "none" }} />;
+      <audio ref={audioRef} style={{ display: "none" }} />
     </div>
   );
 };
