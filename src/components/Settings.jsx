@@ -493,7 +493,7 @@ const SettingsPanel = ({
             </h3>
             <div className="glass-card p-4 rounded-xl space-y-3">
               <p className="text-[9px] text-gray-400 mb-2">
-                Export your chat history as a file, or restore from a backup.
+                Export all data (character, memory, chat history, etc.) or restore from backup.
               </p>
               <div className="flex gap-3">
                 <button
