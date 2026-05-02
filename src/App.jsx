@@ -1588,8 +1588,9 @@ const App = () => {
         } else {
           setter((prev) => [data, ...prev]);
         }
-        showToast("success", "Content generated");
+        return true;
       }
+      return false;
     } finally {
       setLoading((prev) => ({ ...prev, [type]: false }));
       abortControllerRef.current = null;
@@ -1639,62 +1640,50 @@ const App = () => {
         const savedInputKey = inputKey;
 
         // 位置移动触发 → 更新智能家，生成Done后弹窗
-        if (data.triggerLocation) {
-          setTimeout(() => {
-            const doUpdate = async () => {
-              setLoading((prev) => ({ ...prev, sw_update: true }));
-              const prompt = prompts.smartwatch_update
-                .replaceAll("{{NAME}}", savedPersonaName)
-                .replaceAll("{{TIME}}", getCurrentTimeObj().toLocaleString())
-                .replaceAll("{{HISTORY}}", getContextString(chatHistory, savedUserName, null, null, 5))
-                .replaceAll("{{LOCATIONS_LIST}}", savedSmartWatchLocations.map((l) => `ID: ${l.id}, Name: ${l.name}`).join("\n"))
-                .replaceAll("{{LAST_LOG}}", savedSmartWatchLogs.length > 0 ? JSON.stringify(savedSmartWatchLogs[0]) : "None");
-              const systemPrompt = prompts.system
-                .replaceAll("{{NAME}}", savedPersonaName)
-                .replaceAll("{{CHAR_DESCRIPTION}}", savedInputKey + "\n" + savedCharTrackerContext)
-                .replaceAll("{{USER_PERSONA}}", savedUserPersona + "\n" + savedTrackerContext)
-                .replaceAll("{{USER_NAME}}", savedUserName)
-                .replaceAll("{{CUSTOM_RULES}}", savedCustomRules)
-                .replaceAll("{{WORLD_INFO}}", getWorldInfoString(savedWorldBook));
-              try {
-                const abortCtrl = new AbortController();
-                await generateContent({ prompt, systemInstruction: systemPrompt }, apiConfig, (err) => {}, abortCtrl.signal);
-                if (typeof showToast === "function") showToast("info", `${savedCharName}'s real-time location updated`);
-              } finally {
-                setLoading((prev) => ({ ...prev, sw_update: false }));
-              }
-            };
-            doUpdate();
+        if (data.triggerLocation && savedSmartWatchLocations.length > 0) {
+          setTimeout(async () => {
+            setLoading((prev) => ({ ...prev, sw_update: true }));
+            const prompt = prompts.smartwatch_update
+              .replaceAll("{{NAME}}", savedPersonaName)
+              .replaceAll("{{TIME}}", getCurrentTimeObj().toLocaleString())
+              .replaceAll("{{HISTORY}}", getContextString(chatHistory, savedUserName, null, null, 5))
+              .replaceAll("{{LOCATIONS_LIST}}", savedSmartWatchLocations.map((l) => `ID: ${l.id}, Name: ${l.name}`).join("\n"))
+              .replaceAll("{{LAST_LOG}}", savedSmartWatchLogs.length > 0 ? JSON.stringify(savedSmartWatchLogs[0]) : "None");
+            const systemPrompt = prompts.system
+              .replaceAll("{{NAME}}", savedPersonaName)
+              .replaceAll("{{CHAR_DESCRIPTION}}", savedInputKey + "\n" + savedCharTrackerContext)
+              .replaceAll("{{USER_PERSONA}}", savedUserPersona + "\n" + savedTrackerContext)
+              .replaceAll("{{USER_NAME}}", savedUserName)
+              .replaceAll("{{CUSTOM_RULES}}", savedCustomRules)
+              .replaceAll("{{WORLD_INFO}}", getWorldInfoString(savedWorldBook));
+            try {
+              const abortCtrl = new AbortController();
+              await generateContent({ prompt, systemInstruction: systemPrompt }, apiConfig, (err) => {}, abortCtrl.signal);
+              if (typeof showToast === "function") showToast("info", `${savedCharName}'s real-time location updated`);
+            } finally {
+              setLoading((prev) => ({ ...prev, sw_update: false }));
+            }
           }, 1000);
         }
         // 重要事件触发 → 写日记，生成Done后弹窗
         if (data.triggerDiary) {
-          setTimeout(() => {
-            const doDiary = async () => {
-              await runGenerator("diary", setDiaries, prompts.diary);
-              if (typeof showToast === "function") showToast("info", `${savedCharName} wrote a diary entry`);
-            };
-            doDiary();
+          setTimeout(async () => {
+            const ok = await runGenerator("diary", setDiaries, prompts.diary);
+            if (ok && typeof showToast === "function") showToast("info", `${savedCharName} wrote a diary entry`);
           }, 2000);
         }
         // 浏览器搜索触发 → 更新浏览器历史，生成Done后弹窗
         if (data.triggerBrowser) {
-          setTimeout(() => {
-            const doBrowser = async () => {
-              await runGenerator("browser", setBrowserHistory, prompts.browser);
-              if (typeof showToast === "function") showToast("info", `${savedCharName}'s browsing history updated`);
-            };
-            doBrowser();
+          setTimeout(async () => {
+            const ok = await runGenerator("browser", setBrowserHistory, prompts.browser);
+            if (ok && typeof showToast === "function") showToast("info", `${savedCharName}'s browsing history updated`);
           }, 3000);
         }
         // 购物触发 → 更新账单，生成Done后弹窗
         if (data.triggerReceipt) {
-          setTimeout(() => {
-            const doReceipt = async () => {
-              await runGenerator("receipt", setReceipts, prompts.receipt);
-              if (typeof showToast === "function") showToast("info", `${savedCharName}'s transaction history updated`);
-            };
-            doReceipt();
+          setTimeout(async () => {
+            const ok = await runGenerator("receipt", setReceipts, prompts.receipt);
+            if (ok && typeof showToast === "function") showToast("info", `${savedCharName}'s transaction history updated`);
           }, 4000);
         }
       }
@@ -2491,14 +2480,10 @@ Requirements:
           setMessageQueue(finalizedMsgs);
 
           // 惊喜逻辑：概率触发发帖
-          if (forumData.isInitialized && Math.random() < 0.9) {
-            const charName = persona?.name || "Character";
-            if (typeof showToast === "function") showToast("info", `${charName} posted in the forum`);
-            setTimeout(() => {
-              if (window.__forumGenerateChatEventPost) {
-                window.__forumGenerateChatEventPost(true);
-              }
-            }, 5000);
+          if (forumData.isInitialized && Math.random() < 0.3) {
+            if (window.__forumGenerateChatEventPost) {
+              window.__forumGenerateChatEventPost(true);
+            }
           }
 
           // 惊喜逻辑2：概率触发app事件更新（位置/日记/浏览器/账单）
