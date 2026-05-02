@@ -2420,10 +2420,21 @@ Requirements:
               typeof item === "object" && item !== null && item.text
                 ? item.text
                 : String(item);
+            let isVoice =
+              typeof item === "object" && item !== null && item.isVoice === true;
+
+            // Support text marker: [Voice] prefix
+            if (!isVoice && typeof actualText === "string" && actualText.startsWith("[Voice]")) {
+              isVoice = true;
+              actualText = actualText.replace("[Voice]", "").trim();
+            }
+
+            const displayText = isVoice ? `[Voice] ${actualText}` : actualText;
 
             return {
               sender: "char",
-              text: actualText,
+              text: displayText,
+              isVoice: isVoice || undefined,
               time: formatTime(getCurrentTimeObj()),
               ...(realTimeEnabled ? { timestamp: Date.now() } : {}),
               style: chatStyle,
