@@ -1,75 +1,395 @@
-import React, { useState } from "react";
+import React from "react";
 import { Upload, RotateCcw, Asterisk, Type, Monitor, Grid, Palette } from "lucide-react";
 
+// ============================================================
+// 官方皮肤预设
+// 每个皮肤是一个自包含的 CSS 片段, 通过 <style> 注入到 #echoes-chat
+// ============================================================
 const OFFICIAL_SKINS = [
   {
     id: "midnight",
     name: "Midnight Blue",
     desc: "Dark interface, easy on the eyes",
     preview: "bg-[#1a1a2e]",
-    css: `/* Midnight Blue Theme */
-#echoes-chat { --skin-bg: #1a1a2e; --skin-surface: #252540; --skin-card: #2a2a45; --skin-text: #e0e0f0; --skin-sub: #8888aa; }
+    css: `/* == Midnight Blue == */
+#echoes-chat {
+  --skin-bg: #1a1a2e;
+  --skin-surface: #1e1e38;
+  --skin-card: #252540;
+  --skin-text: #d0d0e8;
+  --skin-sub: #8888aa;
+  --skin-accent: #7788dd;
+  --skin-accent-hover: #99aaff;
+}
+/* 主背景 */
 #echoes-chat .bg-\\[\\#F2F2F7\\] { background: #1a1a2e !important; }
 #echoes-chat [class*="bg-\\[\\#F2F2F7"] { background: #1a1a2e !important; }
-#echoes-chat header { color: #8888cc !important; }
-#echoes-chat .bg-\\[\\#EBEBF0\\] { background: #1a1a2e !important; }
-#echoes-chat .glass-card { background: rgba(255,255,255,0.06) !important; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-color: rgba(255,255,255,0.08) !important; color: #d0d0e8 !important; }
+#echoes-chat .bg-\\[\\#EBEBF0\\] { background: #14142a !important; }
+/* 文字层级 */
+#echoes-chat .text-\\[\\#1a1a1a\\] { color: #e0e0f0 !important; }
+#echoes-chat .text-\\[\\#2C2C2C\\] { color: #c8c8e0 !important; }
+#echoes-chat .text-gray-800 { color: #d0d0e8 !important; }
+#echoes-chat .text-gray-700 { color: #c0c0dd !important; }
+#echoes-chat .text-gray-600 { color: #b0b0d0 !important; }
+#echoes-chat .text-gray-500 { color: #8888aa !important; }
+#echoes-chat .text-gray-400 { color: #7777aa !important; }
+#echoes-chat .text-gray-300 { color: #6666aa !important; }
+/* 标题栏 */
+#echoes-chat header { color: #aabbee !important; }
+/* 玻璃面板 - 暗色半透明 */
+#echoes-chat .glass-panel {
+  background: rgba(30,30,60,0.75) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border-color: rgba(255,255,255,0.08) !important;
+  color: #d0d0e8 !important;
+}
+#echoes-chat .glass-card {
+  background: rgba(30,30,60,0.6) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  border-color: rgba(255,255,255,0.06) !important;
+  color: #d0d0e8 !important;
+}
 #echoes-chat .glass-card label { color: #c0c0dd !important; }
-#echoes-chat .glass-card p, #echoes-chat .glass-card span { color: #9999bb !important; }
+#echoes-chat .glass-card p, #echoes-chat .glass-card span { color: #a0a0cc !important; }
+/* 白色背景全换 */
 #echoes-chat [class*="bg-white"] { background: #252540 !important; }
-#echoes-chat .text-gray-800, #echoes-chat .text-gray-700 { color: #d0d0e8 !important; }
-#echoes-chat .text-gray-500, #echoes-chat .text-gray-400 { color: #8888aa !important; }
-#echoes-chat .border-gray-200 { border-color: rgba(255,255,255,0.08) !important; }
-#echoes-chat .border-gray-200\\/50 { border-color: rgba(255,255,255,0.06) !important; }
 #echoes-chat [class*="bg-gray-50"] { background: #1e1e38 !important; }
 #echoes-chat [class*="bg-gray-100"] { background: rgba(255,255,255,0.05) !important; }
-#echoes-chat input, #echoes-chat textarea { background: #1e1e38 !important; color: #d0d0e8 !important; border-color: rgba(255,255,255,0.1) !important; }
-#echoes-chat input::placeholder, #echoes-chat textarea::placeholder { color: #555588 !important; }
+/* 按钮 - 黑色变紫色 */
+#echoes-chat [class*="bg-black"] { background: #5566cc !important; border-color: #5566cc !important; }
+#echoes-chat [class*="bg-black"]:hover { background: #6b7aee !important; }
 #echoes-chat button.bg-black { background: #5566cc !important; }
-#echoes-chat .text-gray-300 { color: #7777aa !important; }
-`,
+#echoes-chat button.bg-black:hover { background: #6b7aee !important; }
+/* 按钮 - #2C2C2C 暗灰变深紫 */
+#echoes-chat [class*="bg-\\[\\#2C2C2C\\]"] { background: #3a3a70 !important; }
+#echoes-chat [class*="bg-\\[\\#2C2C2C\\]"]:hover { background: #4a4a88 !important; }
+#echoes-chat [class*="bg-gray-800"] { background: #3a3a70 !important; }
+/* 按钮文字白变紫白 */
+#echoes-chat [class*="text-white"] { color: #e0e0f0 !important; }
+/* 输入框 */
+#echoes-chat input, #echoes-chat textarea {
+  background: #1e1e38 !important;
+  color: #d0d0e8 !important;
+  border-color: rgba(255,255,255,0.1) !important;
+}
+#echoes-chat input::placeholder, #echoes-chat textarea::placeholder { color: #555588 !important; }
+/* 边框 */
+#echoes-chat .border-gray-200 { border-color: rgba(255,255,255,0.08) !important; }
+#echoes-chat .border-gray-200\\/50 { border-color: rgba(255,255,255,0.06) !important; }
+#echoes-chat .border-white\\/50 { border-color: rgba(255,255,255,0.06) !important; }
+#echoes-chat .border-white\\/60 { border-color: rgba(255,255,255,0.08) !important; }
+#echoes-chat .ring-black\\/5 { --tw-ring-color: rgba(255,255,255,0.05) !important; }
+/* 首页 AppIcon 图标文字 */
+#echoes-chat .text-gray-700.group-hover\\:text-black { color: #aabbdd !important; }
+#echoes-chat .text-gray-700.group-hover\\:text-black:hover { color: #ccddff !important; }
+/* 首页 AppIcon 图标颜色 (通过 CSS filter 反转明亮图标) */
+#echoes-chat .glass-panel svg { stroke: #aabbdd; }
+#echoes-chat .glass-panel:has(img) svg, #echoes-chat [class*="bg-white"] svg { stroke: #aabbdd; }
+/* 通讯/论坛等底部栏 */
+#echoes-chat [class*="rounded-\\[24px\\]"].glass-panel {
+  background: rgba(30,30,60,0.75) !important;
+  border-color: rgba(255,255,255,0.08) !important;
+}
+#echoes-chat [class*="rounded-\\[24px\\]"].glass-panel svg,
+#echoes-chat .flex.justify-around svg { stroke: #99aadd; }
+/* 消息气泡 */
+#echoes-chat [class*="bg-\\[\\#1a1a1a\\]"] { background: #252540 !important; color: #d0d0e8 !important; }
+/* 选项/标签 */ 
+#echoes-chat [class*="bg-black"] { background: #5566cc !important; }
+#echoes-chat .bg-green-500 { background: #44aa77 !important; }
+`
   },
   {
     id: "latte",
     name: "Oat Latte",
-    desc: "Warm soft tones, creamy warmth",
+    desc: "Warm tones, creamy warmth",
     preview: "bg-[#faf0e6]",
-    css: `/* Oat Latte Theme */
-#echoes-chat { --skin-bg: #faf0e6; --skin-surface: #f5e6d3; --skin-card: #fff8f0; --skin-text: #4a3728; --skin-sub: #8b7355; }
+    css: `/* == Oat Latte == */
+#echoes-chat {
+  --skin-bg: #faf0e6;
+  --skin-surface: #f5e6d3;
+  --skin-card: #fff8f0;
+  --skin-text: #4a3728;
+  --skin-sub: #8b7355;
+  --skin-accent: #c4956a;
+  --skin-accent-hover: #b07d50;
+}
 #echoes-chat .bg-\\[\\#F2F2F7\\] { background: #faf0e6 !important; }
 #echoes-chat [class*="bg-\\[\\#F2F2F7"] { background: #faf0e6 !important; }
-#echoes-chat header { color: #c4956a !important; }
-#echoes-chat .bg-\\[\\#EBEBF0\\] { background: #faf0e6 !important; }
-#echoes-chat .glass-card { background: rgba(255,255,255,0.7) !important; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border-color: #e8d5c0 !important; color: #4a3728 !important; border-radius: 14px !important; }
+#echoes-chat .bg-\\[\\#EBEBF0\\] { background: #f0e4d8 !important; }
+#echoes-chat .text-\\[\\#1a1a1a\\] { color: #4a3728 !important; }
+#echoes-chat .text-\\[\\#2C2C2C\\] { color: #5c4a3a !important; }
+#echoes-chat .text-gray-800 { color: #4a3728 !important; }
+#echoes-chat .text-gray-700 { color: #5c4a3a !important; }
+#echoes-chat .text-gray-600 { color: #6b5540 !important; }
+#echoes-chat .text-gray-500 { color: #8b7355 !important; }
+#echoes-chat .text-gray-400 { color: #a0886a !important; }
+#echoes-chat .text-gray-300 { color: #c4956a !important; }
+#echoes-chat header { color: #b07d50 !important; }
+#echoes-chat .glass-panel {
+  background: rgba(255,248,240,0.7) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border-color: #e8d5c0 !important;
+  color: #4a3728 !important;
+}
+#echoes-chat .glass-card {
+  background: rgba(255,248,240,0.55) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  border-color: #e8d5c0 !important;
+  border-radius: 14px !important;
+  color: #4a3728 !important;
+}
 #echoes-chat .glass-card label { color: #6b5540 !important; }
 #echoes-chat .glass-card p, #echoes-chat .glass-card span { color: #8b7355 !important; }
 #echoes-chat [class*="bg-white"] { background: #fff8f0 !important; }
-#echoes-chat .text-gray-800, #echoes-chat .text-gray-700 { color: #4a3728 !important; }
-#echoes-chat .text-gray-500, #echoes-chat .text-gray-400 { color: #8b7355 !important; }
-#echoes-chat .border-gray-200 { border-color: #e8d5c0 !important; }
-#echoes-chat .border-gray-200\\/50 { border-color: #e8d5c0 !important; }
 #echoes-chat [class*="bg-gray-50"] { background: #fff5ec !important; }
 #echoes-chat [class*="bg-gray-100"] { background: rgba(196,150,106,0.08) !important; }
-#echoes-chat input, #echoes-chat textarea { background: #fff5ec !important; color: #4a3728 !important; border-color: #e8d5c0 !important; }
-#echoes-chat input::placeholder, #echoes-chat textarea::placeholder { color: #c4956a !important; }
+#echoes-chat [class*="bg-black"] { background: #c4956a !important; border-color: #c4956a !important; }
+#echoes-chat [class*="bg-black"]:hover { background: #b07d50 !important; }
 #echoes-chat button.bg-black { background: #c4956a !important; }
-#echoes-chat .text-gray-300 { color: #c4956a !important; }
-`,
+#echoes-chat button.bg-black:hover { background: #b07d50 !important; }
+#echoes-chat [class*="bg-\\[\\#2C2C2C\\]"] { background: #b07d50 !important; }
+#echoes-chat [class*="bg-\\[\\#2C2C2C\\]"]:hover { background: #9a6840 !important; }
+#echoes-chat [class*="bg-gray-800"] { background: #b07d50 !important; }
+#echoes-chat [class*="text-white"] { color: #fff8f0 !important; }
+#echoes-chat input, #echoes-chat textarea {
+  background: #fff5ec !important;
+  color: #4a3728 !important;
+  border-color: #e8d5c0 !important;
+}
+#echoes-chat input::placeholder, #echoes-chat textarea::placeholder { color: #c4956a !important; }
+#echoes-chat .border-gray-200 { border-color: #e8d5c0 !important; }
+#echoes-chat .border-gray-200\\/50 { border-color: #e8d5c0 !important; }
+#echoes-chat .border-white\\/50 { border-color: rgba(232,213,192,0.8) !important; }
+#echoes-chat .border-white\\/60 { border-color: rgba(232,213,192,0.8) !important; }
+#echoes-chat .ring-black\\/5 { --tw-ring-color: rgba(180,125,80,0.06) !important; }
+#echoes-chat .text-gray-700.group-hover\\:text-black { color: #8b7355 !important; }
+#echoes-chat .text-gray-700.group-hover\\:text-black:hover { color: #4a3728 !important; }
+#echoes-chat .glass-panel svg { stroke: #8b7355; }
+#echoes-chat [class*="bg-white"] svg { stroke: #8b7355; }
+#echoes-chat [class*="rounded-\\[24px\\]"].glass-panel {
+  background: rgba(255,248,240,0.7) !important;
+  border-color: #e8d5c0 !important;
+}
+#echoes-chat [class*="rounded-\\[24px\\]"].glass-panel svg,
+#echoes-chat .flex.justify-around svg { stroke: #8b7355; }
+#echoes-chat [class*="bg-\\[\\#1a1a1a\\]"] { background: #fff8f0 !important; color: #4a3728 !important; }
+#echoes-chat .bg-green-500 { background: #8bb06a !important; }
+`
+  },
+  {
+    id: "wechat",
+    name: "WeChat Dark",
+    desc: "Deep black, green accents",
+    preview: "bg-[#0f0f0f]",
+    css: `/* == WeChat Dark == */
+#echoes-chat {
+  --skin-bg: #0f0f0f;
+  --skin-surface: #1a1a1a;
+  --skin-card: #1f1f1f;
+  --skin-text: #e5e5e5;
+  --skin-sub: #999;
+  --skin-accent: #07C160;
+  --skin-accent-hover: #06AD56;
+}
+#echoes-chat .bg-\\[\\#F2F2F7\\] { background: #0f0f0f !important; }
+#echoes-chat [class*="bg-\\[\\#F2F2F7"] { background: #0f0f0f !important; }
+#echoes-chat .bg-\\[\\#EBEBF0\\] { background: #080808 !important; }
+#echoes-chat .text-\\[\\#1a1a1a\\] { color: #e5e5e5 !important; }
+#echoes-chat .text-\\[\\#2C2C2C\\] { color: #d5d5d5 !important; }
+#echoes-chat .text-gray-800 { color: #e0e0e0 !important; }
+#echoes-chat .text-gray-700 { color: #d0d0d0 !important; }
+#echoes-chat .text-gray-600 { color: #bbb !important; }
+#echoes-chat .text-gray-500 { color: #999 !important; }
+#echoes-chat .text-gray-400 { color: #888 !important; }
+#echoes-chat .text-gray-300 { color: #777 !important; }
+#echoes-chat header { color: #07C160 !important; }
+#echoes-chat .glass-panel {
+  background: rgba(30,30,30,0.85) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border-color: rgba(255,255,255,0.06) !important;
+  color: #e0e0e0 !important;
+}
+#echoes-chat .glass-card {
+  background: rgba(30,30,30,0.7) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  border-color: rgba(255,255,255,0.05) !important;
+  border-radius: 10px !important;
+  color: #e0e0e0 !important;
+}
+#echoes-chat .glass-card label { color: #ddd !important; }
+#echoes-chat .glass-card p, #echoes-chat .glass-card span { color: #aaa !important; }
+#echoes-chat [class*="bg-white"] { background: #1a1a1a !important; }
+#echoes-chat [class*="bg-gray-50"] { background: #151515 !important; }
+#echoes-chat [class*="bg-gray-100"] { background: rgba(255,255,255,0.04) !important; }
+/* 微信绿按钮 */
+#echoes-chat [class*="bg-black"] { background: #07C160 !important; border-color: #07C160 !important; color: #fff !important; }
+#echoes-chat [class*="bg-black"]:hover { background: #06AD56 !important; }
+#echoes-chat button.bg-black { background: #07C160 !important; color: #fff !important; }
+#echoes-chat button.bg-black:hover { background: #06AD56 !important; }
+#echoes-chat [class*="bg-\\[\\#2C2C2C\\]"] { background: #1a1a1a !important; border-color: rgba(255,255,255,0.1) !important; }
+#echoes-chat [class*="bg-\\[\\#2C2C2C\\]"]:hover { background: #2a2a2a !important; }
+#echoes-chat [class*="bg-gray-800"] { background: #1a1a1a !important; }
+/* 文字白保持不变 */
+#echoes-chat input, #echoes-chat textarea {
+  background: #151515 !important;
+  color: #e0e0e0 !important;
+  border-color: rgba(255,255,255,0.08) !important;
+}
+#echoes-chat input::placeholder, #echoes-chat textarea::placeholder { color: #666 !important; }
+#echoes-chat .border-gray-200 { border-color: rgba(255,255,255,0.06) !important; }
+#echoes-chat .border-gray-200\\/50 { border-color: rgba(255,255,255,0.04) !important; }
+#echoes-chat .border-white\\/50 { border-color: rgba(255,255,255,0.05) !important; }
+#echoes-chat .border-white\\/60 { border-color: rgba(255,255,255,0.06) !important; }
+#echoes-chat .ring-black\\/5 { --tw-ring-color: rgba(255,255,255,0.04) !important; }
+#echoes-chat .text-gray-700.group-hover\\:text-black { color: #aaa !important; }
+#echoes-chat .text-gray-700.group-hover\\:text-black:hover { color: #07C160 !important; }
+#echoes-chat .glass-panel svg { stroke: #aaa; }
+#echoes-chat [class*="bg-white"] svg { stroke: #aaa; }
+#echoes-chat [class*="rounded-\\[24px\\]"].glass-panel {
+  background: rgba(30,30,30,0.85) !important;
+  border-color: rgba(255,255,255,0.06) !important;
+}
+#echoes-chat [class*="rounded-\\[24px\\]"].glass-panel svg,
+#echoes-chat .flex.justify-around svg { stroke: #aaa; }
+#echoes-chat [class*="bg-\\[\\#1a1a1a\\]"] { background: #1f1f1f !important; color: #e0e0e0 !important; }
+#echoes-chat .bg-green-500 { background: #07C160 !important; }
+/* 选中状态标签 */
+#echoes-chat [class*="border-black"] { border-color: #333 !important; }
+#echoes-chat [class*="bg-black"][class*="text-white"] { background: #07C160 !important; }
+`
+  },
+  {
+    id: "sweet",
+    name: "Sweet Bubbles",
+    desc: "Soft pink, polka dots & wings",
+    preview: "bg-[#f0e8ed]",
+    css: `/* == Sweet Bubbles == */
+#echoes-chat {
+  --skin-bg: #f0e8ed;
+  --skin-surface: #f5eff4;
+  --skin-card: #faf5f8;
+  --skin-text: #4a3548;
+  --skin-sub: #8b7088;
+  --skin-accent: #d4959a;
+  --skin-accent-hover: #c08088;
+}
+/* 波点背景 */
+#echoes-chat .bg-\\[\\#F2F2F7\\] {
+  background-color: #f0e8ed !important;
+  background-image: radial-gradient(circle, rgba(255,255,255,0.7) 1px, transparent 1px) !important;
+  background-size: 20px 20px !important;
+}
+#echoes-chat [class*="bg-\\[\\#F2F2F7"] {
+  background-color: #f0e8ed !important;
+  background-image: radial-gradient(circle, rgba(255,255,255,0.7) 1px, transparent 1px) !important;
+  background-size: 20px 20px !important;
+}
+#echoes-chat .bg-\\[\\#EBEBF0\\] { background: #e8dde4 !important; }
+#echoes-chat .text-\\[\\#1a1a1a\\] { color: #4a3548 !important; }
+#echoes-chat .text-\\[\\#2C2C2C\\] { color: #5c4658 !important; }
+#echoes-chat .text-gray-800 { color: #4a3548 !important; }
+#echoes-chat .text-gray-700 { color: #5c4658 !important; }
+#echoes-chat .text-gray-600 { color: #6b5568 !important; }
+#echoes-chat .text-gray-500 { color: #8b7088 !important; }
+#echoes-chat .text-gray-400 { color: #a088a0 !important; }
+#echoes-chat .text-gray-300 { color: #c0a8b8 !important; }
+#echoes-chat header { color: #d4959a !important; }
+#echoes-chat .glass-panel {
+  background: rgba(250,245,248,0.75) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+  border-color: rgba(212,149,154,0.25) !important;
+  color: #4a3548 !important;
+  border-radius: 18px !important;
+}
+#echoes-chat .glass-card {
+  background: rgba(255,255,255,0.55) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  border-color: rgba(212,149,154,0.2) !important;
+  border-radius: 16px !important;
+  color: #4a3548 !important;
+}
+#echoes-chat .glass-card label { color: #5c4658 !important; }
+#echoes-chat .glass-card p, #echoes-chat .glass-card span { color: #8b7088 !important; }
+#echoes-chat [class*="bg-white"] { background: #faf5f8 !important; border-radius: 14px !important; }
+#echoes-chat [class*="bg-gray-50"] { background: #faf5f8 !important; }
+#echoes-chat [class*="bg-gray-100"] { background: rgba(212,149,154,0.08) !important; }
+/* 粉调按钮 */
+#echoes-chat [class*="bg-black"] { background: #d4959a !important; border-color: #d4959a !important; }
+#echoes-chat [class*="bg-black"]:hover { background: #c08088 !important; }
+#echoes-chat button.bg-black { background: #d4959a !important; }
+#echoes-chat button.bg-black:hover { background: #c08088 !important; }
+#echoes-chat [class*="bg-\\[\\#2C2C2C\\]"] { background: #d4959a !important; }
+#echoes-chat [class*="bg-\\[\\#2C2C2C\\]"]:hover { background: #c08088 !important; }
+#echoes-chat [class*="bg-gray-800"] { background: #d4959a !important; }
+#echoes-chat [class*="text-white"] { color: #fff !important; }
+#echoes-chat input, #echoes-chat textarea {
+  background: #faf5f8 !important;
+  color: #4a3548 !important;
+  border-color: rgba(212,149,154,0.3) !important;
+  border-radius: 12px !important;
+}
+#echoes-chat input::placeholder, #echoes-chat textarea::placeholder { color: #c0a8b8 !important; }
+#echoes-chat .border-gray-200 { border-color: rgba(212,149,154,0.2) !important; }
+#echoes-chat .border-gray-200\\/50 { border-color: rgba(212,149,154,0.15) !important; }
+#echoes-chat .border-white\\/50 { border-color: rgba(212,149,154,0.2) !important; }
+#echoes-chat .border-white\\/60 { border-color: rgba(212,149,154,0.25) !important; }
+#echoes-chat .ring-black\\/5 { --tw-ring-color: rgba(212,149,154,0.06) !important; }
+#echoes-chat .text-gray-700.group-hover\\:text-black { color: #8b7088 !important; }
+#echoes-chat .text-gray-700.group-hover\\:text-black:hover { color: #d4959a !important; }
+#echoes-chat .glass-panel svg { stroke: #8b7088; }
+#echoes-chat [class*="bg-white"] svg { stroke: #8b7088; }
+#echoes-chat [class*="rounded-\\[24px\\]"].glass-panel {
+  background: rgba(250,245,248,0.75) !important;
+  border-color: rgba(212,149,154,0.25) !important;
+  border-radius: 18px !important;
+}
+#echoes-chat [class*="rounded-\\[24px\\]"].glass-panel svg,
+#echoes-chat .flex.justify-around svg { stroke: #8b7088; }
+#echoes-chat [class*="bg-\\[\\#1a1a1a\\]"] { background: #faf5f8 !important; color: #4a3548 !important; }
+#echoes-chat .bg-green-500 { background: #b8a8c8 !important; }
+/* 圆角泛滥 - 所有圆角变大 */
+#echoes-chat [class*="rounded-lg"],
+#echoes-chat [class*="rounded-xl"],
+#echoes-chat [class*="rounded-\\[16px\\]"],
+#echoes-chat [class*="rounded-\\[22px\\]"],
+#echoes-chat [class*="rounded-\\[24px\\]"],
+#echoes-chat [class*="rounded-2xl"],
+#echoes-chat [class*="rounded-full"],
+#echoes-chat [class*="rounded-\\[48px\\]"] { border-radius: 18px !important; }
+#echoes-chat [class*="rounded-\\[48px\\]"] { border-radius: 36px !important; }
+#echoes-chat [class*="rounded-full"] { border-radius: 9999px !important; }
+`
   },
 ];
 
 const PersonalizationPanel = ({
+  // --- 显示设置 Props ---
   isFullscreen,
   toggleFullScreen,
+
+  // --- 字体设置 Props ---
   fontName,
   handleResetFont,
   handleFontUrlSubmit,
   inputUrl,
   setInputUrl,
+
+  // --- Icon Customization Props ---
   appList,
   customIcons,
   handleAppIconUpload,
   handleResetIcon,
+
+  // --- 皮肤 Props ---
   skinCSS,
   setSkinCSS,
   selectedSkin,
@@ -90,7 +410,7 @@ const PersonalizationPanel = ({
               Immersive Mode
             </label>
             <p className="text-[10px] text-gray-400">
-              Hides browser address bar and status bar
+              Hide browser address bar & status bar
             </p>
           </div>
           <button
@@ -107,7 +427,7 @@ const PersonalizationPanel = ({
           </button>
         </div>
 
-        {/* Font Settings */}
+        {/* 字体设置 */}
         <div className="glass-card p-4 rounded-xl space-y-3">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-2">
@@ -150,7 +470,7 @@ const PersonalizationPanel = ({
           <Palette size={10} /> Interface Style
         </h3>
 
-        {/* Official Skins */}
+        {/* 官方皮肤 */}
         <div className="grid grid-cols-2 gap-3 mb-4">
           {OFFICIAL_SKINS.map((skin) => (
             <button
@@ -177,7 +497,7 @@ const PersonalizationPanel = ({
           ))}
         </div>
 
-        {/* Custom CSS */}
+        {/* 自定义 CSS */}
         <div className="glass-card p-4 rounded-xl space-y-3">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-2">
@@ -203,12 +523,13 @@ const PersonalizationPanel = ({
                 setSelectedSkin("");
               }
             }}
-            placeholder="Paste CSS to customize the interface..."
+            placeholder="粘贴 CSS 代码来自定义Interface Style..."
             rows={5}
             className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-xs font-mono outline-none focus:border-black resize-y"
           />
           <p className="text-[9px] text-gray-400">
-            Use <code className="bg-gray-100 px-1 rounded">#echoes-chat</code> as the selector prefix
+            Use <code className="bg-gray-100 px-1 rounded">#echoes-chat</code> as the selector prefix. See
+            <a href="./theme-guide.md" target="_blank" className="text-blue-500 underline ml-1">Theme Guide</a>
           </p>
         </div>
       </section>
@@ -236,7 +557,6 @@ const PersonalizationPanel = ({
                     Icon && <Icon size={20} className="text-gray-400" />
                   )}
 
-                  {/* Hover upload overlay */}
                   <label className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity cursor-pointer">
                     <Upload size={16} className="text-white" />
                     <input
