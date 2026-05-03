@@ -233,7 +233,7 @@ const App = () => {
       document.head.appendChild(styleTag);
     }
 
-    // 这里直接把 url 放进去即可，Browser会自动去下载
+    // 这里直接把 url 放进去即可，浏览器会自动去下载
     styleTag.innerHTML = `
     @font-face { font-family: '${name}'; src: url('${url}'); font-display: swap; }
     body { --app-font: '${name}' !important; }
@@ -566,7 +566,7 @@ const App = () => {
         })
         .catch((e) => {
           console.log(e);
-          showToast("error", "全屏模式被Browser拒绝");
+          showToast("error", "全屏模式被浏览器拒绝");
         });
     } else {
       if (document.exitFullscreen) {
@@ -720,7 +720,7 @@ const App = () => {
     });
     setInputKey(finalDescription);
 
-    // 5. 设置World Book (如果有)
+    // 5. 设置世界书 (如果有)
     const groupedWorldBook = (cleaned.worldBook || []).map((entry) => ({
       ...entry,
       group: finalName, // 使用角色名作为分组
@@ -933,12 +933,12 @@ const App = () => {
     setCharStickers((prev) =>
       prev.map((s) => ({
         ...s,
-        group: s.group || "狗男Journal",
+        group: s.group || "狗男日记",
         enabled: s.enabled !== undefined ? s.enabled : true,
       })),
     );
 
-    // 2. 迁移World Book
+    // 2. 迁移世界书
     setWorldBook((prev) =>
       prev.map((w) => ({
         ...w,
@@ -1027,7 +1027,7 @@ const App = () => {
     return Array.from(groups);
   };
 
-  // 2. 移动World Book条目到新分组
+  // 2. 移动世界书条目到新分组
   const moveWorldBookEntry = async (id, newGroup) => {
     let finalGroup = newGroup;
     if (newGroup === "NEW_GROUP_TRIGGER") {
@@ -1043,7 +1043,7 @@ const App = () => {
     );
   };
 
-  // 重命名World Book分组
+  // 重命名世界书分组
   const renameWorldBookGroup = async (oldName) => {
     const newName = await customPrompt("重命名分组:", oldName);
     if (!newName || newName.trim() === "" || newName === oldName) return;
@@ -1055,7 +1055,7 @@ const App = () => {
     );
   };
 
-  // [新增] 删除World Book分组 (支持自定义弹窗)
+  // [新增] 删除世界书分组 (支持自定义弹窗)
   const deleteWorldBookGroup = async (groupName) => {
     if (
       await customConfirm(
@@ -1188,7 +1188,7 @@ const App = () => {
               `已导入 ${formattedEntries.length} 条至 "${defaultGroupName}"`,
             );
           } else {
-            showToast("error", "未找到有效的World Book词条");
+            showToast("error", "未找到有效的世界书词条");
           }
         } catch (err) {
           console.error(err);
@@ -1303,7 +1303,7 @@ const App = () => {
       keys: ["echoes_persona", "echoes_raw_json", "echoes_char_avatar", "echoes_char_facts", "echoes_shared_events"],
     },
     worldbook: {
-      label: "World Book",
+      label: "世界书",
       keys: ["echoes_worldbook"],
     },
     memory: {
@@ -1331,7 +1331,7 @@ const App = () => {
       ],
     },
     smartwatch: {
-      label: "Smart Home",
+      label: "智能家",
       keys: ["echoes_sw_locations", "echoes_sw_logs"],
     },
   };
@@ -1364,7 +1364,7 @@ const App = () => {
       const diaries = data["echoes_diaries"];
       const parts = [];
       if (forum?.posts?.length) parts.push(`${forum.posts.length} 帖子`);
-      if (diaries?.length) parts.push(`${diaries.length} Journal`);
+      if (diaries?.length) parts.push(`${diaries.length} 日记`);
       return parts.length ? parts.join(" · ") : "—";
     }
     if (catId === "smartwatch") return val?.length ? `${val.length} 地点` : "—";
@@ -1694,7 +1694,7 @@ const App = () => {
         const savedCustomRules = customRules;
         const savedInputKey = inputKey;
 
-        // 位置移动触发 → 更新Smart Home，生成完成后弹窗
+        // 位置移动触发 → 更新智能家，生成完成后弹窗
         if (data.triggerLocation && savedSmartWatchLocations.length > 0) {
           setTimeout(async () => {
             setLoading((prev) => ({ ...prev, sw_update: true }));
@@ -1720,14 +1720,14 @@ const App = () => {
             }
           }, 1000);
         }
-        // 重要事件触发 → 写Journal，生成完成后弹窗
+        // 重要事件触发 → 写日记，生成完成后弹窗
         if (data.triggerDiary) {
           setTimeout(async () => {
             const ok = await runGenerator("diary", setDiaries, prompts.diary);
-            if (ok && typeof showToast === "function") showToast("info", `${savedCharName}写了一篇Journal`);
+            if (ok && typeof showToast === "function") showToast("info", `${savedCharName}写了一篇日记`);
           }, 2000);
         }
-        // Browser搜索触发 → 更新Browser历史，生成完成后弹窗
+        // 浏览器搜索触发 → 更新浏览器历史，生成完成后弹窗
         if (data.triggerBrowser) {
           setTimeout(async () => {
             const ok = await runGenerator("browser", setBrowserHistory, prompts.browser);
@@ -1853,7 +1853,7 @@ const App = () => {
     setUserAvatar(null);
     setSmartWatchLocations([]);
     setSmartWatchLogs([]);
-    setForumData({ name: "本地Forum", posts: [], isInitialized: false });
+    setForumData({ name: "本地生活圈", posts: [], isInitialized: false });
     setForumSettings({
       userNick: "User本U",
       smurfNick: "不是小号",
@@ -1923,7 +1923,7 @@ const App = () => {
     if (!persona) return "";
     const effectiveUserName = userName || "你";
 
-    // 1. 处理描述和World Book中的 {{user}}/{{char}} 替换
+    // 1. 处理描述和世界书中的 {{user}}/{{char}} 替换
     const cleanCharDesc = replacePlaceholders(
       inputKey,
       persona.name,
@@ -2556,7 +2556,7 @@ Requirements:
             }
           }
 
-          // 惊喜逻辑2：概率触发app事件更新（位置/Journal/Browser/账单）
+          // 惊喜逻辑2：概率触发app事件更新（位置/日记/浏览器/账单）
           if (Math.random() < 0.1) {
             setTimeout(() => {
               triggerAppEvents();
@@ -2624,7 +2624,7 @@ Requirements:
   };
 
   const handleContextMenu = (e, index) => {
-    e.preventDefault(); // 阻止Browser默认右键菜单
+    e.preventDefault(); // 阻止浏览器默认右键菜单
     setActiveMenuIndex(index);
   };
 
@@ -3072,7 +3072,7 @@ Requirements:
 
   // --- FORUM STATE ---
   const [forumData, setForumData, forumDataLoaded] = useStickyState(
-    { name: "本地Forum", posts: [], isInitialized: false }, // Added isInitialized
+    { name: "本地生活圈", posts: [], isInitialized: false }, // Added isInitialized
     "echoes_forum_data",
   );
   // 论坛昵称设置
@@ -3112,7 +3112,7 @@ Requirements:
 
   if (!isDataReady) {
     return (
-      <div className="h-screen w-full bg-[#EBEBF0] flex flex-col items-center justify-center gap-4">
+      <div id="echoes-chat" className="h-screen w-full bg-[#EBEBF0] flex flex-col items-center justify-center gap-4">
         <RefreshCw className="animate-spin text-gray-400" size={32} />
         <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">
           正在同步本地数据库...
@@ -3123,7 +3123,7 @@ Requirements:
 
   if (isLocked) {
     return (
-      <div className="h-screen w-full bg-[#EBEBF0] flex flex-col items-center justify-start pt-32 p-8 text-[#2C2C2C] relative overflow-hidden">
+      <div id="echoes-chat" className="h-screen w-full bg-[#EBEBF0] flex flex-col items-center justify-start pt-32 p-8 text-[#2C2C2C] relative overflow-hidden">
         <div className="absolute -top-20 -left-20 w-96 h-96 bg-blue-50/50 rounded-full blur-3xl animate-pulse delay-1000 pointer-events-none"></div>
         <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-gray-100/60 rounded-full blur-3xl animate-pulse pointer-events-none"></div>
         {notification && (
@@ -3560,13 +3560,15 @@ Requirements:
                 onClick={() => setActiveApp("chat")}
               >
                 <div className="w-full h-14 flex items-center justify-center gap-3">
-                  <MessageCircle
-                    size={24}
-                    strokeWidth={1.5}
-                    className="text-[#2C2C2C]"
-                  />
+                  <span className="inline-flex items-center justify-center w-6 h-6" data-icon="chat">
+                    <MessageCircle
+                      size={24}
+                      strokeWidth={1.5}
+                      className="text-[#2C2C2C]"
+                    />
+                  </span>
                   <span className="text-sm font-bold text-gray-700 tracking-wide">
-                    Chats
+                    通讯
                   </span>
                 </div>
               </div>
@@ -4852,7 +4854,7 @@ Requirements:
           {/* APP: SETTINGS */}
           <AppWindow
             isOpen={activeApp === "settings"}
-            title="Settings"
+            title="系统设置"
             onClose={() => setActiveApp(previousApp)}
           >
             <div className="h-full pt-4">
@@ -4925,7 +4927,7 @@ Requirements:
           {/* APP: JOURNAL (DIARY & EVENTS) */}
           <AppWindow
             isOpen={activeApp === "journal"}
-            title={showEventsInDiary ? "共同经历" : "Journal"} // 标题随状态变化
+            title={showEventsInDiary ? "共同经历" : "日记"} // 标题随状态变化
             onClose={() => {
               setActiveApp(null);
               setShowEventsInDiary(false); // 关闭时重置
@@ -4939,9 +4941,9 @@ Requirements:
                     ? "bg-black text-white shadow-md"
                     : "bg-gray-100 text-gray-500 hover:bg-gray-200"
                 }`}
-                title="切换Journal/经历"
+                title="切换日记/经历"
               >
-                {/* 如果显示经历，图标变成Journal本(表示点它可以回Journal)；反之亦然 */}
+                {/* 如果显示经历，图标变成日记本(表示点它可以回日记)；反之亦然 */}
                 {showEventsInDiary ? (
                   <Book size={16} />
                 ) : (
@@ -5032,7 +5034,7 @@ Requirements:
                   </div>
                 </div>
               ) : (
-                /* --- B. 原有的Journal列表 --- */
+                /* --- B. 原有的日记列表 --- */
                 <div className="animate-in slide-in-from-left-4">
                   <button
                     onClick={generateDiary}
@@ -5049,7 +5051,7 @@ Requirements:
 
                   {diaries.length === 0 && (
                     <p className="text-center text-gray-400 text-xs mt-10">
-                      暂无Journal
+                      暂无日记
                     </p>
                   )}
 
@@ -5093,7 +5095,7 @@ Requirements:
           {/* APP: TRACES (Receipts) */}
           <AppWindow
             isOpen={activeApp === "traces"}
-            title="Life Traces"
+            title="生活痕迹"
             onClose={() => setActiveApp(null)}
           >
             <div className="space-y-6 pb-20 pt-4">
@@ -5175,7 +5177,7 @@ Requirements:
           {/* APP: SMART WATCH (智能看看) */}
           <AppWindow
             isOpen={activeApp === "smartwatch"}
-            title="Smart Home"
+            title="智能家"
             onClose={() => setActiveApp(null)}
           >
             <div className="pb-20">
@@ -5213,7 +5215,7 @@ Requirements:
                   <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-center px-6">
                     <p className="text-xs text-gray-400">暂无监控数据</p>
                     <p className="text-[10px] text-gray-300">
-                      请确认已开启World Book，然后初始化系统
+                      请确认已开启世界书，然后初始化系统
                     </p>
                     <button
                       onClick={initSmartWatch}
@@ -5564,7 +5566,7 @@ Requirements:
           {/* APP: MUSIC */}
           <AppWindow
             isOpen={activeApp === "music"}
-            title="Resonance"
+            title="共鸣旋律"
             onClose={() => setActiveApp(null)}
           >
             <MusicApp
@@ -5590,10 +5592,10 @@ Requirements:
               onDelete={handleDeleteStatus}
             />
           </AppWindow>
-          {/* APP: PERSONALIZATION (Personalization) */}
+          {/* APP: PERSONALIZATION (个性化) */}
           <AppWindow
             isOpen={activeApp === "personalization"}
-            title="Personalization"
+            title="个性化"
             onClose={() => setActiveApp(null)}
           >
             <PersonalizationPanel
