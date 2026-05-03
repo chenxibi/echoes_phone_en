@@ -160,11 +160,11 @@ const App = () => {
     "echoes_user_stickers",
   );
 
-  // Bulk Import Stickers
+  // 批量导入表情包函数
   const handleBulkImport = (
     text,
     type = "char",
-    targetGroup = "Custom Stickers",
+    targetGroup = "自定义表情",
   ) => {
     const lines = text.split("\n");
     const newStickers = [];
@@ -195,11 +195,11 @@ const App = () => {
       }
       if (typeof showToast === "function")
         // 加上第一个参数 "success"
-        showToast("success", `Successfully imported ${newStickers.length}  stickers`);
+        showToast("success", `已成功导入 ${newStickers.length} 个表情包`);
     } else {
       if (typeof showToast === "function")
         // 把 "error" 挪到前面
-        showToast("error", "Invalid format (should be: description: url)");
+        showToast("error", "格式错误 (应为 描述: 链接)");
     }
   };
   // -- PERSISTENT STATE --
@@ -246,7 +246,7 @@ const App = () => {
       const savedFontName = await echoesDB.getItem("custom-font-name");
       if (savedFontUrl) {
         applyFont("UserCustomFont", savedFontUrl);
-        setFontName(savedFontName || "Custom Font");
+        setFontName(savedFontName || "自定义字体");
       }
     };
     loadFont();
@@ -256,26 +256,26 @@ const App = () => {
     const url = inputUrl.trim(); // 使用你定义好的 inputUrl 状态
     if (url) {
       applyFont("UserCustomFont", url);
-      setFontName("Custom Font");
+      setFontName("自定义字体");
       await echoesDB.setItem("custom-font-url", url);
-      await echoesDB.setItem("custom-font-name", "Custom Font");
+      await echoesDB.setItem("custom-font-name", "自定义字体");
       // setShowFontInput(false); // 如果有这个状态就加上
-      showToast("success", "Font applied");
+      showToast("success", "字体已应用");
     } else {
-      showToast("error", "Please enter a font URL");
+      showToast("error", "请输入字体 URL");
     }
   };
 
   const handleResetFont = async () => {
     // 加上 async
-    // 移除Custom Font
+    // 移除自定义字体
     const styleElement = document.getElementById("UserCustomFont");
     if (styleElement) styleElement.remove();
     document.body.style.fontFamily = "";
-    setFontName("Default Font");
+    setFontName("默认字体");
     await echoesDB.removeItem("custom-font-url");
     await echoesDB.removeItem("custom-font-name");
-    showToast("info", "已恢复Default Font");
+    showToast("info", "已恢复默认字体");
   };
 
   // [新增] 自定义图标状态
@@ -296,14 +296,14 @@ const App = () => {
       const newIcons = { ...customIcons, [appId]: base64 };
       setCustomIcons(newIcons);
       await echoesDB.setItem("my_custom_icons", newIcons);
-      showToast("success", "Icon updated");
+      showToast("success", "图标已更新");
     };
     reader.readAsDataURL(file);
   };
 
   // [新增] 重置图标
   const handleResetIcon = async (appId) => {
-    if (await customConfirm("Reset icon to default?", "Restore Icon")) {
+    if (await customConfirm("确定恢复默认图标吗？", "恢复图标")) {
       setCustomIcons((prev) => {
         const newState = { ...prev };
         delete newState[appId];
@@ -323,7 +323,7 @@ const App = () => {
   };
 
   // 替代 window.alert
-  const customAlert = (message, title = "Notice") => {
+  const customAlert = (message, title = "提示") => {
     return showDialog({ type: "alert", title, message });
   };
 
@@ -560,9 +560,11 @@ const App = () => {
   const toggleFullScreen = () => {
     if (!document.fullscreenElement) {
       document.documentElement
-        .requestFullscreen()
+        .requestFullscreen({ navigationUI: "hide" })
         .then(() => {
           setIsFullscreen(true);
+          // 全屏后添加 viewport-fit 以覆盖状态栏区域
+          document.documentElement.style.setProperty("padding-top", "env(safe-area-inset-top)");
         })
         .catch((e) => {
           console.log(e);
@@ -572,6 +574,7 @@ const App = () => {
       if (document.exitFullscreen) {
         document.exitFullscreen().then(() => {
           setIsFullscreen(false);
+          document.documentElement.style.removeProperty("padding-top");
         });
       }
     }
@@ -852,7 +855,7 @@ const App = () => {
   // --- TRACKER HANDLERS ---
 
   const handleDeleteTrackerItem = async (type, id) => {
-    if (!(await customConfirm("Confirm删除这条记录吗？"))) return;
+    if (!(await customConfirm("确定删除这条记录吗？"))) return;
 
     // 修复点：兼容 "fact" (User Facts) 和 "userFact"
     if (type === "userFact" || type === "fact") {
@@ -893,7 +896,7 @@ const App = () => {
 
   // 删除状态记录函数
   const handleDeleteStatus = async (index) => {
-    if (await customConfirm("Confirm删除这条状态记录？")) {
+    if (await customConfirm("确定删除这条状态记录？")) {
       const newHistory = [...statusHistory];
       newHistory.splice(index, 1);
       setStatusHistory(newHistory);
@@ -918,12 +921,8 @@ const App = () => {
 
   useEffect(() => {
     if (activeApp === "chat" && chatScrollRef.current) {
-      setTimeout(() => {
-        chatScrollRef.current.scrollTo({
-          top: chatScrollRef.current.scrollHeight,
-          behavior: "smooth",
-        });
-      }, 100);
+      // 直接定位到底部，不做滚动动画
+      chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
     }
   }, [chatHistory, activeApp, loading.chat, isTyping]);
 
@@ -1023,7 +1022,7 @@ const App = () => {
 
   // 1. 获取所有唯一的分组名
   const getGroups = (list) => {
-    const groups = new Set(list.map((i) => i.group || "Custom Stickers"));
+    const groups = new Set(list.map((i) => i.group || "自定义表情"));
     return Array.from(groups);
   };
 
@@ -1059,7 +1058,7 @@ const App = () => {
   const deleteWorldBookGroup = async (groupName) => {
     if (
       await customConfirm(
-        `Confirm删除分组 "${groupName}" 下的所有条目吗？`,
+        `确定删除分组 "${groupName}" 下的所有条目吗？`,
         "删除分组",
       )
     ) {
@@ -1096,7 +1095,7 @@ const App = () => {
   const deleteStickerGroup = async (groupName) => {
     if (
       await customConfirm(
-        `Confirm删除库 "${groupName}" 及其中所有表情包吗？`,
+        `确定删除库 "${groupName}" 及其中所有表情包吗？`,
         "删除表情包库",
       )
     ) {
@@ -1118,7 +1117,7 @@ const App = () => {
   const toggleStickerGroup = (groupName, isEnabled) => {
     setCharStickers((prev) =>
       prev.map((s) =>
-        (s.group || "Custom Stickers") === groupName
+        (s.group || "自定义表情") === groupName
           ? { ...s, enabled: isEnabled }
           : s,
       ),
@@ -1228,7 +1227,7 @@ const App = () => {
         "添加表情包",
       );
       if (!desc) {
-        // 处理Cancel (null)
+        // 处理取消 (null)
         event.target.value = "";
         return;
       }
@@ -1237,14 +1236,14 @@ const App = () => {
         // 2. 压缩图片
         const compressedBase64 = await compressImage(file);
 
-        // 3. [关键修改] Confirm分组：如果有传入 targetGroup 就用它，否则用默认值
-        const finalGroup = targetGroup || "Custom Stickers";
+        // 3. [关键修改] 确定分组：如果有传入 targetGroup 就用它，否则用默认值
+        const finalGroup = targetGroup || "自定义表情";
 
         const newSticker = {
           id: `s${Date.now()}`,
           url: compressedBase64,
           desc: desc,
-          group: finalGroup, // [使用Confirm的分组]
+          group: finalGroup, // [使用确定的分组]
           enabled: true,
         };
 
@@ -1282,7 +1281,7 @@ const App = () => {
 
   // 删除表情包
   const handleDeleteSticker = async (id) => {
-    if (await customConfirm("Confirm删除这 stickers吗？")) {
+    if (await customConfirm("确定删除这个表情包吗？")) {
       if (editingSticker?.source === "user") {
         setUserStickers((prev) => prev.filter((s) => s.id !== id));
       } else {
@@ -1578,7 +1577,7 @@ const App = () => {
     setLoading({});
     setMessageQueue([]);
     setIsTyping(false);
-    showToast("info", "已Cancel生成");
+    showToast("info", "已取消生成");
   };
 
   // Generator Actions
@@ -1766,8 +1765,18 @@ const App = () => {
     try {
       // 1. 本地简易解析 (只提取名字)
       let extractedName = "Unknown";
-      // 尝试匹配 Name: xxx
-      const nameMatch = inputKey.match(/^Name:\s*(.+?)(\n|$)/i);
+      // Match multiple formats: Name: xxx / Name：xxx / 名字：xxx / 姓名：xxx
+      const namePatterns = [
+        /^name:\s*(.+?)(\n|$)/im,
+        /^name：\s*(.+?)(\n|$)/im,
+        /^名字：\s*(.+?)(\n|$)/im,
+        /^姓名：\s*(.+?)(\n|$)/im,
+      ];
+      let nameMatch = null;
+      for (const p of namePatterns) {
+        nameMatch = inputKey.match(p);
+        if (nameMatch) break;
+      }
       if (nameMatch) {
         extractedName = nameMatch[1].trim();
       } else {
@@ -1804,7 +1813,7 @@ const App = () => {
     if (
       !(await customConfirm(
         // 替换 window.confirm
-        "Confirm要登出吗？这将彻底清除当前角色的所有本地数据，无法恢复。",
+        "确定要登出吗？这将彻底清除当前角色的所有本地数据，无法恢复。",
         "清除数据",
       ))
     ) {
@@ -2680,7 +2689,7 @@ Requirements:
   const handleDeleteWithConfirm = async (index) => {
     const msgToDelete = chatHistory[index];
 
-    if (await customConfirm("Confirm要删除这条消息吗？", "删除消息")) {
+    if (await customConfirm("确定要删除这条消息吗？", "删除消息")) {
       if (msgToDelete && msgToDelete.id) {
         rollbackTrackerData(msgToDelete.id);
       }
@@ -2705,7 +2714,7 @@ Requirements:
 
     if (
       await customConfirm(
-        `Confirm要删除选中的 ${selectedMsgs.size} 条消息吗？`,
+        `确定要删除选中的 ${selectedMsgs.size} 条消息吗？`,
         "批量删除",
       )
     ) {
@@ -3080,7 +3089,7 @@ Requirements:
     { userNick: "User本U", smurfNick: "不是小号", charNick: "匿名用户" },
     "echoes_forum_settings",
   );
-  // 论坛引导Notice词
+  // 论坛引导提示词
   const [forumGuidance, setForumGuidance] = useState("");
   // 当前查看的帖子 ID
   const [activeThreadId, setActiveThreadId] = useState(null);
@@ -3306,14 +3315,16 @@ Requirements:
                 </div>
               </button>
 
-              {/* 直接进入 */}
-              <button
-                onClick={unlockDeviceDirect}
-                className="w-full text-center text-[11px] text-gray-400 hover:text-[#7A2A3A] transition-colors py-1"
-                style={{ textDecorationLine: "underline", textDecorationThickness: "1px", textUnderlineOffset: "4px" }}
-              >
-                直接进入
-              </button>
+              {/* 直接进入：仅在only shown when core config is empty */}
+              {!inputKey && (
+                <button
+                  onClick={unlockDeviceDirect}
+                  className="w-full text-center text-[11px] text-gray-400 hover:text-[#7A2A3A] transition-colors py-1"
+                  style={{ textDecorationLine: "underline", textDecorationThickness: "1px", textUnderlineOffset: "4px" }}
+                >
+                  直接进入
+                </button>
+              )}
 
             </div>
 
@@ -3555,7 +3566,7 @@ Requirements:
             </div>
             <div className="mt-auto pb-6">
               <div
-                data-app-link="Chat"
+                data-app-link="通讯"
                 className="glass-panel rounded-[24px] p-2 flex justify-around items-center shadow-lg cursor-pointer hover:bg-white/40 transition-colors mx-2"
                 onClick={() => setActiveApp("chat")}
               >
@@ -4118,7 +4129,7 @@ Requirements:
                       className={`flex flex-col gap-1 ${
                         msg.sender === "me" ? "items-end" : "items-start"
                       } group relative animate-in fade-in slide-in-from-bottom-2 ${
-                        // 多选模式下增加点击区域和样式Notice
+                        // 多选模式下增加点击区域和样式提示
                         isMultiSelectMode
                           ? "cursor-pointer hover:bg-gray-100/50 p-2 rounded-xl transition-colors"
                           : ""
@@ -4191,7 +4202,7 @@ Requirements:
                                   onClick={() => setEditIndex(null)}
                                   className="px-3 py-1 text-xs bg-gray-200 rounded-full text-gray-600"
                                 >
-                                  Cancel
+                                  取消
                                 </button>
                                 <button
                                   onClick={() => saveEdit(i)}
@@ -4651,7 +4662,7 @@ Requirements:
                       }}
                       className="px-6 py-2 bg-gray-200 text-gray-700 rounded-full text-xs font-bold"
                     >
-                      Cancel
+                      取消
                     </button>
                     <span className="text-xs font-bold text-gray-500">
                       已选 {selectedMsgs.size} 条
@@ -4721,7 +4732,7 @@ Requirements:
                         onClick={stopGeneration}
                         className="w-full py-2.5 bg-red-50 text-red-500 rounded-full text-xs font-bold flex items-center justify-center gap-2 animate-pulse"
                       >
-                        <X size={14} /> Cancel生成
+                        <X size={14} /> 取消生成
                       </button>
                     ) : (
                       <>
@@ -5481,7 +5492,7 @@ Requirements:
           >
             <div className="space-y-6 pb-20 pt-4">
               <button
-                data-app-link="Browser Refresh"
+                data-app-link="浏览器刷新"
                 onClick={generateBrowser}
                 disabled={loading.browser}
                 className="w-full py-3 bg-[#2C2C2C] text-white rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-black transition-all flex items-center justify-center gap-2 shadow-lg"
@@ -5713,7 +5724,7 @@ Requirements:
                 onClick={() => setShowLocationModal(false)}
                 className="flex-1 py-2.5 bg-gray-100 text-gray-600 rounded-xl text-sm font-medium hover:bg-gray-200 transition-colors"
               >
-                Cancel
+                取消
               </button>
               <button
                 onClick={() => {
@@ -5780,12 +5791,12 @@ Requirements:
               输入图片描述
             </button>
 
-            {/* Cancel按钮 */}
+            {/* 取消按钮 */}
             <button
               onClick={() => setShowImageModal(false)}
               className="w-full py-2.5 text-gray-400 text-sm hover:text-gray-600 transition-colors"
             >
-              Cancel
+              取消
             </button>
           </div>
         </div>
@@ -5843,7 +5854,7 @@ Requirements:
                 onClick={() => { setShowImportModal(false); setImportData(null); }}
                 className="flex-1 py-2.5 text-gray-500 bg-gray-100 rounded-xl text-sm font-medium hover:bg-gray-200 transition-colors"
               >
-                Cancel
+                取消
               </button>
               <button
                 onClick={doImport}
