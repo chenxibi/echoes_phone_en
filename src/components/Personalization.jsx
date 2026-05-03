@@ -116,6 +116,19 @@ const OFFICIAL_SKINS = [
 #echoes-chat .bg-white\\/90 { background: rgba(30,30,60,0.85) !important; backdrop-filter: blur(20px) !important; -webkit-backdrop-filter: blur(20px) !important; }
 #echoes-chat [class*="bg-white"].rounded-2xl { background: #252540 !important; opacity: 0.95; }
 #echoes-chat .bg-black\\/50 { background: rgba(0,0,0,0.5) !important; }
+/* 操作菜单、表情面板、模态卡片保持原始深色样式 */
+#echoes-chat .bg-\[\#1a1a1a\]\/95 { background: rgba(26,26,26,0.95) !important; color: #fff !important; }
+#echoes-chat .bg-\[\#1a1a1a\]\/95 * { color: #fff !important; }
+#echoes-chat .bg-\[\#1a1a1a\]\\/95 { background: rgba(26,26,26,0.95) !important; color: #fff !important; }
+#echoes-chat [class*="bg-[#1a1a1a]"] { background: #1a1a1a !important; color: #fff !important; }
+#echoes-chat [class*="bg-[#1a1a1a]"] * { color: #fff !important; }
+#echoes-chat .text-red-300 { color: #fc8181 !important; }
+#echoes-chat .hover\:bg-white\/20:hover { background: rgba(255,255,255,0.2) !important; }
+#echoes-chat .border-white\/20 { border-color: rgba(255,255,255,0.2) !important; }
+#echoes-chat .bg-black\/50 { background: rgba(0,0,0,0.5) !important; }
+#echoes-chat .fixed.inset-0 { background: rgba(0,0,0,0.5) !important; }
+#echoes-chat .bg-white\/90 { opacity:0.92 !important; backdrop-filter: blur(20px) !important; -webkit-backdrop-filter: blur(20px) !important; }
+#echoes-chat [class*="bg-white"].rounded-2xl { opacity: 0.95 !important; }
 #echoes-chat .text-red-500 { color: #ff7799 !important; }
 `
   },
@@ -213,6 +226,19 @@ const OFFICIAL_SKINS = [
 #echoes-chat .bg-white\\/90 { background: rgba(255,248,240,0.85) !important; backdrop-filter: blur(20px) !important; -webkit-backdrop-filter: blur(20px) !important; }
 #echoes-chat [class*="bg-white"].rounded-2xl { background: #fff8f0 !important; opacity: 0.95; }
 #echoes-chat .bg-black\\/50 { background: rgba(0,0,0,0.5) !important; }
+/* 操作菜单、表情面板、模态卡片保持原始深色样式 */
+#echoes-chat .bg-\[\#1a1a1a\]\/95 { background: rgba(26,26,26,0.95) !important; color: #fff !important; }
+#echoes-chat .bg-\[\#1a1a1a\]\/95 * { color: #fff !important; }
+#echoes-chat .bg-\[\#1a1a1a\]\\/95 { background: rgba(26,26,26,0.95) !important; color: #fff !important; }
+#echoes-chat [class*="bg-[#1a1a1a]"] { background: #1a1a1a !important; color: #fff !important; }
+#echoes-chat [class*="bg-[#1a1a1a]"] * { color: #fff !important; }
+#echoes-chat .text-red-300 { color: #fc8181 !important; }
+#echoes-chat .hover\:bg-white\/20:hover { background: rgba(255,255,255,0.2) !important; }
+#echoes-chat .border-white\/20 { border-color: rgba(255,255,255,0.2) !important; }
+#echoes-chat .bg-black\/50 { background: rgba(0,0,0,0.5) !important; }
+#echoes-chat .fixed.inset-0 { background: rgba(0,0,0,0.5) !important; }
+#echoes-chat .bg-white\/90 { opacity:0.92 !important; backdrop-filter: blur(20px) !important; -webkit-backdrop-filter: blur(20px) !important; }
+#echoes-chat [class*="bg-white"].rounded-2xl { opacity: 0.95 !important; }
 #echoes-chat .text-red-500 { color: #cc6666 !important; }
 `
   },
@@ -301,7 +327,7 @@ const OFFICIAL_SKINS = [
   {
     id: "sweet",
     name: "Sweet Bubbles",
-    desc: "Soft pink dots, bear & bow",
+    desc: "灰粉波点，小熊软萌氛围",
     preview: "bg-[#f0e8ed]",
     css: `/* Sweet Bubbles */
 #echoes-chat { --skin-bg: #f0e8ed; --skin-surface: #f5eff4; --skin-card: #faf5f8; --skin-text: #4a3548; --skin-sub: #8b7088; --skin-accent: #d4959a; --skin-accent-hover: #c08088; }
@@ -364,35 +390,35 @@ const OFFICIAL_SKINS = [
 #echoes-chat [class*="rounded-\\[48px\\]"] { border-radius:36px !important; }
 #echoes-chat [class*="rounded-full"] { border-radius:9999px !important; }
 /* 小熊替换生活圈图标 */
-#echoes-chat [data-app-link="Forum"] svg { display:none !important; }
-#echoes-chat [data-app-link="Forum"] .glass-panel::after { content:""; position:absolute; inset:6px; background-image:url("./pink-bear.png"); background-size:contain; background-repeat:no-repeat; background-position:center; }
+#echoes-chat [data-app-link="生活圈"] svg { display:none !important; }
+#echoes-chat [data-app-link="生活圈"] .glass-panel::after { content:""; position:absolute; inset:6px; background-image:url("./pink-bear.png"); background-size:contain; background-repeat:no-repeat; background-position:center; }
 /* 蝴蝶结替换Interface Style标题图标 */
 #echoes-chat h3[data-section-icon="palette"] svg { display:none !important; }
 #echoes-chat h3[data-section-icon="palette"]::before { content:""; display:inline-block; width:12px; height:12px; background-image:url("./bow.png"); background-size:contain; background-repeat:no-repeat; vertical-align:middle; }
 /* 蝴蝶结替换个性化App图标 */
-#echoes-chat [data-app-link="Personalization"] svg { display:none !important; }
-#echoes-chat [data-app-link="Personalization"] .glass-panel::after { content:""; position:absolute; inset:6px; background-image:url("./bow.png"); background-size:contain; background-repeat:no-repeat; background-position:center; }
+#echoes-chat [data-app-link="个性化"] svg { display:none !important; }
+#echoes-chat [data-app-link="个性化"] .glass-panel::after { content:""; position:absolute; inset:6px; background-image:url("./bow.png"); background-size:contain; background-repeat:no-repeat; background-position:center; }
 /* 棒棒糖替换系统设置图标 */
-#echoes-chat [data-app-link="Settings"] svg { display:none !important; }
-#echoes-chat [data-app-link="Settings"] .glass-panel::after { content:""; position:absolute; inset:6px; background-image:url("./pink-lollipop.png"); background-size:contain; background-repeat:no-repeat; background-position:center; }
+#echoes-chat [data-app-link="系统设置"] svg { display:none !important; }
+#echoes-chat [data-app-link="系统设置"] .glass-panel::after { content:""; position:absolute; inset:6px; background-image:url("./pink-lollipop.png"); background-size:contain; background-repeat:no-repeat; background-position:center; }
 /* 电话替换浏览器图标 */
-#echoes-chat [data-app-link="Browser"] svg { display:none !important; }
-#echoes-chat [data-app-link="Browser"] .glass-panel::after { content:""; position:absolute; inset:6px; background-image:url("./pink-telephone.png"); background-size:contain; background-repeat:no-repeat; background-position:center; }
+#echoes-chat [data-app-link="浏览器"] svg { display:none !important; }
+#echoes-chat [data-app-link="浏览器"] .glass-panel::after { content:""; position:absolute; inset:6px; background-image:url("./pink-telephone.png"); background-size:contain; background-repeat:no-repeat; background-position:center; }
 /* 爱心替换音乐图标 */
-#echoes-chat [data-app-link="Resonance"] svg { display:none !important; }
-#echoes-chat [data-app-link="Resonance"] .glass-panel::after { content:""; position:absolute; inset:6px; background-image:url("./pink-heart.png"); background-size:contain; background-repeat:no-repeat; background-position:center; }
+#echoes-chat [data-app-link="共鸣旋律"] svg { display:none !important; }
+#echoes-chat [data-app-link="共鸣旋律"] .glass-panel::after { content:""; position:absolute; inset:6px; background-image:url("./pink-heart.png"); background-size:contain; background-repeat:no-repeat; background-position:center; }
 /* 蝴蝶结替换智能家图标 */
-#echoes-chat [data-app-link="Smart Home"] svg { display:none !important; }
-#echoes-chat [data-app-link="Smart Home"] .glass-panel::after { content:""; position:absolute; inset:6px; background-image:url("./pink-butterfly.png"); background-size:contain; background-repeat:no-repeat; background-position:center; }
+#echoes-chat [data-app-link="智能家"] svg { display:none !important; }
+#echoes-chat [data-app-link="智能家"] .glass-panel::after { content:""; position:absolute; inset:6px; background-image:url("./pink-butterfly.png"); background-size:contain; background-repeat:no-repeat; background-position:center; }
 /* 草莓巧克力替换日记图标 */
-#echoes-chat [data-app-link="Journal"] svg { display:none !important; }
-#echoes-chat [data-app-link="Journal"] .glass-panel::after { content:""; position:absolute; inset:6px; background-image:url("./strawberry-chocolate.png"); background-size:contain; background-repeat:no-repeat; background-position:center; }
+#echoes-chat [data-app-link="日记"] svg { display:none !important; }
+#echoes-chat [data-app-link="日记"] .glass-panel::after { content:""; position:absolute; inset:6px; background-image:url("./strawberry-chocolate.png"); background-size:contain; background-repeat:no-repeat; background-position:center; }
 /* 蜡烛替换生活痕迹图标 */
-#echoes-chat [data-app-link="Life Traces"] svg { display:none !important; }
-#echoes-chat [data-app-link="Life Traces"] .glass-panel::after { content:""; position:absolute; inset:6px; background-image:url("./pink-candle.png"); background-size:contain; background-repeat:no-repeat; background-position:center; }
+#echoes-chat [data-app-link="生活痕迹"] svg { display:none !important; }
+#echoes-chat [data-app-link="生活痕迹"] .glass-panel::after { content:""; position:absolute; inset:6px; background-image:url("./pink-candle.png"); background-size:contain; background-repeat:no-repeat; background-position:center; }
 /* 蘑菇替换世界书图标 */
-#echoes-chat [data-app-link="World Book"] svg { display:none !important; }
-#echoes-chat [data-app-link="World Book"] .glass-panel::after { content:""; position:absolute; inset:6px; background-image:url("./pink-mushroom.png"); background-size:contain; background-repeat:no-repeat; background-position:center; }
+#echoes-chat [data-app-link="世界书"] svg { display:none !important; }
+#echoes-chat [data-app-link="世界书"] .glass-panel::after { content:""; position:absolute; inset:6px; background-image:url("./pink-mushroom.png"); background-size:contain; background-repeat:no-repeat; background-position:center; }
 /* 饮料替换底部通讯栏图标 */
 #echoes-chat [data-icon="chat"] svg { display:none !important; }
 #echoes-chat [data-icon="chat"]::before { content:""; display:inline-block; width:24px; height:24px; background-image:url("./pink-drink.png"); background-size:contain; background-repeat:no-repeat; vertical-align:middle; }
@@ -403,8 +429,8 @@ const OFFICIAL_SKINS = [
 #echoes-chat h3[data-section-icon="display"] svg { display:none !important; }
 #echoes-chat h3[data-section-icon="display"]::before { content:""; display:inline-block; width:12px; height:12px; background-image:url("./pink-laptop.png"); background-size:contain; background-repeat:no-repeat; vertical-align:middle; }
 /* 玩具替换浏览器刷新按钮图标 */
-#echoes-chat [data-app-link="Browser Refresh"] svg { display:none !important; }
-#echoes-chat [data-app-link="Browser Refresh"]::before { content:""; display:inline-block; width:16px; height:16px; background-image:url("./pink-toy.png"); background-size:contain; background-repeat:no-repeat; vertical-align:middle; margin-right:6px; }
+#echoes-chat [data-app-link="浏览器刷新"] svg { display:none !important; }
+#echoes-chat [data-app-link="浏览器刷新"]::before { content:""; display:inline-block; width:16px; height:16px; background-image:url("./pink-toy.png"); background-size:contain; background-repeat:no-repeat; vertical-align:middle; margin-right:6px; }
 `,
   },
 ];
@@ -509,7 +535,7 @@ const PersonalizationPanel = ({
         </h3>
 
         {/* 官方皮肤 */}
-        <div className="grid grid-cols-2 gap-3 mb-4">
+        <div className="grid grid-cols-4 gap-2 mb-4">
           {OFFICIAL_SKINS.map((skin) => (
             <button
               key={skin.id}
@@ -522,15 +548,27 @@ const PersonalizationPanel = ({
                   setSkinCSS(skin.css);
                 }
               }}
-              className={`p-3 rounded-xl border-2 text-left transition-all ${
+              className={`p-2 rounded-xl border-2 text-center transition-all ${
                 selectedSkin === skin.id
                   ? "border-black bg-gray-50"
                   : "border-gray-200 hover:border-gray-400"
               }`}
             >
-              <div className={`w-full h-10 rounded-lg mb-2 ${skin.preview}`} />
-              <div className="text-xs font-bold text-gray-700">{skin.name}</div>
-              <div className="text-[10px] text-gray-400 mt-0.5">{skin.desc}</div>
+              <div className={`w-full h-8 rounded-lg mb-1 ${skin.preview}/* 操作菜单、表情面板、模态卡片保持原始深色样式 */
+#echoes-chat .bg-\[\#1a1a1a\]\/95 { background: rgba(26,26,26,0.95) !important; color: #fff !important; }
+#echoes-chat .bg-\[\#1a1a1a\]\/95 * { color: #fff !important; }
+#echoes-chat .bg-\[\#1a1a1a\]\\/95 { background: rgba(26,26,26,0.95) !important; color: #fff !important; }
+#echoes-chat [class*="bg-[#1a1a1a]"] { background: #1a1a1a !important; color: #fff !important; }
+#echoes-chat [class*="bg-[#1a1a1a]"] * { color: #fff !important; }
+#echoes-chat .text-red-300 { color: #fc8181 !important; }
+#echoes-chat .hover\:bg-white\/20:hover { background: rgba(255,255,255,0.2) !important; }
+#echoes-chat .border-white\/20 { border-color: rgba(255,255,255,0.2) !important; }
+#echoes-chat .bg-black\/50 { background: rgba(0,0,0,0.5) !important; }
+#echoes-chat .fixed.inset-0 { background: rgba(0,0,0,0.5) !important; }
+#echoes-chat .bg-white\/90 { opacity:0.92 !important; backdrop-filter: blur(20px) !important; -webkit-backdrop-filter: blur(20px) !important; }
+#echoes-chat [class*="bg-white"].rounded-2xl { opacity: 0.95 !important; }
+`} />
+              <div className="text-[11px] font-bold text-gray-700 leading-tight">{skin.name}</div>
             </button>
           ))}
         </div>
@@ -566,8 +604,18 @@ const PersonalizationPanel = ({
             className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-xs font-mono outline-none focus:border-black resize-y"
           />
           <p className="text-[9px] text-gray-400">
-            Use <code className="bg-gray-100 px-1 rounded">#echoes-chat</code> as prefix. See 
-            <a href="./theme-guide.md" target="_blank" className="text-blue-500 underline ml-1">Theme Guide</a>
+            Use <code className="bg-gray-100 px-1 rounded">#echoes-chat</code> 作为选择器前缀，
+            <button
+              onClick={() => {
+                const link = document.createElement('a');
+                link.href = './theme-guide.md';
+                link.download = 'theme-guide.md';
+                link.click();
+              }}
+              className="text-blue-500 underline ml-1 cursor-pointer"
+            >
+              点击下载Theme Guide
+            </button>
           </p>
         </div>
       </section>
