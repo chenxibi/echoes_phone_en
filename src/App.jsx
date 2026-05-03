@@ -160,11 +160,11 @@ const App = () => {
     "echoes_user_stickers",
   );
 
-  // 批量导入表情包函数
+  // Bulk Import Stickers
   const handleBulkImport = (
     text,
     type = "char",
-    targetGroup = "自定义表情",
+    targetGroup = "Custom Stickers",
   ) => {
     const lines = text.split("\n");
     const newStickers = [];
@@ -195,11 +195,11 @@ const App = () => {
       }
       if (typeof showToast === "function")
         // 加上第一个参数 "success"
-        showToast("success", `已成功导入 ${newStickers.length} 个表情包`);
+        showToast("success", `Successfully imported ${newStickers.length}  stickers`);
     } else {
       if (typeof showToast === "function")
         // 把 "error" 挪到前面
-        showToast("error", "格式错误 (应为 描述: 链接)");
+        showToast("error", "Invalid format (should be: description: url)");
     }
   };
   // -- PERSISTENT STATE --
@@ -233,7 +233,7 @@ const App = () => {
       document.head.appendChild(styleTag);
     }
 
-    // 这里直接把 url 放进去即可，浏览器会自动去下载
+    // 这里直接把 url 放进去即可，Browser会自动去下载
     styleTag.innerHTML = `
     @font-face { font-family: '${name}'; src: url('${url}'); font-display: swap; }
     body { --app-font: '${name}' !important; }
@@ -246,7 +246,7 @@ const App = () => {
       const savedFontName = await echoesDB.getItem("custom-font-name");
       if (savedFontUrl) {
         applyFont("UserCustomFont", savedFontUrl);
-        setFontName(savedFontName || "自定义字体");
+        setFontName(savedFontName || "Custom Font");
       }
     };
     loadFont();
@@ -256,26 +256,26 @@ const App = () => {
     const url = inputUrl.trim(); // 使用你定义好的 inputUrl 状态
     if (url) {
       applyFont("UserCustomFont", url);
-      setFontName("自定义字体");
+      setFontName("Custom Font");
       await echoesDB.setItem("custom-font-url", url);
-      await echoesDB.setItem("custom-font-name", "自定义字体");
+      await echoesDB.setItem("custom-font-name", "Custom Font");
       // setShowFontInput(false); // 如果有这个状态就加上
-      showToast("success", "字体已应用");
+      showToast("success", "Font applied");
     } else {
-      showToast("error", "请输入字体 URL");
+      showToast("error", "Please enter a font URL");
     }
   };
 
   const handleResetFont = async () => {
     // 加上 async
-    // 移除自定义字体
+    // 移除Custom Font
     const styleElement = document.getElementById("UserCustomFont");
     if (styleElement) styleElement.remove();
     document.body.style.fontFamily = "";
-    setFontName("默认字体");
+    setFontName("Default Font");
     await echoesDB.removeItem("custom-font-url");
     await echoesDB.removeItem("custom-font-name");
-    showToast("info", "已恢复默认字体");
+    showToast("info", "已恢复Default Font");
   };
 
   // [新增] 自定义图标状态
@@ -296,14 +296,14 @@ const App = () => {
       const newIcons = { ...customIcons, [appId]: base64 };
       setCustomIcons(newIcons);
       await echoesDB.setItem("my_custom_icons", newIcons);
-      showToast("success", "图标已更新");
+      showToast("success", "Icon updated");
     };
     reader.readAsDataURL(file);
   };
 
   // [新增] 重置图标
   const handleResetIcon = async (appId) => {
-    if (await customConfirm("确定恢复默认图标吗？", "恢复图标")) {
+    if (await customConfirm("Reset icon to default?", "Restore Icon")) {
       setCustomIcons((prev) => {
         const newState = { ...prev };
         delete newState[appId];
@@ -323,7 +323,7 @@ const App = () => {
   };
 
   // 替代 window.alert
-  const customAlert = (message, title = "提示") => {
+  const customAlert = (message, title = "Notice") => {
     return showDialog({ type: "alert", title, message });
   };
 
@@ -566,7 +566,7 @@ const App = () => {
         })
         .catch((e) => {
           console.log(e);
-          showToast("error", "全屏模式被浏览器拒绝");
+          showToast("error", "全屏模式被Browser拒绝");
         });
     } else {
       if (document.exitFullscreen) {
@@ -720,7 +720,7 @@ const App = () => {
     });
     setInputKey(finalDescription);
 
-    // 5. 设置世界书 (如果有)
+    // 5. 设置World Book (如果有)
     const groupedWorldBook = (cleaned.worldBook || []).map((entry) => ({
       ...entry,
       group: finalName, // 使用角色名作为分组
@@ -852,7 +852,7 @@ const App = () => {
   // --- TRACKER HANDLERS ---
 
   const handleDeleteTrackerItem = async (type, id) => {
-    if (!(await customConfirm("确定删除这条记录吗？"))) return;
+    if (!(await customConfirm("Confirm删除这条记录吗？"))) return;
 
     // 修复点：兼容 "fact" (User Facts) 和 "userFact"
     if (type === "userFact" || type === "fact") {
@@ -893,7 +893,7 @@ const App = () => {
 
   // 删除状态记录函数
   const handleDeleteStatus = async (index) => {
-    if (await customConfirm("确定删除这条状态记录？")) {
+    if (await customConfirm("Confirm删除这条状态记录？")) {
       const newHistory = [...statusHistory];
       newHistory.splice(index, 1);
       setStatusHistory(newHistory);
@@ -933,12 +933,12 @@ const App = () => {
     setCharStickers((prev) =>
       prev.map((s) => ({
         ...s,
-        group: s.group || "狗男日记",
+        group: s.group || "狗男Journal",
         enabled: s.enabled !== undefined ? s.enabled : true,
       })),
     );
 
-    // 2. 迁移世界书
+    // 2. 迁移World Book
     setWorldBook((prev) =>
       prev.map((w) => ({
         ...w,
@@ -1023,11 +1023,11 @@ const App = () => {
 
   // 1. 获取所有唯一的分组名
   const getGroups = (list) => {
-    const groups = new Set(list.map((i) => i.group || "自定义表情"));
+    const groups = new Set(list.map((i) => i.group || "Custom Stickers"));
     return Array.from(groups);
   };
 
-  // 2. 移动世界书条目到新分组
+  // 2. 移动World Book条目到新分组
   const moveWorldBookEntry = async (id, newGroup) => {
     let finalGroup = newGroup;
     if (newGroup === "NEW_GROUP_TRIGGER") {
@@ -1043,7 +1043,7 @@ const App = () => {
     );
   };
 
-  // 重命名世界书分组
+  // 重命名World Book分组
   const renameWorldBookGroup = async (oldName) => {
     const newName = await customPrompt("重命名分组:", oldName);
     if (!newName || newName.trim() === "" || newName === oldName) return;
@@ -1055,11 +1055,11 @@ const App = () => {
     );
   };
 
-  // [新增] 删除世界书分组 (支持自定义弹窗)
+  // [新增] 删除World Book分组 (支持自定义弹窗)
   const deleteWorldBookGroup = async (groupName) => {
     if (
       await customConfirm(
-        `确定删除分组 "${groupName}" 下的所有条目吗？`,
+        `Confirm删除分组 "${groupName}" 下的所有条目吗？`,
         "删除分组",
       )
     ) {
@@ -1096,7 +1096,7 @@ const App = () => {
   const deleteStickerGroup = async (groupName) => {
     if (
       await customConfirm(
-        `确定删除库 "${groupName}" 及其中所有表情包吗？`,
+        `Confirm删除库 "${groupName}" 及其中所有表情包吗？`,
         "删除表情包库",
       )
     ) {
@@ -1118,7 +1118,7 @@ const App = () => {
   const toggleStickerGroup = (groupName, isEnabled) => {
     setCharStickers((prev) =>
       prev.map((s) =>
-        (s.group || "自定义表情") === groupName
+        (s.group || "Custom Stickers") === groupName
           ? { ...s, enabled: isEnabled }
           : s,
       ),
@@ -1188,7 +1188,7 @@ const App = () => {
               `已导入 ${formattedEntries.length} 条至 "${defaultGroupName}"`,
             );
           } else {
-            showToast("error", "未找到有效的世界书词条");
+            showToast("error", "未找到有效的World Book词条");
           }
         } catch (err) {
           console.error(err);
@@ -1228,7 +1228,7 @@ const App = () => {
         "添加表情包",
       );
       if (!desc) {
-        // 处理取消 (null)
+        // 处理Cancel (null)
         event.target.value = "";
         return;
       }
@@ -1237,14 +1237,14 @@ const App = () => {
         // 2. 压缩图片
         const compressedBase64 = await compressImage(file);
 
-        // 3. [关键修改] 确定分组：如果有传入 targetGroup 就用它，否则用默认值
-        const finalGroup = targetGroup || "自定义表情";
+        // 3. [关键修改] Confirm分组：如果有传入 targetGroup 就用它，否则用默认值
+        const finalGroup = targetGroup || "Custom Stickers";
 
         const newSticker = {
           id: `s${Date.now()}`,
           url: compressedBase64,
           desc: desc,
-          group: finalGroup, // [使用确定的分组]
+          group: finalGroup, // [使用Confirm的分组]
           enabled: true,
         };
 
@@ -1282,7 +1282,7 @@ const App = () => {
 
   // 删除表情包
   const handleDeleteSticker = async (id) => {
-    if (await customConfirm("确定删除这个表情包吗？")) {
+    if (await customConfirm("Confirm删除这 stickers吗？")) {
       if (editingSticker?.source === "user") {
         setUserStickers((prev) => prev.filter((s) => s.id !== id));
       } else {
@@ -1303,7 +1303,7 @@ const App = () => {
       keys: ["echoes_persona", "echoes_raw_json", "echoes_char_avatar", "echoes_char_facts", "echoes_shared_events"],
     },
     worldbook: {
-      label: "世界书",
+      label: "World Book",
       keys: ["echoes_worldbook"],
     },
     memory: {
@@ -1331,7 +1331,7 @@ const App = () => {
       ],
     },
     smartwatch: {
-      label: "智能家",
+      label: "Smart Home",
       keys: ["echoes_sw_locations", "echoes_sw_logs"],
     },
   };
@@ -1364,7 +1364,7 @@ const App = () => {
       const diaries = data["echoes_diaries"];
       const parts = [];
       if (forum?.posts?.length) parts.push(`${forum.posts.length} 帖子`);
-      if (diaries?.length) parts.push(`${diaries.length} 日记`);
+      if (diaries?.length) parts.push(`${diaries.length} Journal`);
       return parts.length ? parts.join(" · ") : "—";
     }
     if (catId === "smartwatch") return val?.length ? `${val.length} 地点` : "—";
@@ -1578,7 +1578,7 @@ const App = () => {
     setLoading({});
     setMessageQueue([]);
     setIsTyping(false);
-    showToast("info", "已取消生成");
+    showToast("info", "已Cancel生成");
   };
 
   // Generator Actions
@@ -1694,7 +1694,7 @@ const App = () => {
         const savedCustomRules = customRules;
         const savedInputKey = inputKey;
 
-        // 位置移动触发 → 更新智能家，生成完成后弹窗
+        // 位置移动触发 → 更新Smart Home，生成完成后弹窗
         if (data.triggerLocation && savedSmartWatchLocations.length > 0) {
           setTimeout(async () => {
             setLoading((prev) => ({ ...prev, sw_update: true }));
@@ -1720,14 +1720,14 @@ const App = () => {
             }
           }, 1000);
         }
-        // 重要事件触发 → 写日记，生成完成后弹窗
+        // 重要事件触发 → 写Journal，生成完成后弹窗
         if (data.triggerDiary) {
           setTimeout(async () => {
             const ok = await runGenerator("diary", setDiaries, prompts.diary);
-            if (ok && typeof showToast === "function") showToast("info", `${savedCharName}写了一篇日记`);
+            if (ok && typeof showToast === "function") showToast("info", `${savedCharName}写了一篇Journal`);
           }, 2000);
         }
-        // 浏览器搜索触发 → 更新浏览器历史，生成完成后弹窗
+        // Browser搜索触发 → 更新Browser历史，生成完成后弹窗
         if (data.triggerBrowser) {
           setTimeout(async () => {
             const ok = await runGenerator("browser", setBrowserHistory, prompts.browser);
@@ -1804,7 +1804,7 @@ const App = () => {
     if (
       !(await customConfirm(
         // 替换 window.confirm
-        "确定要登出吗？这将彻底清除当前角色的所有本地数据，无法恢复。",
+        "Confirm要登出吗？这将彻底清除当前角色的所有本地数据，无法恢复。",
         "清除数据",
       ))
     ) {
@@ -1853,7 +1853,7 @@ const App = () => {
     setUserAvatar(null);
     setSmartWatchLocations([]);
     setSmartWatchLogs([]);
-    setForumData({ name: "本地生活圈", posts: [], isInitialized: false });
+    setForumData({ name: "本地Forum", posts: [], isInitialized: false });
     setForumSettings({
       userNick: "User本U",
       smurfNick: "不是小号",
@@ -1923,7 +1923,7 @@ const App = () => {
     if (!persona) return "";
     const effectiveUserName = userName || "你";
 
-    // 1. 处理描述和世界书中的 {{user}}/{{char}} 替换
+    // 1. 处理描述和World Book中的 {{user}}/{{char}} 替换
     const cleanCharDesc = replacePlaceholders(
       inputKey,
       persona.name,
@@ -2556,7 +2556,7 @@ Requirements:
             }
           }
 
-          // 惊喜逻辑2：概率触发app事件更新（位置/日记/浏览器/账单）
+          // 惊喜逻辑2：概率触发app事件更新（位置/Journal/Browser/账单）
           if (Math.random() < 0.1) {
             setTimeout(() => {
               triggerAppEvents();
@@ -2624,7 +2624,7 @@ Requirements:
   };
 
   const handleContextMenu = (e, index) => {
-    e.preventDefault(); // 阻止浏览器默认右键菜单
+    e.preventDefault(); // 阻止Browser默认右键菜单
     setActiveMenuIndex(index);
   };
 
@@ -2680,7 +2680,7 @@ Requirements:
   const handleDeleteWithConfirm = async (index) => {
     const msgToDelete = chatHistory[index];
 
-    if (await customConfirm("确定要删除这条消息吗？", "删除消息")) {
+    if (await customConfirm("Confirm要删除这条消息吗？", "删除消息")) {
       if (msgToDelete && msgToDelete.id) {
         rollbackTrackerData(msgToDelete.id);
       }
@@ -2705,7 +2705,7 @@ Requirements:
 
     if (
       await customConfirm(
-        `确定要删除选中的 ${selectedMsgs.size} 条消息吗？`,
+        `Confirm要删除选中的 ${selectedMsgs.size} 条消息吗？`,
         "批量删除",
       )
     ) {
@@ -3072,7 +3072,7 @@ Requirements:
 
   // --- FORUM STATE ---
   const [forumData, setForumData, forumDataLoaded] = useStickyState(
-    { name: "本地生活圈", posts: [], isInitialized: false }, // Added isInitialized
+    { name: "本地Forum", posts: [], isInitialized: false }, // Added isInitialized
     "echoes_forum_data",
   );
   // 论坛昵称设置
@@ -3080,7 +3080,7 @@ Requirements:
     { userNick: "User本U", smurfNick: "不是小号", charNick: "匿名用户" },
     "echoes_forum_settings",
   );
-  // 论坛引导提示词
+  // 论坛引导Notice词
   const [forumGuidance, setForumGuidance] = useState("");
   // 当前查看的帖子 ID
   const [activeThreadId, setActiveThreadId] = useState(null);
@@ -3555,7 +3555,7 @@ Requirements:
             </div>
             <div className="mt-auto pb-6">
               <div
-                data-app-link="通讯"
+                data-app-link="Chat"
                 className="glass-panel rounded-[24px] p-2 flex justify-around items-center shadow-lg cursor-pointer hover:bg-white/40 transition-colors mx-2"
                 onClick={() => setActiveApp("chat")}
               >
@@ -3566,7 +3566,7 @@ Requirements:
                     className="text-[#2C2C2C]"
                   />
                   <span className="text-sm font-bold text-gray-700 tracking-wide">
-                    通讯
+                    Chats
                   </span>
                 </div>
               </div>
@@ -4116,7 +4116,7 @@ Requirements:
                       className={`flex flex-col gap-1 ${
                         msg.sender === "me" ? "items-end" : "items-start"
                       } group relative animate-in fade-in slide-in-from-bottom-2 ${
-                        // 多选模式下增加点击区域和样式提示
+                        // 多选模式下增加点击区域和样式Notice
                         isMultiSelectMode
                           ? "cursor-pointer hover:bg-gray-100/50 p-2 rounded-xl transition-colors"
                           : ""
@@ -4189,7 +4189,7 @@ Requirements:
                                   onClick={() => setEditIndex(null)}
                                   className="px-3 py-1 text-xs bg-gray-200 rounded-full text-gray-600"
                                 >
-                                  取消
+                                  Cancel
                                 </button>
                                 <button
                                   onClick={() => saveEdit(i)}
@@ -4649,7 +4649,7 @@ Requirements:
                       }}
                       className="px-6 py-2 bg-gray-200 text-gray-700 rounded-full text-xs font-bold"
                     >
-                      取消
+                      Cancel
                     </button>
                     <span className="text-xs font-bold text-gray-500">
                       已选 {selectedMsgs.size} 条
@@ -4719,7 +4719,7 @@ Requirements:
                         onClick={stopGeneration}
                         className="w-full py-2.5 bg-red-50 text-red-500 rounded-full text-xs font-bold flex items-center justify-center gap-2 animate-pulse"
                       >
-                        <X size={14} /> 取消生成
+                        <X size={14} /> Cancel生成
                       </button>
                     ) : (
                       <>
@@ -4852,7 +4852,7 @@ Requirements:
           {/* APP: SETTINGS */}
           <AppWindow
             isOpen={activeApp === "settings"}
-            title="系统设置"
+            title="Settings"
             onClose={() => setActiveApp(previousApp)}
           >
             <div className="h-full pt-4">
@@ -4925,7 +4925,7 @@ Requirements:
           {/* APP: JOURNAL (DIARY & EVENTS) */}
           <AppWindow
             isOpen={activeApp === "journal"}
-            title={showEventsInDiary ? "共同经历" : "日记"} // 标题随状态变化
+            title={showEventsInDiary ? "共同经历" : "Journal"} // 标题随状态变化
             onClose={() => {
               setActiveApp(null);
               setShowEventsInDiary(false); // 关闭时重置
@@ -4939,9 +4939,9 @@ Requirements:
                     ? "bg-black text-white shadow-md"
                     : "bg-gray-100 text-gray-500 hover:bg-gray-200"
                 }`}
-                title="切换日记/经历"
+                title="切换Journal/经历"
               >
-                {/* 如果显示经历，图标变成日记本(表示点它可以回日记)；反之亦然 */}
+                {/* 如果显示经历，图标变成Journal本(表示点它可以回Journal)；反之亦然 */}
                 {showEventsInDiary ? (
                   <Book size={16} />
                 ) : (
@@ -5032,7 +5032,7 @@ Requirements:
                   </div>
                 </div>
               ) : (
-                /* --- B. 原有的日记列表 --- */
+                /* --- B. 原有的Journal列表 --- */
                 <div className="animate-in slide-in-from-left-4">
                   <button
                     onClick={generateDiary}
@@ -5049,7 +5049,7 @@ Requirements:
 
                   {diaries.length === 0 && (
                     <p className="text-center text-gray-400 text-xs mt-10">
-                      暂无日记
+                      暂无Journal
                     </p>
                   )}
 
@@ -5093,7 +5093,7 @@ Requirements:
           {/* APP: TRACES (Receipts) */}
           <AppWindow
             isOpen={activeApp === "traces"}
-            title="生活痕迹"
+            title="Life Traces"
             onClose={() => setActiveApp(null)}
           >
             <div className="space-y-6 pb-20 pt-4">
@@ -5175,7 +5175,7 @@ Requirements:
           {/* APP: SMART WATCH (智能看看) */}
           <AppWindow
             isOpen={activeApp === "smartwatch"}
-            title="智能家"
+            title="Smart Home"
             onClose={() => setActiveApp(null)}
           >
             <div className="pb-20">
@@ -5213,7 +5213,7 @@ Requirements:
                   <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-center px-6">
                     <p className="text-xs text-gray-400">暂无监控数据</p>
                     <p className="text-[10px] text-gray-300">
-                      请确认已开启世界书，然后初始化系统
+                      请确认已开启World Book，然后初始化系统
                     </p>
                     <button
                       onClick={initSmartWatch}
@@ -5479,7 +5479,7 @@ Requirements:
           >
             <div className="space-y-6 pb-20 pt-4">
               <button
-                data-app-link="浏览器刷新"
+                data-app-link="Browser Refresh"
                 onClick={generateBrowser}
                 disabled={loading.browser}
                 className="w-full py-3 bg-[#2C2C2C] text-white rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-black transition-all flex items-center justify-center gap-2 shadow-lg"
@@ -5564,7 +5564,7 @@ Requirements:
           {/* APP: MUSIC */}
           <AppWindow
             isOpen={activeApp === "music"}
-            title="共鸣旋律"
+            title="Resonance"
             onClose={() => setActiveApp(null)}
           >
             <MusicApp
@@ -5590,10 +5590,10 @@ Requirements:
               onDelete={handleDeleteStatus}
             />
           </AppWindow>
-          {/* APP: PERSONALIZATION (个性化) */}
+          {/* APP: PERSONALIZATION (Personalization) */}
           <AppWindow
             isOpen={activeApp === "personalization"}
-            title="个性化"
+            title="Personalization"
             onClose={() => setActiveApp(null)}
           >
             <PersonalizationPanel
@@ -5711,7 +5711,7 @@ Requirements:
                 onClick={() => setShowLocationModal(false)}
                 className="flex-1 py-2.5 bg-gray-100 text-gray-600 rounded-xl text-sm font-medium hover:bg-gray-200 transition-colors"
               >
-                取消
+                Cancel
               </button>
               <button
                 onClick={() => {
@@ -5778,12 +5778,12 @@ Requirements:
               输入图片描述
             </button>
 
-            {/* 取消按钮 */}
+            {/* Cancel按钮 */}
             <button
               onClick={() => setShowImageModal(false)}
               className="w-full py-2.5 text-gray-400 text-sm hover:text-gray-600 transition-colors"
             >
-              取消
+              Cancel
             </button>
           </div>
         </div>
@@ -5841,7 +5841,7 @@ Requirements:
                 onClick={() => { setShowImportModal(false); setImportData(null); }}
                 className="flex-1 py-2.5 text-gray-500 bg-gray-100 rounded-xl text-sm font-medium hover:bg-gray-200 transition-colors"
               >
-                取消
+                Cancel
               </button>
               <button
                 onClick={doImport}

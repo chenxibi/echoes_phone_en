@@ -340,38 +340,38 @@ const OFFICIAL_SKINS = [
 #echoes-chat [class*="rounded-\\[48px\\]"] { border-radius:36px !important; }
 #echoes-chat [class*="rounded-full"] { border-radius:9999px !important; }
 /* 小熊替换生活圈图标 */
-#echoes-chat [data-app-link="生活圈"] svg { display:none !important; }
-#echoes-chat [data-app-link="生活圈"] .glass-panel::after { content:""; position:absolute; inset:6px; background-image:url("./pink-bear.png"); background-size:contain; background-repeat:no-repeat; background-position:center; }
+#echoes-chat [data-app-link="Forum"] svg { display:none !important; }
+#echoes-chat [data-app-link="Forum"] .glass-panel::after { content:""; position:absolute; inset:6px; background-image:url("./pink-bear.png"); background-size:contain; background-repeat:no-repeat; background-position:center; }
 /* 蝴蝶结替换Interface Style标题图标 */
 #echoes-chat h3[data-section-icon="palette"] svg { display:none !important; }
 #echoes-chat h3[data-section-icon="palette"]::before { content:""; display:inline-block; width:12px; height:12px; background-image:url("./bow.png"); background-size:contain; background-repeat:no-repeat; vertical-align:middle; }
 /* 蝴蝶结替换个性化App图标 */
-#echoes-chat [data-app-link="个性化"] svg { display:none !important; }
-#echoes-chat [data-app-link="个性化"] .glass-panel::after { content:""; position:absolute; inset:6px; background-image:url("./bow.png"); background-size:contain; background-repeat:no-repeat; background-position:center; }
+#echoes-chat [data-app-link="Personalization"] svg { display:none !important; }
+#echoes-chat [data-app-link="Personalization"] .glass-panel::after { content:""; position:absolute; inset:6px; background-image:url("./bow.png"); background-size:contain; background-repeat:no-repeat; background-position:center; }
 /* 棒棒糖替换系统设置图标 */
-#echoes-chat [data-app-link="系统设置"] svg { display:none !important; }
-#echoes-chat [data-app-link="系统设置"] .glass-panel::after { content:""; position:absolute; inset:6px; background-image:url("./pink-lollipop.png"); background-size:contain; background-repeat:no-repeat; background-position:center; }
+#echoes-chat [data-app-link="Settings"] svg { display:none !important; }
+#echoes-chat [data-app-link="Settings"] .glass-panel::after { content:""; position:absolute; inset:6px; background-image:url("./pink-lollipop.png"); background-size:contain; background-repeat:no-repeat; background-position:center; }
 /* 电话替换浏览器图标 */
-#echoes-chat [data-app-link="浏览器"] svg { display:none !important; }
-#echoes-chat [data-app-link="浏览器"] .glass-panel::after { content:""; position:absolute; inset:6px; background-image:url("./pink-telephone.png"); background-size:contain; background-repeat:no-repeat; background-position:center; }
+#echoes-chat [data-app-link="Browser"] svg { display:none !important; }
+#echoes-chat [data-app-link="Browser"] .glass-panel::after { content:""; position:absolute; inset:6px; background-image:url("./pink-telephone.png"); background-size:contain; background-repeat:no-repeat; background-position:center; }
 /* 爱心替换音乐图标 */
-#echoes-chat [data-app-link="共鸣旋律"] svg { display:none !important; }
-#echoes-chat [data-app-link="共鸣旋律"] .glass-panel::after { content:""; position:absolute; inset:6px; background-image:url("./pink-heart.png"); background-size:contain; background-repeat:no-repeat; background-position:center; }
+#echoes-chat [data-app-link="Resonance"] svg { display:none !important; }
+#echoes-chat [data-app-link="Resonance"] .glass-panel::after { content:""; position:absolute; inset:6px; background-image:url("./pink-heart.png"); background-size:contain; background-repeat:no-repeat; background-position:center; }
 /* 蝴蝶结替换智能家图标 */
-#echoes-chat [data-app-link="智能家"] svg { display:none !important; }
-#echoes-chat [data-app-link="智能家"] .glass-panel::after { content:""; position:absolute; inset:6px; background-image:url("./pink-butterfly.png"); background-size:contain; background-repeat:no-repeat; background-position:center; }
+#echoes-chat [data-app-link="Smart Home"] svg { display:none !important; }
+#echoes-chat [data-app-link="Smart Home"] .glass-panel::after { content:""; position:absolute; inset:6px; background-image:url("./pink-butterfly.png"); background-size:contain; background-repeat:no-repeat; background-position:center; }
 /* 草莓巧克力替换日记图标 */
-#echoes-chat [data-app-link="日记"] svg { display:none !important; }
-#echoes-chat [data-app-link="日记"] .glass-panel::after { content:""; position:absolute; inset:6px; background-image:url("./strawberry-chocolate.png"); background-size:contain; background-repeat:no-repeat; background-position:center; }
+#echoes-chat [data-app-link="Journal"] svg { display:none !important; }
+#echoes-chat [data-app-link="Journal"] .glass-panel::after { content:""; position:absolute; inset:6px; background-image:url("./strawberry-chocolate.png"); background-size:contain; background-repeat:no-repeat; background-position:center; }
 /* 蜡烛替换生活痕迹图标 */
-#echoes-chat [data-app-link="生活痕迹"] svg { display:none !important; }
-#echoes-chat [data-app-link="生活痕迹"] .glass-panel::after { content:""; position:absolute; inset:6px; background-image:url("./pink-candle.png"); background-size:contain; background-repeat:no-repeat; background-position:center; }
+#echoes-chat [data-app-link="Life Traces"] svg { display:none !important; }
+#echoes-chat [data-app-link="Life Traces"] .glass-panel::after { content:""; position:absolute; inset:6px; background-image:url("./pink-candle.png"); background-size:contain; background-repeat:no-repeat; background-position:center; }
 /* 蘑菇替换世界书图标 */
-#echoes-chat [data-app-link="世界书"] svg { display:none !important; }
-#echoes-chat [data-app-link="世界书"] .glass-panel::after { content:""; position:absolute; inset:6px; background-image:url("./pink-mushroom.png"); background-size:contain; background-repeat:no-repeat; background-position:center; }
+#echoes-chat [data-app-link="World Book"] svg { display:none !important; }
+#echoes-chat [data-app-link="World Book"] .glass-panel::after { content:""; position:absolute; inset:6px; background-image:url("./pink-mushroom.png"); background-size:contain; background-repeat:no-repeat; background-position:center; }
 /* 饮料替换底部通讯栏 */
-#echoes-chat [data-app-link="通讯"] svg { display:none !important; }
-#echoes-chat [data-app-link="通讯"] .glass-panel::after { content:""; position:absolute; inset:6px; background-image:url("./pink-drink.png"); background-size:contain; background-repeat:no-repeat; background-position:center; }
+#echoes-chat [data-app-link="Chat"] svg { display:none !important; }
+#echoes-chat [data-app-link="Chat"] .glass-panel::after { content:""; position:absolute; inset:6px; background-image:url("./pink-drink.png"); background-size:contain; background-repeat:no-repeat; background-position:center; }
 /* 发带替换Icon Customization标题 */
 #echoes-chat h3[data-section-icon="customize"] svg { display:none !important; }
 #echoes-chat h3[data-section-icon="customize"]::before { content:""; display:inline-block; width:12px; height:12px; background-image:url("./pink-hair-band.png"); background-size:contain; background-repeat:no-repeat; vertical-align:middle; }
@@ -379,8 +379,8 @@ const OFFICIAL_SKINS = [
 #echoes-chat h3[data-section-icon="display"] svg { display:none !important; }
 #echoes-chat h3[data-section-icon="display"]::before { content:""; display:inline-block; width:12px; height:12px; background-image:url("./pink-laptop.png"); background-size:contain; background-repeat:no-repeat; vertical-align:middle; }
 /* 玩具替换浏览器刷新按钮图标 */
-#echoes-chat [data-app-link="浏览器刷新"] svg { display:none !important; }
-#echoes-chat [data-app-link="浏览器刷新"]::before { content:""; display:inline-block; width:16px; height:16px; background-image:url("./pink-toy.png"); background-size:contain; background-repeat:no-repeat; vertical-align:middle; margin-right:6px; }
+#echoes-chat [data-app-link="Browser Refresh"] svg { display:none !important; }
+#echoes-chat [data-app-link="Browser Refresh"]::before { content:""; display:inline-block; width:16px; height:16px; background-image:url("./pink-toy.png"); background-size:contain; background-repeat:no-repeat; vertical-align:middle; margin-right:6px; }
 `,
   },
 ];
