@@ -3315,14 +3315,14 @@ Requirements:
                 </div>
               </button>
 
-              {/* Enter Directly：only shown when core config is empty */}
+              {/* 直接进入：仅在核心设定为空时显示 */}
               {!inputKey && (
                 <button
                   onClick={unlockDeviceDirect}
                   className="w-full text-center text-[11px] text-gray-400 hover:text-[#7A2A3A] transition-colors py-1"
                   style={{ textDecorationLine: "underline", textDecorationThickness: "1px", textUnderlineOffset: "4px" }}
                 >
-                  Enter Directly
+                  直接进入
                 </button>
               )}
 
@@ -3873,7 +3873,7 @@ Requirements:
                   >
                     <div
                       className={`absolute top-0.5 w-3 h-3 bg-white rounded-full transition-all ${
-                        trackerConfig.facts ? "left-4.5" : "left-0.5"
+                        trackerConfig.facts ? "left-4" : "left-0.5"
                       }`}
                     />
                   </button>
