@@ -1765,7 +1765,7 @@ const App = () => {
     try {
       // 1. 本地简易解析 (只提取名字)
       let extractedName = "Unknown";
-      // Match multiple formats: Name: xxx / Name：xxx / 名字：xxx / 姓名：xxx
+      // 匹配多种格式: Name: xxx / Name：xxx / 名字：xxx / 姓名：xxx
       const namePatterns = [
         /^name:\s*(.+?)(\n|$)/im,
         /^name：\s*(.+?)(\n|$)/im,
@@ -3315,14 +3315,14 @@ Requirements:
                 </div>
               </button>
 
-              {/* 直接进入：仅在only shown when core config is empty */}
+              {/* Enter Directly：only shown when core config is empty */}
               {!inputKey && (
                 <button
                   onClick={unlockDeviceDirect}
                   className="w-full text-center text-[11px] text-gray-400 hover:text-[#7A2A3A] transition-colors py-1"
                   style={{ textDecorationLine: "underline", textDecorationThickness: "1px", textUnderlineOffset: "4px" }}
                 >
-                  直接进入
+                  Enter Directly
                 </button>
               )}
 
@@ -3868,7 +3868,7 @@ Requirements:
                   <button
                     onClick={() => toggleTrackerConfig("facts")}
                     className={`w-8 h-4 rounded-full relative transition-colors ${
-                      trackerConfig.facts ? "bg-[#D4C5A9]" : "bg-gray-300"
+                      trackerConfig.facts ? "bg-green-500" : "bg-gray-300"
                     }`}
                   >
                     <div
