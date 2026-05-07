@@ -83,7 +83,7 @@ export async function registerPush(uid) {
 
   if (!subscription) {
     // VAPID public key 需要从后端获取, 暂时留空
-    const vapidPublicKey = "BOHV4yY8cSYnEVeAp5NFuRR7v4nb7fDfwDaIUN0dENbjWsFbe2Op5SRQwEjn651FGUHIy6ANm7jim3fFIHyNCwU";
+    const vapidPublicKey = "BH5azEAVggc-ab33IZ_VCa0DDJmci-c0WRxc-0mubUnkD9yxpdWJNMF8S4wmClLO2Yj3tjwMGpbsZBi_6Dg_Osk";
     subscription = await registration.pushManager.subscribe({
       userVisibleOnly: true,
       applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),

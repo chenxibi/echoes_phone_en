@@ -1,9 +1,9 @@
-name: 角色主动消息
+name: 角色主动消息 (disabled - EN version not yet activated)
 
 on:
-  schedule:
-    # UTC 0-14 = 北京时间 8-22 点，每个整点
-    - cron: "0 0-14 * * *"
+  # schedule 暂时禁用，EN 版暂不推送
+  # schedule:
+  #   - cron: "0 0-14 * * *"
   workflow_dispatch:
 
 jobs:
