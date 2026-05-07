@@ -25,4 +25,4 @@ pnpm-debug.log*
 # Misc
 *.local
 .cowork-temp/
-.openclaw/
+.openclaw/echoes-server/CREDENTIALS.md
