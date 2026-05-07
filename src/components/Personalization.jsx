@@ -66,7 +66,7 @@ const OFFICIAL_SKINS = [
 #echoes-chat :not(button)[class*="text-white"] { color: #ffffff !important; }
 
 /* 输入框样式 */
-#echoes-chat input, #echoes-chat textarea { background: #ffffff !important; color: #2c3e50 !important; border: 1px solid #cfd8dc !important; border-radius: 8px !important; transition: border-color 0.3s !important; }
+#echoes-chat input, #echoes-chat textarea, #echoes-chat [contenteditable] { background: #ffffff !important; color: #2c3e50 !important; border: 1px solid #cfd8dc !important; border-radius: 8px !important; transition: border-color 0.3s !important; }
 #echoes-chat input:focus, #echoes-chat textarea:focus { border-color: #5da9ad !important; ring: none !important; outline: none !important; }
 #echoes-chat input::placeholder, #echoes-chat textarea::placeholder { color: #bdc3c7 !important; }
 
@@ -198,7 +198,7 @@ const OFFICIAL_SKINS = [
 #echoes-chat [class*="bg-\\[\\#2C2C2C\\]"]:hover { background: #9a6840 !important; }
 #echoes-chat [class*="bg-gray-800"] { background: #b07d50 !important; }
 #echoes-chat :not(button)[class*="text-white"] { color: #fff8f0 !important; }
-#echoes-chat input, #echoes-chat textarea {
+#echoes-chat input, #echoes-chat textarea, #echoes-chat [contenteditable] {
   background: #fff5ec !important;
   color: #4a3728 !important;
   border-color: #e8d5c0 !important;
@@ -354,6 +354,11 @@ const OFFICIAL_SKINS = [
  color: #fcee0a !important;
 }
 #echoes-chat [class*="bg-\[\#2C2C2C\]"] svg { stroke: #fcee0a !important; }
+/* bg-[#2C2C2C]强制黄色-优先级高于[class*="bg-black"] */\
+#echoes-chat button[class*="bg-\[\#2C2C2C\]"],\
+#echoes-chat [class*="bg-\[\#2C2C2C\]"] button,\
+#echoes-chat [class*="bg-\[\#2C2C2C\]"] .text-white,\
+#echoes-chat [class*="bg-\[\#2C2C2C\]"] [class*="text-white"] { color: #fcee0a !important; }\
 /* bg-[#2C2C2C]子元素强制黄色 手机不可hover */
 #echoes-chat [class*="bg-\[\#2C2C2C\]"] * { color: #fcee0a !important; }
 
@@ -362,7 +367,7 @@ const OFFICIAL_SKINS = [
 #echoes-chat select option { color: #00f3ff !important; background: rgba(0,243,255,0.05) !important; border: 1px solid rgba(0,243,255,0.5) !important; }
 
 /* 输入框：极简科技感 */
-#echoes-chat input, #echoes-chat textarea {
+#echoes-chat input, #echoes-chat textarea, #echoes-chat [contenteditable] {
  background: rgba(0, 243, 255, 0.05) !important;
  color: #00f3ff !important;
  border: 1px solid rgba(0, 243, 255, 0.5) !important;
@@ -747,7 +752,7 @@ const OFFICIAL_SKINS = [
 /* 按钮文字白变紫白 */
 #echoes-chat :not(button)[class*="text-white"] { color: #e0e0f0 !important; }
 /* 输入框 */
-#echoes-chat input, #echoes-chat textarea {
+#echoes-chat input, #echoes-chat textarea, #echoes-chat [contenteditable] {
   background: #1e1e38 !important;
   color: #d0d0e8 !important;
   border-color: rgba(255,255,255,0.1) !important;

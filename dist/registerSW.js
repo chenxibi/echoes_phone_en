@@ -1,1 +1,0 @@
-if('serviceWorker' in navigator) {window.addEventListener('load', () => {navigator.serviceWorker.register('/echoes_phone_en/sw.js', { scope: '/echoes_phone_en/' })})}
