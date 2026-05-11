@@ -4,7 +4,12 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Accessibility: Skip link */
+
+/* ============================================
+   P0 ACCESSIBILITY (保留)
+   ============================================ */
+
+/* Skip link for accessibility */
 .skip-link {
   position: absolute;
   top: -40px;
@@ -32,13 +37,25 @@
   border: 0;
 }
 
-
-/* 1. 定义全局字体变量 */
-:root {
-  --app-font: "Noto Serif SC", serif; /* 这里是默认字体 */
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
-/* 2. 强制应用到所有文字元素 */
+/* ============================================
+   GLOBAL FONTS
+   ============================================ */
+:root {
+  --app-font: "Noto Serif SC", serif;
+}
+
 body,
 button,
 input,
@@ -49,6 +66,9 @@ div {
   font-family: var(--app-font) !important;
 }
 
+/* ============================================
+   UTILITIES
+   ============================================ */
 .diary-content p {
   margin-bottom: 1em;
 }
@@ -88,6 +108,7 @@ div {
   background: rgba(0, 0, 0, 0.2);
 }
 
+/* Toast animation */
 @keyframes slideDown {
   from {
     transform: translateY(-100%);
@@ -102,20 +123,18 @@ div {
   animation: slideDown 0.3s ease-out forwards;
 }
 
+/* Typing dots */
 @keyframes pulse-subtle {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.7;
-  }
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
 }
 .typing-dot {
   animation: pulse-subtle 1s infinite;
 }
 
-/* Frosted Glass Utilities */
+/* ============================================
+   GLASS / FROSTED EFFECT
+   ============================================ */
 .glass-panel {
   background: rgba(255, 255, 255, 0.65);
   backdrop-filter: blur(16px);
@@ -127,6 +146,7 @@ div {
 .glass-card {
   background: rgba(255, 255, 255, 0.5);
   backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   border: 1px solid rgba(255, 255, 255, 0.6);
 }
 
@@ -135,9 +155,9 @@ div {
   letter-spacing: -0.02em;
 }
 
-/* ...原有样式... */
-
-/* Smart Watch Map Styles */
+/* ============================================
+   SMART WATCH MAP STYLES
+   ============================================ */
 .map-line {
   position: absolute;
   left: 50%;
@@ -169,7 +189,7 @@ div {
 }
 
 .map-node-dot.active {
-  background: #22c55e; /* Green-500 */
+  background: #22c55e;
   box-shadow: 0 0 10px #22c55e;
   transform: scale(1.2);
 }
@@ -177,7 +197,7 @@ div {
 .map-card {
   position: absolute;
   width: 110px;
-  background: #e5e7eb; /* Gray-200 */
+  background: #e5e7eb;
   padding: 8px;
   font-family: serif;
   font-size: 10px;
@@ -200,7 +220,6 @@ div {
   opacity: 0.8;
 }
 
-/* Connectors */
 .map-connector {
   position: absolute;
   height: 1px;
@@ -209,51 +228,41 @@ div {
   z-index: 0;
 }
 
-/* 唱片慢速旋转 */
+/* ============================================
+   RECORD PLAYER ANIMATIONS
+   ============================================ */
 @keyframes spin-slow {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 .animate-spin-slow {
   animation: spin-slow 12s linear infinite;
 }
 
 @keyframes heartbeat-fine {
-  0% {
-    stroke-dashoffset: 100;
-  }
-  100% {
-    stroke-dashoffset: -100;
-  }
+  0% { stroke-dashoffset: 100; }
+  100% { stroke-dashoffset: -100; }
 }
 .animate-heartbeat-fine {
   animation: heartbeat-fine 2.5s linear infinite;
 }
 
 @keyframes music-wave {
-  0%,
-  100% {
-    height: 4px;
-  }
-  50% {
-    height: 12px;
-  }
+  0%, 100% { height: 4px; }
+  50% { height: 12px; }
 }
-
 .animate-music-bar {
   animation: music-wave 0.8s ease-in-out infinite;
 }
 
-.delay-1 {
-  animation-delay: 0.1s;
-}
-.delay-2 {
-  animation-delay: 0.3s;
-}
-.delay-3 {
-  animation-delay: 0.2s;
+.delay-1 { animation-delay: 0.1s; }
+.delay-2 { animation-delay: 0.3s; }
+.delay-3 { animation-delay: 0.2s; }
+
+@keyframes diceRoll {
+  0% { transform: rotate(0deg) scale(0.8); }
+  25% { transform: rotate(90deg) scale(1.1); }
+  50% { transform: rotate(180deg) scale(0.9); }
+  75% { transform: rotate(270deg) scale(1.05); }
+  100% { transform: rotate(360deg) scale(1); }
 }
