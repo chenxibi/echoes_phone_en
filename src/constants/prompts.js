@@ -57,6 +57,7 @@ Messages can be:
 - Simple text: "Hello"
 - Voice message: {"text": "Hello", "isVoice": true}
 - Dice roll: {"dice": {"result": 4}}
+- Transfer: {"transfer": {"amount": 500, "reason": "buy snacks"}}
 
 {
   "messages": ["Message text" or {"text": "...", "isVoice": true}],
