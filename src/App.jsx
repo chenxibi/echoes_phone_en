@@ -4460,7 +4460,7 @@ Requirements:
 
                         {/* [新增] 菜单 (复用原有的菜单代码逻辑) */}
                         {!isMultiSelectMode && activeMenuIndex === i && (
-                          <div className="absolute top-full mt-2 z-50 flex flex-col items-center animate-in fade-in zoom-in-95 duration-200">
+                          <div className={`absolute ${i >= chatHistory.length - 2 ? 'bottom-full mb-2' : 'top-full mt-2'} z-50 flex flex-col items-center animate-in fade-in zoom-in-95 duration-200`}>
                             <div className="bg-[#1a1a1a]/95 backdrop-blur-md text-white rounded-xl shadow-2xl p-1.5 flex gap-1 items-center border border-white/20">
                               {/* 系统消息只需要删除和多选 */}
                               <button
@@ -4807,7 +4807,7 @@ Requirements:
                           {/* --- 长按弹出的菜单 (现在对转账也生效) --- */}
                           {!isMultiSelectMode && activeMenuIndex === i && (
                             <div
-                              className="absolute top-full mt-2 z-[120] flex flex-col items-center animate-in fade-in zoom-in-95 duration-200"
+                              className={`absolute ${i >= chatHistory.length - 2 ? 'bottom-full mb-2' : 'top-full mt-2'} z-[120] flex flex-col items-center animate-in fade-in zoom-in-95 duration-200`}
                               style={{
                                 left: msg.sender === "me" ? "auto" : "0",
                                 right: msg.sender === "me" ? "0" : "auto",
@@ -4993,7 +4993,7 @@ Requirements:
 
               {/* 用户表情包面板 */}
               {showUserStickerPanel && (
-                <div className="absolute bottom-16 left-4 right-4 h-48 bg-white/90 backdrop-blur-xl rounded-2xl shadow-2xl p-4 z-[110] overflow-y-auto custom-scrollbar border border-white animate-in slide-in-from-bottom-2">
+                <div className="absolute bottom-[5rem] left-4 right-4 h-48 bg-white/90 backdrop-blur-xl rounded-2xl shadow-2xl p-4 z-[110] overflow-y-auto custom-scrollbar border border-white animate-in slide-in-from-bottom-2">
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-[10px] font-bold uppercase text-gray-500">
                       我的表情
@@ -5112,7 +5112,7 @@ Requirements:
                   <div className="relative flex items-center gap-1.5 md:gap-2">
                     {/* [新增] 媒体菜单 (绝对定位在上方) */}
                     {showMediaMenu && (
-                      <div className="absolute bottom-14 left-0 bg-white/90 backdrop-blur-xl border border-gray-200 p-2 rounded-xl shadow-xl flex gap-4 animate-in slide-in-from-bottom-2 z-50">
+                      <div className="absolute bottom-[4.5rem] left-0 bg-white/90 backdrop-blur-xl border border-gray-200 p-2 rounded-xl shadow-xl flex gap-4 animate-in slide-in-from-bottom-2 z-50">
                         {/* 表情按钮 (搬到这里了) */}
                         <button
                           onClick={() => {
