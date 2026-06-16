@@ -469,7 +469,7 @@ const SettingsPanel = ({
                   </button>
                 </div>
 
-                {/* 主动消息 */}
+                {/* 主动消息 
                 <div className="flex items-center justify-between">
                   <div>
                     <label className="block text-[10px] font-bold uppercase text-gray-500">
@@ -490,6 +490,7 @@ const SettingsPanel = ({
                     />
                   </button>
                 </div>
+                */}
 
                 {/* 表情包管理 (Inside SettingsPanel) */}
                 <div>
