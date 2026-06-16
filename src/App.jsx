@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from "react";
+﻿import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { Virtuoso } from "react-virtuoso";
 import { jsonrepair } from "jsonrepair";
 import { PRESET_LOCATION_IMAGES } from "./constants/assets";
 import Forum from "./components/Forum";
@@ -829,6 +830,12 @@ const App = () => {
     "echoes_real_time_enabled",
   );
   const chatScrollRef = useRef(null);
+  const virtuosoRef = useRef(null);
+  const isAtBottomRef = useRef(true);
+
+  // sticker 查找 Map 缓存 (避免每条消息都 .find 遍历数组)
+  const charStickerMap = useMemo(() => new Map(charStickers.map(s => [s.id, s])), [charStickers]);
+  const userStickerMap = useMemo(() => new Map(userStickers.map(s => [s.id, s])), [userStickers]);
 
   // === 新增状态 ===
   const [showCreationAssistant, setShowCreationAssistant] = useState(false);
@@ -1102,11 +1109,21 @@ const App = () => {
   }, [notification]);
 
   useEffect(() => {
-    if (activeApp === "chat" && chatScrollRef.current) {
-      // 直接定位到底部，不做滚动动画
-      chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
+    if (activeApp === "chat" && virtuosoRef.current) {
+      // 切换到聊天时滚到底部
+      virtuosoRef.current.scrollToIndex({
+        index: chatHistory.length - 1,
+        behavior: "auto",
+      });
     }
-  }, [chatHistory, activeApp, loading.chat, isTyping]);
+  }, [activeApp]);
+
+  // 处理 isTyping 时的滚动到底部
+  useEffect(() => {
+    if (activeApp === 'chat' && virtuosoRef.current && isTyping) {
+      if (isAtBottomRef.current) { virtuosoRef.current.scrollToIndex({ index: chatHistory.length + messageQueue.length, behavior: 'smooth' }); }
+    }
+  }, [isTyping, messageQueue.length, activeApp]);
 
   // --- [新增] 数据结构迁移：自动给旧数据加上分组 ---
   useEffect(() => {
@@ -2446,6 +2463,12 @@ Requirements:
 
     setChatHistory((prev) => [...prev, newMsg]);
     setChatInput("");
+    // 发送后主动滚到底部
+    setTimeout(() => {
+      if (virtuosoRef.current) {
+        virtuosoRef.current.scrollToIndex({ index: chatHistory.length, behavior: "smooth" });
+      }
+    }, 50);
     lastUserSendTimeRef.current = Date.now();
     setLastInteractionTime(Date.now());
     setMsgCountSinceSummary((prev) => prev + 1);
@@ -2852,7 +2875,7 @@ Requirements:
           setMessageQueue(finalizedMsgs);
           setLastInteractionTime(Date.now());
 
-          // Surprise logic: random app events
+          // 惊喜逻辑：概率触发发帖或app事件更新（位置/日记/浏览器/账单）
           if (Math.random() < 0.1) {
             setTimeout(() => {
               triggerAppEvents();
@@ -3878,6 +3901,97 @@ Requirements:
         </div>
       )}
       <div className="relative w-full h-full md:w-[400px] md:h-[800px] bg-[#F2F2F7] md:rounded-[48px] md:border-[8px] md:border-white shadow-2xl flex flex-col overflow-hidden ring-1 ring-black/5">
+      {/* 用户表情包面板 */}
+              {showUserStickerPanel && (
+                <div className="absolute bottom-[100px] left-4 right-4 h-48 bg-white/90 backdrop-blur-xl rounded-2xl shadow-2xl p-4 z-[9999] overflow-y-auto custom-scrollbar border border-white animate-in slide-in-from-bottom-2">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-[10px] font-bold uppercase text-gray-500">
+                      我的表情
+                    </span>
+                    <div className="flex items-center gap-2.5">
+                      <div className="flex items-center gap-2">
+                        {/* 编辑按钮 */}
+                        <button
+                          onClick={() =>
+                            setIsUserStickerEditMode(!isUserStickerEditMode)
+                          }
+                          // 这里我建议把 px-1 改成 px-2，这样跟后面两个按钮大小更一致，你可以看看效果
+                          className={`text-[10px] px-2 py-1 rounded-full transition-colors ${
+                            isUserStickerEditMode
+                              ? "bg-red-50 text-red-500 font-bold"
+                              : "text-gray-600 hover:text-gray-400"
+                          }`}
+                        >
+                          {isUserStickerEditMode ? "完成" : "编辑"}
+                        </button>
+
+                        {/* 上传按钮 - 改为透明灰色风格 */}
+                        <label className="text-[10px] text-gray-600 hover:text-gray-400 px-2 py-1 rounded-full cursor-pointer transition-colors flex items-center gap-1">
+                          <Plus size={10} /> 上传
+                          <input
+                            type="file"
+                            className="hidden"
+                            onChange={(e) => handleStickerUpload(e, "user")}
+                          />
+                        </label>
+
+                        {/* 批量按钮 - 改为透明灰色风格 */}
+                        <button
+                          onClick={async () => {
+                            const input = await customPrompt("请输入链接进行批量导入", "", "批量导入");
+                            if (input) handleBulkImport(input, "user", "我的");
+                          }}
+                          className="text-[10px] text-gray-600 hover:text-gray-400 px-2 py-1 rounded-full cursor-pointer transition-colors flex items-center gap-1"
+                        >
+                          {/* 注意：你原代码这里用的是 Download 图标，我保留了，如果需要 Link 图标请自行替换 */}
+                          <Download size={10} /> 批量
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-5 gap-2">
+                    {userStickers.map((s) => (
+                      <div
+                        key={s.id}
+                        className={`aspect-square rounded-lg overflow-hidden cursor-pointer transition-all relative group ${
+                          isUserStickerEditMode
+                            ? "ring-2 ring-red-400/50 scale-90"
+                            : "hover:scale-105"
+                        }`}
+                        onClick={() => {
+                          if (isUserStickerEditMode) {
+                            // 编辑模式：点击进入编辑，标记来源为 user
+                            setEditingSticker({ ...s, source: "user" });
+                          } else {
+                            // 正常模式：发送表情
+                            handleUserSend(null, "sticker", s);
+                          }
+                        }}
+                      >
+                        <img
+                          src={s.url}
+                          className="w-full h-full object-cover"
+                        />
+                        {/* 编辑模式下的遮罩图标 */}
+                        {isUserStickerEditMode && (
+                          <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
+                            <Edit2
+                              size={12}
+                              className="text-white drop-shadow-md"
+                            />
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                    {userStickers.length === 0 && (
+                      <p className="col-span-5 text-center text-xs text-gray-400 py-4">
+                        暂无表情，请上传
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
+
         {/* Status Bar */}
         <header className="h-12 px-8 flex items-center justify-between text-[10px] text-gray-400 bg-transparent z-20 shrink-0 pt-2" role="banner">
           <span>{formatTime(getCurrentTimeObj())}</span>
@@ -4393,134 +4507,55 @@ Requirements:
                 </div>
               )}
 
-              <div
-                className="flex-grow overflow-y-auto overflow-x-hidden p-4 space-y-6 custom-scrollbar"
-                ref={chatScrollRef}
-              >
-                <div className="text-center py-4">
-                  <span className="text-[9px] text-gray-400 bg-gray-100/50 px-3 py-1 rounded-full">
-                    {formatDate(getCurrentTimeObj())}
-                  </span>
-                </div>
-                {chatHistory.map((msg, i) => {
+              <Virtuoso
+                ref={virtuosoRef}
+                atBottomStateChange={(atBottom) => {
+                  isAtBottomRef.current = atBottom;
+                }}
+                data={chatHistory}
+                className="flex-grow overflow-y-auto overflow-x-hidden custom-scrollbar" style={{ paddingBottom: '1.5rem' }}
+                followOutput={expandedChatStatusIndex === null && activeMenuIndex === null ? 'smooth' : false}
+                initialTopMostItemIndex={chatHistory.length - 1}
+                overscan={200}
+                itemContent={(i, msg) => {
+                  const msgKey = msg.id || i;
                   const isSelected = selectedMsgs.has(i);
 
                   if (msg.isSystem) {
                     return (
                       <div
-                        key={i}
-                        className="relative group flex justify-center my-4 animate-in fade-in duration-300"
-                        // 绑定事件，支持菜单
-                        onContextMenu={
-                          !isMultiSelectMode
-                            ? (e) => handleContextMenu(e, i)
-                            : undefined
-                        }
-                        onTouchStart={
-                          !isMultiSelectMode
-                            ? () => handleTouchStart(i)
-                            : undefined
-                        }
-                        onTouchEnd={
-                          !isMultiSelectMode ? handleTouchEnd : undefined
-                        }
-                        onMouseDown={
-                          !isMultiSelectMode
-                            ? () => handleTouchStart(i)
-                            : undefined
-                        }
-                        onMouseUp={
-                          !isMultiSelectMode ? handleTouchEnd : undefined
-                        }
-                        onClick={() => {
-                          if (isMultiSelectMode) toggleMessageSelection(i);
-                        }}
+                        key={msgKey}
+                        className="relative group flex justify-center my-4 px-4 mb-6"
+                        onContextMenu={!isMultiSelectMode ? (e) => handleContextMenu(e, i) : undefined}
+                        onTouchStart={!isMultiSelectMode ? () => handleTouchStart(i) : undefined}
+                        onTouchEnd={!isMultiSelectMode ? handleTouchEnd : undefined}
+                        onMouseDown={!isMultiSelectMode ? () => handleTouchStart(i) : undefined}
+                        onMouseUp={!isMultiSelectMode ? handleTouchEnd : undefined}
+                        onClick={() => { if (isMultiSelectMode) toggleMessageSelection(i); }}
                       >
-                        {/* 胶囊本体 */}
-                        <div
-                          className={`
-                            bg-gray-200/60 backdrop-blur-sm text-gray-500 text-[10px] font-bold px-3 py-1 rounded-full shadow-sm cursor-pointer transition-all
-                            ${
-                              isMultiSelectMode && isSelected
-                                ? "ring-2 ring-[#7A2A3A] bg-white"
-                                : ""
-                            }
-                        `}
-                        >
+                        <div className={`bg-gray-200/60 backdrop-blur-sm text-gray-500 text-[10px] font-bold px-3 py-1 rounded-full shadow-sm cursor-pointer transition-all ${isMultiSelectMode && isSelected ? "ring-2 ring-[#7A2A3A] bg-white" : ""}`}>
                           {msg.text.replace("[系统通知] ", "")}
                         </div>
-
-                        {/* [新增] 菜单 (复用原有的菜单代码逻辑) */}
                         {!isMultiSelectMode && activeMenuIndex === i && (
                           <div className={`absolute ${i >= chatHistory.length - 2 ? 'bottom-full mb-2' : 'top-full mt-2'} z-50 flex flex-col items-center animate-in fade-in zoom-in-95 duration-200`}>
                             <div className="bg-[#1a1a1a]/95 backdrop-blur-md text-white rounded-xl shadow-2xl p-1.5 flex gap-1 items-center border border-white/20">
-                              {/* 系统消息只需要删除和多选 */}
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setIsMultiSelectMode(true);
-                                  setSelectedMsgs(new Set([i]));
-                                  setActiveMenuIndex(null);
-                                }}
-                                className="flex flex-col items-center gap-1 p-2 hover:bg-white/20 rounded-lg min-w-[40px]"
-                              >
-                                <span className="text-[11px]">多选</span>
-                              </button>
+                              <button onClick={(e) => { e.stopPropagation(); setIsMultiSelectMode(true); setSelectedMsgs(new Set([i])); setActiveMenuIndex(null); }} className="flex flex-col items-center gap-1 p-2 hover:bg-white/20 rounded-lg min-w-[40px]"><span className="text-[11px]">多选</span></button>
                               <div className="w-[1px] h-4 bg-white/20"></div>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleDeleteWithConfirm(i);
-                                }}
-                                className="flex flex-col items-center gap-1 p-2 hover:bg-red-500/50 rounded-lg min-w-[40px] text-red-300 hover:text-white"
-                              >
-                                <span className="text-[11px]">删除</span>
-                              </button>
+                              <button onClick={(e) => { e.stopPropagation(); handleDeleteWithConfirm(i); }} className="flex flex-col items-center gap-1 p-2 hover:bg-red-500/50 rounded-lg min-w-[40px] text-red-300 hover:text-white"><span className="text-[11px]">删除</span></button>
                             </div>
-                            {/* 遮罩 */}
-                            <div
-                              className="fixed inset-0 z-[-1]"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setActiveMenuIndex(null);
-                              }}
-                            ></div>
+                            <div className="fixed inset-0 z-[-1]" onClick={(e) => { e.stopPropagation(); setActiveMenuIndex(null); }}></div>
                           </div>
                         )}
                       </div>
                     );
                   }
 
-                  let stickerUrl = null;
-
-                  if (msg.sticker && msg.sticker.url) {
-                    stickerUrl = msg.sticker.url;
-                  } else if (msg.stickerId) {
-                    if (msg.stickerSource === "user") {
-                      const found = userStickers.find(
-                        (s) => s.id === msg.stickerId,
-                      );
-                      if (found) stickerUrl = found.url;
-                    } else {
-                      const found = charStickers.find(
-                        (s) => s.id === msg.stickerId,
-                      );
-                      if (found) stickerUrl = found.url;
-                    }
-                  }
-
-                  // 时间分隔线：消息间隔超过 1 小时
+                  // 时间分隔线
                   const prevMsg = i > 0 ? chatHistory[i - 1] : null;
-                  const showGapMarker =
-                    !msg.isSystem &&
-                    prevMsg &&
-                    !prevMsg.isSystem &&
-                    msg.timestamp &&
-                    prevMsg.timestamp &&
-                    msg.timestamp - prevMsg.timestamp > 3600000;
+                  const showGapMarker = prevMsg && !prevMsg.isSystem && msg.timestamp && prevMsg.timestamp && msg.timestamp - prevMsg.timestamp > 3600000;
 
                   return (
-                    <React.Fragment key={i}>
+                    <div key={msgKey} className="px-4 space-y-6 mb-6">
                     {showGapMarker && (
                       <div className="flex justify-center my-3">
                         <span className="text-[10px] text-gray-400 bg-gray-100 px-3 py-1 rounded-full">
@@ -4529,558 +4564,147 @@ Requirements:
                       </div>
                     )}
                     <div
-                      onClick={() => {
-                        // 如果在多选模式下，点击任何地方都是切换选中
-                        if (isMultiSelectMode) toggleMessageSelection(i);
-                      }}
-                      className={`flex flex-col gap-1 ${
-                        msg.sender === "me" ? "items-end" : "items-start"
-                      } group relative animate-in fade-in slide-in-from-bottom-2 ${
-                        // 多选模式下增加点击区域和样式提示
-                        isMultiSelectMode
-                          ? "cursor-pointer hover:bg-gray-100/50 p-2 rounded-xl transition-colors"
-                          : ""
-                      }`}
+                      onClick={() => { if (isMultiSelectMode) toggleMessageSelection(i); }}
+                      className={`flex flex-col gap-1 ${msg.sender === "me" ? "items-end" : "items-start"} group relative ${isMultiSelectMode ? "cursor-pointer hover:bg-gray-100/50 p-2 rounded-xl transition-colors" : ""}`}
                     >
-                      {/* --- 第一行：头像 + 气泡 + (恢复)状态按钮 --- */}
-                      <div
-                        className={`flex gap-3 relative ${
-                          msg.sender === "me" ? "flex-row-reverse" : "flex-row"
-                        } max-w-full`}
-                      >
-                        {/* [新增] 多选模式下的 Checkbox */}
+                      <div className={`flex gap-3 relative ${msg.sender === "me" ? "flex-row-reverse" : "flex-row"} max-w-full`}>
                         {isMultiSelectMode && (
-                          <div
-                            className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
-                              isSelected
-                                ? "bg-[#7A2A3A] border-[#7A2A3A]"
-                                : "border-gray-300 bg-white"
-                            }`}
-                          >
-                            {isSelected && (
-                              <Check size={14} className="text-white" />
-                            )}
+                          <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${isSelected ? "bg-[#7A2A3A] border-[#7A2A3A]" : "border-gray-300 bg-white"}`}>
+                            {isSelected && <Check size={14} className="text-white" />}
                           </div>
                         )}
-                        {/* 1. 头像 */}
-                        <div
-                          className={`w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center overflow-hidden shadow-sm ${
-                            msg.sender === "me"
-                              ? "bg-gray-200"
-                              : "bg-white border border-gray-100"
-                          }`}
-                        >
+                        <div className={`w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center overflow-hidden shadow-sm ${msg.sender === "me" ? "bg-gray-200" : "bg-white border border-gray-100"}`}>
                           {msg.sender === "me" ? (
-                            userAvatar ? (
-                              <img
-                                src={userAvatar}
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <User size={14} className="text-gray-500" />
-                            )
-                          ) : avatar ? (
-                            <img
-                              src={avatar}
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <span className="text-gray-800 text-[10px] font-bold">
-                              {persona?.name?.[0]}
-                            </span>
-                          )}
+                            userAvatar ? <img src={userAvatar} className="w-full h-full object-cover" /> : <User size={14} className="text-gray-500" />
+                          ) : avatar ? <img src={avatar} className="w-full h-full object-cover" /> : <span className="text-gray-800 text-[10px] font-bold">{persona?.name?.[0]}</span>}
                         </div>
 
-                        <div
-                          className={`flex flex-col ${
-                            msg.sender === "me" ? "items-end" : "items-start"
-                          } max-w-[72%] relative`}
-                        >
-                          {/* 编辑模式 */}
+                        <div className={`flex flex-col ${msg.sender === "me" ? "items-end" : "items-start"} max-w-[72%] relative`}>
                           {editIndex === i ? (
                             <div className="flex flex-col gap-2 w-64 animate-in zoom-in-95">
-                              <textarea
-                                value={editContent}
-                                onChange={(e) => setEditContent(e.target.value)}
-                                className="w-full p-2 text-sm border border-gray-300 rounded-xl outline-none focus:border-black transition-colors resize-none h-24 bg-white/90"
-                              />
+                              <textarea value={editContent} onChange={(e) => setEditContent(e.target.value)} className="w-full p-2 text-sm border border-gray-300 rounded-xl outline-none focus:border-black transition-colors resize-none h-24 bg-white/90" />
                               <div className="flex gap-2 justify-end">
-                                <button
-                                  onClick={() => setEditIndex(null)}
-                                  className="px-3 py-1 text-xs bg-gray-200 rounded-full text-gray-600"
-                                >
-                                  取消
-                                </button>
-                                <button
-                                  onClick={() => saveEdit(i)}
-                                  className="px-3 py-1 text-xs bg-black text-white rounded-full"
-                                >
-                                  保存
-                                </button>
+                                <button onClick={() => setEditIndex(null)} className="px-3 py-1 text-xs bg-gray-200 rounded-full text-gray-600">取消</button>
+                                <button onClick={() => saveEdit(i)} className="px-3 py-1 text-xs bg-black text-white rounded-full">保存</button>
                               </div>
                             </div>
                           ) : (
-                            // 正常显示模式：绑定长按事件 (使得转账也能长按删除)
-                            <div
-                              className={
-                                isMultiSelectMode ? "pointer-events-none" : ""
-                              }
-                              onContextMenu={
-                                !isMultiSelectMode
-                                  ? (e) => handleContextMenu(e, i)
-                                  : undefined
-                              }
-                              onTouchStart={
-                                !isMultiSelectMode
-                                  ? () => handleTouchStart(i)
-                                  : undefined
-                              }
-                              onTouchEnd={
-                                !isMultiSelectMode ? handleTouchEnd : undefined
-                              }
-                              onMouseDown={
-                                !isMultiSelectMode
-                                  ? () => handleTouchStart(i)
-                                  : undefined
-                              }
-                              onMouseUp={
-                                !isMultiSelectMode ? handleTouchEnd : undefined
-                              }
-                            >
-                              {/* === 内容分发逻辑 === */}
+                            <div className={isMultiSelectMode ? "pointer-events-none" : ""} onContextMenu={!isMultiSelectMode ? (e) => handleContextMenu(e, i) : undefined} onTouchStart={!isMultiSelectMode ? () => handleTouchStart(i) : undefined} onTouchEnd={!isMultiSelectMode ? handleTouchEnd : undefined} onMouseDown={!isMultiSelectMode ? () => handleTouchStart(i) : undefined} onMouseUp={!isMultiSelectMode ? handleTouchEnd : undefined}>
                               {(() => {
-                                // A. 转账渲染 (放在最优先)
-                                if (msg.isTransfer) {
-                                  return (
-                                    <TransferBubble
-                                      msg={msg}
-                                      isMe={msg.sender === "me"}
-                                      onInteract={(action) =>
-                                        handleTransferInteract(i, action)
-                                      }
-                                    />
-                                  );
-                                }
+                                if (msg.isTransfer) return <TransferBubble msg={msg} isMe={msg.sender === "me"} onInteract={(action) => handleTransferInteract(i, action)} />;
 
-                                // B. 图片/表情包逻辑
                                 let stickerUrl = msg.sticker?.url;
                                 if (!stickerUrl && msg.stickerId) {
-                                  let found = charStickers.find(
-                                    (s) => s.id === msg.stickerId,
-                                  );
-                                  if (!found)
-                                    found = userStickers.find(
-                                      (s) => s.id === msg.stickerId,
-                                    );
+                                  let found = charStickerMap.get(msg.stickerId);
+                                  if (!found) found = userStickerMap.get(msg.stickerId);
                                   if (found) stickerUrl = found.url;
                                 }
+                                if (stickerUrl) return <div className="w-32 rounded-xl overflow-hidden shadow-sm border border-gray-100"><img src={stickerUrl} className="w-full h-auto" /></div>;
 
-                                if (stickerUrl) {
-                                  return (
-                                    <div className="w-32 rounded-xl overflow-hidden shadow-sm border border-gray-100">
-                                      <img
-                                        src={stickerUrl}
-                                        className="w-full h-auto"
-                                      />
-                                    </div>
-                                  );
-                                }
+                                if (msg.isImage) return (
+                                  <div className="cursor-pointer overflow-hidden rounded-xl border-2 border-white shadow-sm bg-white relative group/img transition-transform active:scale-95">
+                                    {msg.imageData ? <img src={msg.imageData} alt="发送的图片" className="w-48 max-h-64 object-cover rounded-xl" /> : <div className="w-48 h-32 bg-gray-200 flex items-center justify-center"><Camera size={24} className="text-gray-400" /></div>}
+                                  </div>
+                                );
 
-                                // C. 真实图片
-                                if (msg.isImage) {
-                                  return (
-                                    <div className="cursor-pointer overflow-hidden rounded-xl border-2 border-white shadow-sm bg-white relative group/img transition-transform active:scale-95">
-                                      {msg.imageData ? (
-                                        <img
-                                          src={msg.imageData}
-                                          alt="发送的图片"
-                                          className="w-48 max-h-64 object-cover rounded-xl"
-                                        />
-                                      ) : (
-                                        <div className="w-48 h-32 bg-gray-200 flex items-center justify-center">
-                                          <Camera size={24} className="text-gray-400" />
-                                        </div>
-                                      )}
-                                    </div>
-                                  );
-                                }
-
-                                // D. 假图片逻辑
                                 const isFakeImg = isImageMsg(msg.text);
+                                if (isFakeImg) { const imgDesc = getImageDesc(msg.text); return <div className="cursor-pointer overflow-hidden rounded-xl border-2 border-white shadow-sm bg-white relative group/img transition-transform active:scale-95" onClick={() => customAlert(imgDesc, "图片内容")}><img src={PLACEHOLDER_IMG_BASE64} className="w-48 h-32 object-cover block bg-gray-200" /></div>; }
 
-                                if (isFakeImg) {
-                                  const imgDesc = getImageDesc(msg.text);
+                                if (msg.isLocation) return <LocationBubble name={msg.location?.name || "地点"} address={msg.location?.address || ""} />;
+                                if (msg.isVoice) return <VoiceMessageBubble msg={msg} isMe={msg.sender === "me"} />;
+                                if (msg.isDice) return <DiceFace value={msg.dice?.result || 1} animate={!msg.diceRolled} onDone={() => { msg.diceRolled = true; }} />;
 
-                                  return (
-                                    <div
-                                      className="cursor-pointer overflow-hidden rounded-xl border-2 border-white shadow-sm bg-white relative group/img transition-transform active:scale-95"
-                                      onClick={() =>
-                                        customAlert(imgDesc, "图片内容")
-                                      }
-                                    >
-                                      <img
-                                        src={PLACEHOLDER_IMG_BASE64} // 【改】：删掉那一长串 Base64，直接填这个变量名
-                                        className="w-48 h-32 object-cover block bg-gray-200"
-                                      />
-                                    </div>
-                                  );
-                                }
-
-                                let messageContent = null;
-
-                                if (msg.isLocation) {
-                                  return (
-                                    <LocationBubble
-                                      name={msg.location?.name || "地点"}
-                                      address={msg.location?.address || ""}
-                                    />
-                                  );
-                                } else if (msg.isVoice) {
-                                  return (
-                                    <VoiceMessageBubble
-                                      msg={msg}
-                                      isMe={msg.sender === "me"}
-                                    />
-                                  );
-                                } else if (msg.isDice) {
-                                  return (<DiceFace value={msg.dice?.result || 1} animate={!msg.diceRolled} onDone={() => { msg.diceRolled = true; }} />);
-                                }
-
-                                // E. 普通文本/转发卡片 (Fallback)
                                 return (
-                                  <div
-                                    className={`px-4 py-2.5 rounded-2xl text-sm leading-relaxed shadow-sm whitespace-pre-wrap select-text ${
-                                      msg.sender === "me"
-                                        ? "bg-[#2C2C2C] text-white rounded-tr-none"
-                                        : "bg-white border border-gray-100 text-gray-800 rounded-tl-none"
-                                    }`}
-                                  >
+                                  <div className={`px-4 py-2.5 rounded-2xl text-sm leading-relaxed shadow-sm whitespace-pre-wrap select-text ${msg.sender === "me" ? "bg-[#2C2C2C] text-white rounded-tr-none" : "bg-white border border-gray-100 text-gray-800 rounded-tl-none"}`}>
                                     {msg.isForward ? (() => {
                                       const fwd = msg.forwardData;
                                       const isForumType = fwd?.type === "post" || fwd?.type === "comment";
-                                      const labelMap = {
-                                        post: "帖子", comment: "评论",
-                                        diary: "日记", receipt: "消费", browser: "浏览",
-                                        incognito: "隐私浏览", smartwatch: "监控日志"
-                                      };
+                                      const labelMap = { post: "帖子", comment: "评论", diary: "日记", receipt: "消费", browser: "浏览", incognito: "隐私浏览", smartwatch: "监控日志" };
                                       const typeLabel = labelMap[fwd?.type] || "转发";
                                       return (
-                                      <div className="text-left max-w-[240px] pl-3 border-l-2 border-white/30 my-1">
-                                        <div className="flex items-center gap-2 mb-1 opacity-70">
-                                          <Share size={10} />
-                                          <span className="text-[10px] font-bold uppercase tracking-wider">
-                                            {typeLabel}
-                                          </span>
+                                        <div className="text-left max-w-[240px] pl-3 border-l-2 border-white/30 my-1">
+                                          <div className="flex items-center gap-2 mb-1 opacity-70"><Share size={10} /><span className="text-[10px] font-bold uppercase tracking-wider">{typeLabel}</span></div>
+                                          {isForumType ? (<><div className="text-[10px] text-white/80 mb-1 font-bold">@{fwd?.author}</div><div className="text-xs text-white/80 line-clamp-3 leading-relaxed font-light">{fwd?.content}</div></>) : <div className="text-xs text-white/80 line-clamp-5 leading-relaxed">{msg.text}</div>}
                                         </div>
-                                        {isForumType ? (
-                                          <>
-                                            <div className="text-[10px] text-white/80 mb-1 font-bold">
-                                              @{fwd?.author}
-                                            </div>
-                                            <div className="text-xs text-white/80 line-clamp-3 leading-relaxed font-light">
-                                              {fwd?.content}
-                                            </div>
-                                          </>
-                                        ) : (
-                                          <div className="text-xs text-white/80 line-clamp-5 leading-relaxed">
-                                            {msg.text}
-                                          </div>
-                                        )}
-                                      </div>
-                                    )})() : (
-                                      msg.text
-                                    )}
+                                      );
+                                    })() : msg.text}
                                   </div>
                                 );
                               })()}
                             </div>
                           )}
 
-                          {/* --- 长按弹出的菜单 (现在对转账也生效) --- */}
                           {!isMultiSelectMode && activeMenuIndex === i && (
-                            <div
-                              className={`absolute ${i >= chatHistory.length - 2 ? 'bottom-full mb-2' : 'top-full mt-2'} z-[120] flex flex-col items-center animate-in fade-in zoom-in-95 duration-200`}
-                              style={{
-                                left: msg.sender === "me" ? "auto" : "0",
-                                right: msg.sender === "me" ? "0" : "auto",
-                              }}
-                            >
+                            <div className={`absolute ${i >= chatHistory.length - 2 ? 'bottom-full mb-2' : 'top-full mt-2'} z-[120] flex flex-col items-center animate-in fade-in zoom-in-95 duration-200`} style={{ left: msg.sender === "me" ? "auto" : "0", right: msg.sender === "me" ? "0" : "auto" }}>
                               <div className="bg-[#1a1a1a]/95 backdrop-blur-md text-white rounded-xl shadow-2xl p-1.5 flex gap-1 items-center border border-white/20">
-                                {/* 1. 复制按钮 (无条件显示) */}
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleCopy(msg.text); // 转账消息也有 text，完全可以复制
-                                  }}
-                                  className="flex flex-col items-center gap-1 p-2 hover:bg-white/20 rounded-lg min-w-[40px]"
-                                >
-                                  <span className="text-[11px]">复制</span>
-                                </button>
-
+                                <button onClick={(e) => { e.stopPropagation(); handleCopy(msg.text); }} className="flex flex-col items-center gap-1 p-2 hover:bg-white/20 rounded-lg min-w-[40px]"><span className="text-[11px]">复制</span></button>
                                 <div className="w-[1px] h-4 bg-white/20"></div>
-
-                                {/* 2. 改写按钮 (无条件显示) */}
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    startEdit(i, msg.text); // 转账消息也可以进入编辑模式
-                                  }}
-                                  className="flex flex-col items-center gap-1 p-2 hover:bg-white/20 rounded-lg min-w-[40px]"
-                                >
-                                  <span className="text-[11px]">改写</span>
-                                </button>
-
+                                <button onClick={(e) => { e.stopPropagation(); startEdit(i, msg.text); }} className="flex flex-col items-center gap-1 p-2 hover:bg-white/20 rounded-lg min-w-[40px]"><span className="text-[11px]">改写</span></button>
                                 <div className="w-[1px] h-4 bg-white/20"></div>
-
-                                {/* 3. 多选按钮 */}
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setIsMultiSelectMode(true);
-                                    setSelectedMsgs(new Set([i]));
-                                    setActiveMenuIndex(null);
-                                  }}
-                                  className="flex flex-col items-center gap-1 p-2 hover:bg-white/20 rounded-lg min-w-[40px]"
-                                >
-                                  <span className="text-[11px]">多选</span>
-                                </button>
-
+                                <button onClick={(e) => { e.stopPropagation(); setIsMultiSelectMode(true); setSelectedMsgs(new Set([i])); setActiveMenuIndex(null); }} className="flex flex-col items-center gap-1 p-2 hover:bg-white/20 rounded-lg min-w-[40px]"><span className="text-[11px]">多选</span></button>
                                 <div className="w-[1px] h-4 bg-white/20"></div>
-
-                                {/* 4. 删除按钮 */}
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleDeleteWithConfirm(i);
-                                  }}
-                                  className="flex flex-col items-center gap-1 p-2 hover:bg-red-500/50 rounded-lg min-w-[40px] text-red-300 hover:text-white"
-                                >
-                                  <span className="text-[11px]">删除</span>
-                                </button>
+                                <button onClick={(e) => { e.stopPropagation(); handleDeleteWithConfirm(i); }} className="flex flex-col items-center gap-1 p-2 hover:bg-red-500/50 rounded-lg min-w-[40px] text-red-300 hover:text-white"><span className="text-[11px]">删除</span></button>
                               </div>
-
-                              {/* 遮罩 */}
-                              <div
-                                className="fixed inset-0 z-[-1]"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setActiveMenuIndex(null);
-                                }}
-                              ></div>
+                              <div className="fixed inset-0 z-[-1]" onClick={(e) => { e.stopPropagation(); setActiveMenuIndex(null); }}></div>
                             </div>
                           )}
                         </div>
 
-                        {/* 3. 状态按钮 */}
                         {msg.sender === "char" && msg.status && (
-                          <button
-                            onClick={() =>
-                              setExpandedChatStatusIndex(
-                                expandedChatStatusIndex === i ? null : i,
-                              )
-                            }
-                            className={`self-center p-1.5 rounded-full transition-all ${
-                              expandedChatStatusIndex === i
-                                ? "bg-[#7A2A3A] text-white shadow-md transform scale-110"
-                                : "text-gray-300 hover:text-[#7A2A3A] hover:bg-gray-100"
-                            }`}
-                          >
+                          <button onClick={() => setExpandedChatStatusIndex(expandedChatStatusIndex === i ? null : i)} className={`self-center p-1.5 rounded-full transition-all ${expandedChatStatusIndex === i ? "bg-[#7A2A3A] text-white shadow-md transform scale-110" : "text-gray-300 hover:text-[#7A2A3A] hover:bg-gray-100"}`}>
                             <Activity size={12} />
                           </button>
                         )}
                       </div>
 
-                      {/* --- 第二行：时间 + 重说 --- */}
                       {!isMultiSelectMode && (
-                        <div
-                          className={`flex gap-3 mt-1 items-center opacity-0 group-hover:opacity-100 transition-opacity ${
-                            msg.sender === "me"
-                              ? "mr-12 flex-row-reverse"
-                              : "ml-12 pl-1 flex-row"
-                          }`}
-                        >
-                          <span className="text-[9px] text-gray-300">
-                            {msg.timestamp ? formatSmartTime(msg.timestamp) : msg.time}
-                          </span>
-                          {msg.sender === "char" && !msg.isTransfer && (
-                            <button
-                              onClick={() => setRegenerateTarget(i)}
-                              className="text-gray-300 hover:text-black transition-colors p-1"
-                              title="重生成"
-                            >
-                              <RotateCcw size={11} />
-                            </button>
-                          )}
+                        <div className={`flex gap-3 mt-1 items-center opacity-0 group-hover:opacity-100 transition-opacity ${msg.sender === "me" ? "mr-12 flex-row-reverse" : "ml-12 pl-1 flex-row"}`}>
+                          <span className="text-[9px] text-gray-300">{msg.timestamp ? formatSmartTime(msg.timestamp) : msg.time}</span>
+                          {msg.sender === "char" && !msg.isTransfer && <button onClick={() => setRegenerateTarget(i)} className="text-gray-300 hover:text-black transition-colors p-1" title="重生成"><RotateCcw size={11} /></button>}
                         </div>
                       )}
 
-                      {/* --- 第三行：状态展开卡片 --- */}
                       {expandedChatStatusIndex === i && msg.status && (
                         <div className="ml-12 mt-1 w-64 glass-card p-3 rounded-xl animate-in slide-in-from-top-2 border border-gray-200/50 relative z-10">
-                          {/* ... 状态卡片内容 ... */}
                           <div className="space-y-2">
-                            <div className="flex items-start gap-2">
-                              <Shirt
-                                size={10}
-                                className="mt-0.5 text-gray-400 shrink-0"
-                              />
-                              <span className="text-[10px] text-gray-600 leading-tight">
-                                {msg.status.outfit}
-                              </span>
-                            </div>
-                            <div className="flex items-start gap-2">
-                              <Eye
-                                size={10}
-                                className="mt-0.5 text-gray-400 shrink-0"
-                              />
-                              <span className="text-[10px] text-gray-600 leading-tight">
-                                {msg.status.action}
-                              </span>
-                            </div>
-                            <div className="flex items-start gap-2">
-                              <Heart
-                                size={10}
-                                className="mt-0.5 text-blue-400 shrink-0"
-                              />
-                              <span className="text-[10px] text-blue-800 italic leading-tight">
-                                "{msg.status.thought}"
-                              </span>
-                            </div>
-                            <div className="flex items-start gap-2">
-                              <Ghost
-                                size={10}
-                                className="mt-0.5 text-red-400 shrink-0"
-                              />
-                              <span className="text-[10px] text-red-800 italic leading-tight">
-                                "{msg.status.desire}"
-                              </span>
-                            </div>
+                            <div className="flex items-start gap-2"><Shirt size={10} className="mt-0.5 text-gray-400 shrink-0" /><span className="text-[10px] text-gray-600 leading-tight">{msg.status.outfit}</span></div>
+                            <div className="flex items-start gap-2"><Eye size={10} className="mt-0.5 text-gray-400 shrink-0" /><span className="text-[10px] text-gray-600 leading-tight">{msg.status.action}</span></div>
+                            <div className="flex items-start gap-2"><Heart size={10} className="mt-0.5 text-blue-400 shrink-0" /><span className="text-[10px] text-blue-800 italic leading-tight">&quot;{msg.status.thought}&quot;</span></div>
+                            <div className="flex items-start gap-2"><Ghost size={10} className="mt-0.5 text-red-400 shrink-0" /><span className="text-[10px] text-red-800 italic leading-tight">&quot;{msg.status.desire}&quot;</span></div>
                           </div>
                         </div>
                       )}
                     </div>
-                    </React.Fragment>
-                  );
-                })}
-                {(loading.chat || isTyping) && (
-                  <div className="flex gap-2 items-center ml-12 pl-2">
-                    <div
-                      className="w-1.5 h-1.5 bg-gray-400 rounded-full typing-dot"
-                      style={{ animationDelay: "0s" }}
-                    ></div>
-                    <div
-                      className="w-1.5 h-1.5 bg-gray-400 rounded-full typing-dot"
-                      style={{ animationDelay: "0.2s" }}
-                    ></div>
-                    <div
-                      className="w-1.5 h-1.5 bg-gray-400 rounded-full typing-dot"
-                      style={{ animationDelay: "0.4s" }}
-                    ></div>
-                    <span className="text-xs text-gray-400 ml-1">
-                      对方正在输入...
-                    </span>
-                  </div>
-                )}
-              </div>
-
-              {/* --- 底部输入栏 (V2: 按钮常驻 + 响应式布局) --- */}
-              <div className="p-3 glass-panel border-t border-white/50 shrink-0 relative z-[100]">
-              {/* 用户表情包面板 */}
-              {showUserStickerPanel && (
-                <div className="absolute bottom-full mb-2 left-4 right-4 h-48 bg-white/90 backdrop-blur-xl rounded-2xl shadow-2xl p-4 z-[9999] overflow-y-auto custom-scrollbar border border-white animate-in slide-in-from-bottom-2">
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-[10px] font-bold uppercase text-gray-500">
-                      我的表情
-                    </span>
-                    <div className="flex items-center gap-2.5">
-                      <div className="flex items-center gap-2">
-                        {/* 编辑按钮 */}
-                        <button
-                          onClick={() =>
-                            setIsUserStickerEditMode(!isUserStickerEditMode)
-                          }
-                          // 这里我建议把 px-1 改成 px-2，这样跟后面两个按钮大小更一致，你可以看看效果
-                          className={`text-[10px] px-2 py-1 rounded-full transition-colors ${
-                            isUserStickerEditMode
-                              ? "bg-red-50 text-red-500 font-bold"
-                              : "text-gray-600 hover:text-gray-400"
-                          }`}
-                        >
-                          {isUserStickerEditMode ? "完成" : "编辑"}
-                        </button>
-
-                        {/* 上传按钮 - 改为透明灰色风格 */}
-                        <label className="text-[10px] text-gray-600 hover:text-gray-400 px-2 py-1 rounded-full cursor-pointer transition-colors flex items-center gap-1">
-                          <Plus size={10} /> 上传
-                          <input
-                            type="file"
-                            className="hidden"
-                            onChange={(e) => handleStickerUpload(e, "user")}
-                          />
-                        </label>
-
-                        {/* 批量按钮 - 改为透明灰色风格 */}
-                        <button
-                          onClick={async () => {
-                            const input = await customPrompt("请输入链接进行批量导入", "", "批量导入");
-                            if (input) handleBulkImport(input, "user", "我的");
-                          }}
-                          className="text-[10px] text-gray-600 hover:text-gray-400 px-2 py-1 rounded-full cursor-pointer transition-colors flex items-center gap-1"
-                        >
-                          {/* 注意：你原代码这里用的是 Download 图标，我保留了，如果需要 Link 图标请自行替换 */}
-                          <Download size={10} /> 批量
-                        </button>
-                      </div>
                     </div>
-                  </div>
-                  <div className="grid grid-cols-5 gap-2">
-                    {userStickers.map((s) => (
-                      <div
-                        key={s.id}
-                        className={`aspect-square rounded-lg overflow-hidden cursor-pointer transition-all relative group ${
-                          isUserStickerEditMode
-                            ? "ring-2 ring-red-400/50 scale-90"
-                            : "hover:scale-105"
-                        }`}
-                        onClick={() => {
-                          if (isUserStickerEditMode) {
-                            // 编辑模式：点击进入编辑，标记来源为 user
-                            setEditingSticker({ ...s, source: "user" });
-                          } else {
-                            // 正常模式：发送表情
-                            handleUserSend(null, "sticker", s);
-                          }
-                        }}
-                      >
-                        <img
-                          src={s.url}
-                          className="w-full h-full object-cover"
-                        />
-                        {/* 编辑模式下的遮罩图标 */}
-                        {isUserStickerEditMode && (
-                          <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
-                            <Edit2
-                              size={12}
-                              className="text-white drop-shadow-md"
-                            />
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                    {userStickers.length === 0 && (
-                      <p className="col-span-5 text-center text-xs text-gray-400 py-4">
-                        暂无表情，请上传
-                      </p>
-                    )}
-                  </div>
-                </div>
-              )}
+                  );
+                }}
+                components={{
+                  Header: () => (
+                    <div className="text-center py-4">
+                      <span className="text-[9px] text-gray-400 bg-gray-100/50 px-3 py-1 rounded-full">
+                        {formatDate(getCurrentTimeObj())}
+                      </span>
+                    </div>
+                  ),
+                  Footer: () => (
+                    <div className="">
+                      {(loading.chat || isTyping) && (
+                        <div className="flex gap-2 items-center ml-12 pl-2 px-4 py-4">
+                          <div className="w-1.5 h-1.5 bg-gray-400 rounded-full typing-dot" style={{ animationDelay: "0s" }}></div>
+                          <div className="w-1.5 h-1.5 bg-gray-400 rounded-full typing-dot" style={{ animationDelay: "0.2s" }}></div>
+                          <div className="w-1.5 h-1.5 bg-gray-400 rounded-full typing-dot" style={{ animationDelay: "0.4s" }}></div>
+                          <span className="text-xs text-gray-400 ml-1">对方正在输入...</span>
+                        </div>
+                      )}
+                    </div>
+                  ),
+                }}
+              />
 
-
-                {isMultiSelectMode ? (
-                  /* 多选操作栏 */
-                  <div className="flex items-center justify-between px-2 animate-in slide-in-from-bottom-2">
-                    <button
+              {isMultiSelectMode ? (
+                /* 多选操作栏 */
+                <div className="flex items-center justify-between px-2 animate-in slide-in-from-bottom-2">
+                  <button
                       onClick={() => {
                         setIsMultiSelectMode(false);
                         setSelectedMsgs(new Set());
@@ -5294,7 +4918,6 @@ Requirements:
                   </div>
                 )}
               </div>
-            </div>
           </AppWindow>
 
           {/* APP: SETTINGS */}
