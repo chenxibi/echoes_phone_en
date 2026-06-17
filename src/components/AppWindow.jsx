@@ -43,7 +43,7 @@ const AppWindow = ({ isOpen, title, children, onClose, isChat, actions }) => {
       </header>
       <div
         className={`flex-grow overflow-y-auto custom-scrollbar ${
-          !isChat ? "p-6" : ""
+          !isChat ? "p-6" : "pb-6"
         }`}
       >
         {children}
