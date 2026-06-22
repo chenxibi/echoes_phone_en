@@ -360,7 +360,8 @@ export const cleanCharacterJson = (jsonContent) => {
     }
 
     // 5. 组合最终文本 Key
-    let cleanText = `Name: ${name}\n\nDescription:\n${richDescription}`;
+    // 5. Combine final text key (first line is plain name, no Name: prefix)
+    let cleanText = `${name}\n\nDescription:\n${richDescription}`;
 
     // 6. 处理 WorldBook (世界书)
     // 同样优先取有内容的那一边
