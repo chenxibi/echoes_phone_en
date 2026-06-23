@@ -371,22 +371,17 @@ const SettingsPanel = ({
                   <label className="block text-[10px] font-bold uppercase text-gray-500 mb-2">
                     风格 (Style)
                   </label>
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="grid grid-cols-2 gap-2">
                     {[
                       {
                         id: "dialogue",
-                        label: "短信",
-                        desc: "拟真聊天体验",
+                        label: "Chat",
+                        desc: "Realistic texting",
                       },
                       {
                         id: "novel",
-                        label: "小说",
-                        desc: "大段文字描写",
-                      },
-                      {
-                        id: "brackets",
-                        label: "剧本",
-                        desc: "括号动作描写",
+                        label: "Novel",
+                        desc: "Long-form narrative",
                       },
                     ].map((style) => (
                       <button
@@ -449,7 +444,7 @@ const SettingsPanel = ({
                     <label className="block text-[10px] font-bold uppercase text-gray-500">
                       真实时间感知
                     </label>
-                    <span className="text-[9px] text-gray-400">【线下】、【小说】、【剧本】模式下推荐关闭</span>
+                    <span className="text-[9px] text-gray-400">【Reality】, 【Novel】 modes: recommended to disable</span>
                   </div>
                   <button
                     onClick={() => {
