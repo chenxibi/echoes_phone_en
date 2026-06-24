@@ -346,14 +346,14 @@ Instructions:
 4. **Character Logic**:
    - If Mode is "Manual": {{char}} MUST reply.
    - If Mode is "Auto": {{char}} should ONLY reply if the topic is *directly* related to their specific interests. Otherwise, return NO character reply.
-5. JSON SYNTAX RULE: If the dialogue or thought content contains double quotes, you MUST use Chinese double quotes ("�) instead. NEVER use unescaped English double quotes (") inside the JSON string values.
+5. JSON SYNTAX RULE: If the dialogue or thought content contains double quotes, you MUST use Chinese double quotes ("�? instead. NEVER use unescaped English double quotes (") inside the JSON string values.
 6. - Create interactions, arguments, agreements, or ridicule between netizens.
 7. **FORMAT RULE (CRITICAL)**: 
    - Do NOT write "回复 xxx: " in the content field. Use the "replyTo" field to indicate who this reply targets.
    - The system will render the "回复 xxx: " prefix automatically based on the replyTo field.
    - **ONE TARGET PER MESSAGE**: Set replyTo to at most one nickname. Do NOT target multiple people in a single reply.
    - For top-level comments, set replyTo to null.
-   - The "author" field MUST be the nickname ONLY.
+   - Example target: { "author": "草莓刨冰", "content": "你才是宠物", "replyTo": "小狗饲养�?, "isCharacter": false }
 
 JSON Format:
 {
@@ -362,7 +362,6 @@ JSON Format:
     { "author": "{{char}}", "content": "Character's reply (only if applicable)", "replyTo": "targetNickname or null", "isCharacter": true }
   ]
 }`,
-
   // ... forum_char_post ...
   forum_char_post: `Generate a forum post content written by {{char}}.
 Recent Chat Context:
@@ -388,6 +387,7 @@ Recent Chat:
 """
 {{HISTORY}}
 """
+Topic: {{TOPIC}}
 
 Instructions:
 1. **Decision**: Is there a noteworthy emotion, event, or thought derived from the chat? (e.g., getting a gift, having a fight, feeling loved, daily complaint).
@@ -396,39 +396,38 @@ Instructions:
    - **Generate 2-4 initial comments** from random netizens reacting to this post immediately.
    - **Style**: 
    - Vague/Subtle: Don't name {{user}} directly. Use "Someone", "That girl", "My crush", etc.
-   - If it's a sweet moment: "Show off" subtly (暗戳戳秀恩爱).
+   - If it's a sweet moment: "Show off" subtly (暗戳戳炫耀).
    - If it's a conflict: Seek advice or vent.
-   - If it's daily life: Share the mood.
-   - It could also be consulting: if the user likes them, how to impress the user, good places for dating, etc.
+   - The post must feel like a REAL forum post (casual, sometimes unclear, authentic slang).
 3. If NO (Chat is boring/too short): Return "null" for title and content.
 4. **Naming Style for Netizens (CRITICAL)**:
    Generate diverse, realistic Chinese internet nicknames. 
    **STRICT CONSTRAINT**: You MUST generate NEW, ORIGINAL nicknames. **DO NOT** use the specific example names listed below. Use the *logic* behind them to create unique ones.
    - **Foodie/Cute**: Combine sweet/soft foods with actions or adjectives. Use personification.
      * Logic: Food + Verb/Adjective or Animal + Food.
-     * Ref: "冰粉汤圆" (Simple Food), "小狗挖挖�? (Animal+Action), "萌萌小蛋�? (Adjective+Food).
-   - **Artistic/Poetic**: Use classical imagery, abstract concepts, or romanticized foreign words.
-     * Logic: imagery stacking, ancient poetry vibes, or "emo" artistic expressions.
-     * Ref: "春水煎茶", "不是风动", "Evangelist", "十四行诗".
-   - **Boomer/Old Gen (30-50s)**: 
-     * Men: Ambitious, traditional values, nature landscapes. Ref: "天道酬勤", "雪山飞狐", "砥砺前行", "英雄本色".
-     * Women: Peaceful, floral, wishing for safety. Ref: "静待花开", "平安是福", "荷塘月色".
-   - **Casual/Meme**: Spoken phrases, mental states, self-deprecating humor, or lazy vibes.
+     * Ref: "冰粉汤圆" (Simple Food), "萌萌小蛋�? (Adjective+Food), "小狗挖挖�? (Animal+Food), "小猫睡不着" (Animal+Action).
+   - **Artistic/Literary**: Use poetic imagery or artistic terms.
+     * Logic: Nature Item + Clean Verb/Scene.
+     * Ref: "春水煎茶", "残月升", "胶片与旧梦", "春风十里".
+   - **Boomer/Simple**: Use motivational phrases or simple slogans.
+     * Logic: 4-char idioms or simple life motto.
+     * Ref: "天道酬勤", "海阔天空", "老陈", "老司机".
+   - **Meme/Creative**: Use creative misspellings, abbreviations, or cyberpunk-style mashups.
      * Logic: Sounds like a sentence fragment or a mood status.
-     * Ref: "今天也很想鼠", "怒然大勃", "下次一�?, "当小三被打了".
-5. JSON SYNTAX RULE: If the dialogue or thought content contains double quotes, you MUST use Chinese double quotes (“�? instead. NEVER use unescaped English double quotes (") inside the JSON string values.
+     * Ref: "今天也有点�? "突然笑", "暂时还没想好", "锅比碗大啦啦啦�?.
+5. JSON SYNTAX RULE: If the dialogue or thought content contains double quotes, you MUST use Chinese double quotes ("�? instead. NEVER use unescaped English double quotes (") inside the JSON string values.
 6. Language: Simplified Chinese.
 
 JSON Format:
 {
-  "shouldPost": true,
-  "title": "Title",
-  "content": "Content",
-  "replies": [
-     { "author": "NetizenA", "content": "Comment 1", "replyTo": "targetNickname or null", "isCharacter": false },
-     { "author": "NetizenB", "content": "Comment 2", "replyTo": "targetNickname or null", "isCharacter": false }
+  "title": "Title or null",
+  "content": "Content or null",
+  "initialReplies": [
+    { "author": "Nickname", "content": "Comment content", "replyTo": "targetNickname or null" },
+    ...
   ]
 }`,
+
   trigger_events: `Analyze the recent chat history and decide what events to trigger.
 Recent Chat:
 """
