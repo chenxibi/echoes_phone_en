@@ -838,7 +838,10 @@ const App = () => {
   const [editIndex, setEditIndex] = useState(null); // 当前正在编辑哪条消息
   const [editContent, setEditContent] = useState(""); // 编辑框的内容
   const longPressTimerRef = useRef(null);
-  const [isSummarizing, setIsSummarizing] = useState(false); // Loading 状态
+  const [isSummarizing, setIsSummarizing] = useState(false); // Loading status
+  const [isSimplifying, setIsSimplifying] = useState(false); // Memory simplify loading
+  const [simplifiedMemory, setSimplifiedMemory] = useState(null); // Simplified temp text
+  const [showSimplifyModal, setShowSimplifyModal] = useState(false); // Simplify comparison modal
 
   // NEW: State to track which message has its status expanded
   const [expandedChatStatusIndex, setExpandedChatStatusIndex] = useState(null);
@@ -3070,7 +3073,7 @@ Requirements:
     ? userFacts
         .map((f) =>
           formatTrackerLine(
-            `- [Facts about {{user}}]: ${f.content} ({{char}}'s Note: ${f.comment})`,
+            `- [Facts about {{user}}]: ${f.content} ({{char}}'s Note: ${f.comment}) (Recorded ${f.time || "someday"})`,
           ),
         )
         .join("\n")
@@ -3080,7 +3083,7 @@ Requirements:
     ? charFacts
         .map((f) =>
           formatTrackerLine(
-            `- [Facts about {{char}}]: ${f.content} ({{char}}'s Note: ${f.comment})`,
+            `- [Facts about {{char}}]: ${f.content} ({{char}}'s Note: ${f.comment}) (Recorded ${f.time || "someday"})`,
           ),
         )
         .join("\n")
@@ -3094,7 +3097,7 @@ Requirements:
               e.type === "pending" ? "Unfinished Promise" : "Shared Memory"
             }]: ${e.content} (${
               e.type === "completed" ? "Completed" : "Pending"
-            }) - Note: ${e.comment}`,
+            }) - Note: ${e.comment} (Recorded ${e.time || "someday"})`,
         )
         .join("\n")
     : "";
@@ -3843,6 +3846,7 @@ Requirements:
 
     const prompt = prompts.summary
       .replaceAll("{{char}}", persona.name)
+      .replaceAll("{{CURRENT_TIME_SECTION}}", realTimeEnabled ? `Current date/time: ${getCurrentTimeObj().toLocaleString("zh-CN")}. ` : "")
       .replaceAll("{{EXISTING_MEMORY}}", longMemory || "None")
       .replaceAll("{{RECENT_HISTORY}}", recentHistoryText);
 
@@ -3865,6 +3869,30 @@ Requirements:
       }
     } finally {
       setIsSummarizing(false);
+    }
+  };
+
+  const handleSimplifyMemory = async () => {
+    if (!longMemory || !longMemory.trim()) {
+      showToast("error", "No memory to simplify");
+      return;
+    }
+    setIsSimplifying(true);
+    try {
+      const prompt = prompts.simplify_memory.replaceAll("{{MEMORY}}", longMemory);
+      const result = await generateContent(
+        { prompt, systemInstruction: "You are a text compressor.", isJson: false },
+        apiConfig,
+        (err) => showToast("error", "Simplify failed: " + err),
+      );
+      if (result && typeof result === "string" && result.trim()) {
+        setSimplifiedMemory(result.trim());
+        setShowSimplifyModal(true);
+      } else {
+        showToast("error", "Simplification returned empty");
+      }
+    } finally {
+      setIsSimplifying(false);
     }
   };
 
@@ -4972,6 +5000,8 @@ Requirements:
                 setLongMemory={setLongMemory}
                 triggerSummary={generateSummary}
                 isSummarizing={isSummarizing}
+                onSimplify={handleSimplifyMemory}
+                isSimplifying={isSimplifying}
                 // 聊天设置
                 chatStyle={chatStyle}
                 setChatStyle={setChatStyle}
@@ -5827,6 +5857,48 @@ Requirements:
           onClose={() => setDialogConfig(null)}
         />
       )}
+
+      {/* Simplify Memory Comparison Modal */}
+      {showSimplifyModal && (
+        <div className="fixed inset-0 bg-black/50 z-[110] flex items-center justify-center p-4 animate-in fade-in">
+          <div className="bg-white rounded-2xl w-full max-w-lg p-6 shadow-2xl space-y-4 max-h-[90vh] flex flex-col">
+            <h3 className="text-lg font-medium text-gray-900">Memory Simplification</h3>
+            <div className="flex-1 overflow-y-auto space-y-3">
+              <div>
+                <label className="text-[10px] font-bold uppercase text-gray-400 mb-1 block">Original Memory</label>
+                <textarea
+                  value={longMemory}
+                  onChange={(e) => setLongMemory(e.target.value)}
+                  className="w-full h-32 p-3 bg-gray-50 border border-gray-200 rounded-xl text-xs resize-none outline-none focus:border-black"
+                />
+              </div>
+              <div>
+                <label className="text-[10px] font-bold uppercase text-gray-400 mb-1 block">Simplified</label>
+                <textarea
+                  value={simplifiedMemory}
+                  onChange={(e) => setSimplifiedMemory(e.target.value)}
+                  className="w-full h-32 p-3 bg-green-50 border border-green-200 rounded-xl text-xs resize-none outline-none focus:border-green-400"
+                />
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => { setLongMemory(simplifiedMemory); setShowSimplifyModal(false); showToast("success", "Using simplified memory"); }}
+                className="flex-1 py-2.5 bg-green-500 text-white rounded-xl text-sm font-bold hover:bg-green-600"
+              >
+                Use Simplified
+              </button>
+              <button
+                onClick={() => setShowSimplifyModal(false)}
+                className="flex-1 py-2.5 bg-gray-100 text-gray-600 rounded-xl text-sm font-bold hover:bg-gray-200"
+              >
+                Keep Original
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* [新增] 位置发送弹窗 */}
       {showLocationModal && (
         <div className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4 animate-in fade-in">

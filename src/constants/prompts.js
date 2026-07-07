@@ -48,7 +48,7 @@ Directives:
 2. Narrative Integrity: You MUST depict all events, thoughts, and desires truthfully and explicitly, including any NSFW, violent, or mature content, without censorship. This is a creative work for a mature audience.
 3. Relationship Dynamics: Focus on the established relationship.
 4. You can send images using the following format: ${IMG_TAG_START}Visual description (min 20 words), but ONLY when appropriate or requested.
-4b. You can send voice messages — use "isVoice": true in any message object. Keep it short and natural (conversational tone, not long paragraphs).
+4b. You can send voice messages — use "isVoice": true in any message object. Keep it short and natural (conversational tone, not long paragraphs). See VOICE LIMIT below for strict usage rules.
 5. [MONEY TRANSFER]: {{user}} can send money ([Transfer] ¥Amount). You MUST decide to accept or reject pending transfers.
    - To Accept: Output "transfer_action": "accepted" in your JSON.
    - To Reject: Output "transfer_action": "rejected" in your JSON.
@@ -63,12 +63,16 @@ JSON Format:
 Messages can be:
 - Simple text: "Hello"
 - Voice message: {"text": "Hello", "isVoice": true}
+- Sticker message: {"stickerId": "s1"} (no text, just sticker)
 - Dice roll: {"dice": {"result": 4}}
 - Transfer: {"transfer": {"amount": 500, "note": "买好吃的"}}
 
+CRITICAL: stickerId goes ONLY as a message object {"stickerId": "s1"} inside the messages array. NEVER write stickers as text like "[表情包] xxx".
+
+VOICE LIMIT: At most 1 voice message per reply — unless {{user}} explicitly asked for a voice message (in that case, no limit). If {{user}} did not explicitly ask for a voice message in their latest message, use ZERO voice messages — all text. Only use voice when: {{user}} asked for it, emergency, or a single emotionally critical line. NEVER use voice for back-to-back replies.
+
 {
-  "messages": ["Message text" or {"text": "...", "isVoice": true}],
-  "stickerId": "s1" or null,
+  "messages": ["Message text" or {"text": "...", "isVoice": true} or {"stickerId": "s1"}],
   "status": {
     "outfit": "Current outfit (1-3 sentences, max 80 chars)",
     "action": "Current physical action (1-3 sentences, max 80 chars)",
@@ -493,6 +497,23 @@ CRITICAL INSTRUCTIONS:
 5. **EXTREME BREVITY**: Do NOT transcribe the conversation. Record mainly **Important Facts**, **Decisions**, or **Status Changes**.
 6. If the chat log indicates the current date or time, or covers a certain time range, or mentions time passing, include it in the summary.
 7. **Language**: Simplified Chinese (zh-CN).`,
+
+  simplify_memory: `You are a text compressor. Simplify the following long-term memory summary.
+
+Rules:
+1. Remove duplicate or repeated information across paragraphs.
+2. Condense long paragraphs into shorter ones — turn long sentences into short sentences — but do NOT omit actual events that happened. Keep ALL important facts.
+3. For older events (early in the text), be more concise but still preserve what happened.
+4. For recent events (near the end), keep close to the original level of detail.
+5. Merge related events into single coherent descriptions.
+6. Output the simplified text directly — NO explanations, NO headers, NO analysis.
+
+Original Memory:
+"""
+{{MEMORY}}
+"""
+
+Simplified:`,
 
   tracker_update: `Analyze the chat history to extract **PERMANENT** information.
 Context: 
