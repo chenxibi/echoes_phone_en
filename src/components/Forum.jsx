@@ -376,8 +376,7 @@ ${realNameContext}
         "{{CHAR_DESCRIPTION}}",
         userPersona + "\n" + charTrackerContext,
       )
-      .replaceAll("{{WORLD_INFO}}", cleanWorldInfo)
-      .replaceAll("{{MODE}}", aiPromptMode);
+      .replaceAll("{{WORLD_INFO}}", cleanWorldInfo);
 
     try {
       const data = await generateContent(
