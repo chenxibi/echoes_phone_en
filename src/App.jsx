@@ -1201,6 +1201,8 @@ const App = () => {
       if (metaThemeColor) {
         metaThemeColor.setAttribute("content", "#F2F2F7");
       }
+      // Reset body background
+      document.body.style.backgroundColor = '#F2F2F7';
       return;
     }
     if (!styleEl) {
@@ -1220,6 +1222,9 @@ const App = () => {
       document.head.appendChild(metaThemeColor);
     }
     metaThemeColor.setAttribute("content", bgColor);
+
+    // Sync body background to prevent white gaps behind rounded phone corners
+    document.body.style.backgroundColor = bgColor;
   }, [skinCSS]);
 
   // Helpers
