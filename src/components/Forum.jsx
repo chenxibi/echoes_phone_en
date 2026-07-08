@@ -281,7 +281,7 @@ const Forum = ({
         hasMainUserReplied ||
         mode === "Manual") &&
       !isSmurfReply;
-    const aiPromptMode = isCharThread || mode === "Manual" ? "Manual" : "Auto";
+    const aiPromptMode = (isCharThread || mode === "Manual" || hasMainUserReplied) ? "Manual" : "Auto";
     const currentUserName = userName || "User";
     const userNick = forumSettings.userNick || userName || "User本U";
     const charNick = forumSettings.charNick || persona.name || "匿名用户";
