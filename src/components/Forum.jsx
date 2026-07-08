@@ -293,10 +293,17 @@ const Forum = ({
         - **Action**: Decide naturally whether to reply to "${userLastReply.author}" or others based on content interest.
        `;
     } else if (userLastReplyIndex === -1) {
-      targetInstruction = `
-        - **Targeting Constraint**: The user "${userNick}" has NOT commented in this thread yet.
-        - **Action**: Do NOT reply to "${userNick} or ${charNick}". Interact with other netizens instead.
+      if (isUserThread) {
+        targetInstruction = `
+        - **Targeting Note**: "${userNick}" is the OP (author) of this thread but has NOT commented in the reply section yet.
+        - **Action**: You MAY reply to the thread topic itself (addressing "${userNick}" as the OP). You may also interact with other netizens. Do NOT reply to "${charNick}".
         `;
+      } else {
+        targetInstruction = `
+        - **Targeting Constraint**: The user "${userNick}" has NOT commented in this thread yet.
+        - **Action**: Do NOT reply to "${userNick}" or "${charNick}". Interact with other netizens instead.
+        `;
+      }
     } else if (!charHasRepliedToUser) {
       targetInstruction = `
         - **Targeting Priority**: "${userNick}" just commented and is waiting for a reply.
