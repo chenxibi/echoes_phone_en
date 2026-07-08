@@ -47,6 +47,8 @@ const Forum = ({
   setForwardContext,
   setActiveApp, // 用于跳转到 Chat
   onChatEventPost, // 聊天事件触发发帖的回调
+  forumInteractionContext, // 论坛互动上下文（隐式传给AI）
+  setForumInteractionContext, // 更新论坛互动上下文的回调
 }) => {
   // --- 内部状态管理 ---
   const [forumData, setForumData] = useStickyState(
@@ -94,6 +96,68 @@ const Forum = ({
     if (type === "char")
       return forumSettings.charNick || persona?.name || "匿名用户";
     return "匿名网友";
+  };
+
+  // Format author name for interaction context: nickname (real name)
+  const formatAuthorWithRealName = (author, authorType) => {
+    if (authorType === "me" || authorType === "smurf") {
+      return `${author}（${userName || "User"}）`;
+    }
+    if (authorType === "char" || author === forumSettings.charNick) {
+      return `${author}（${persona?.name || "char"}）`;
+    }
+    return author;
+  };
+
+  // Scan all forum posts for char-user interactions, generate hidden context for AI
+  const syncForumInteractions = (forumDataSnapshot) => {
+    const charNick = forumSettings.charNick || "匿名用户";
+    const userNick = forumSettings.userNick || "User本U";
+    const charName = persona?.name || "char";
+    const currentUserName = userName || "User";
+    
+    const interactions = [];
+    
+    for (const post of forumDataSnapshot.posts || []) {
+      const replies = post.replies || [];
+      let hasCharUserInteraction = false;
+      
+      for (const r of replies) {
+        const isCharReply = r.isCharacter || r.authorType === "char" || r.author === charNick;
+        const isUserReply = (r.authorType === "me" || r.author === userNick) && !r.isSmurfReply;
+        const isUserMainReply = r.authorType === "me" || (r.author === userNick && r.authorType !== "smurf");
+        
+        const charRepliedUser = isCharReply && r.replyTo && r.replyTo === userNick;
+        const userRepliedChar = isUserReply && r.replyTo && r.replyTo === charNick;
+        const charInUserThread = isCharReply && post.authorType === "me";
+        const userInCharThread = isUserMainReply && post.authorType === "char";
+        
+        if (charRepliedUser || userRepliedChar || charInUserThread || userInCharThread) {
+          hasCharUserInteraction = true;
+          break;
+        }
+      }
+      
+      if (hasCharUserInteraction) {
+        const threadAuthor = formatAuthorWithRealName(post.author, post.authorType);
+        let context = `Thread: ${post.title}\nAuthor: ${threadAuthor}\nContent: ${post.content}\n\nReplies:\n`;
+        for (const r of replies) {
+          const rAuthor = formatAuthorWithRealName(r.author, r.authorType || (r.isCharacter ? "char" : r.authorType));
+          const rReplyTo = r.replyTo 
+            ? ` → ${r.replyTo === charNick ? `${charNick}（${charName}）` : r.replyTo === userNick ? `${userNick}（${currentUserName}）` : r.replyTo}`
+            : "";
+          context += `${rAuthor}${rReplyTo}: ${r.content}\n`;
+        }
+        interactions.push(context);
+      }
+    }
+    
+    if (interactions.length > 0) {
+      const joined = interactions.join("\n\n---\n\n");
+      setForumInteractionContext(`${charName} and ${currentUserName} interacted in the forum:\n\n${joined}`);
+    } else {
+      setForumInteractionContext(null);
+    }
   };
 
   const getFormattedSystemPrompt = () => {
@@ -398,18 +462,22 @@ ${realNameContext}
           isUser: false,
         }));
 
-        setForumData((prev) => ({
-          ...prev,
-          posts: prev.posts.map((p) =>
-            p.id === threadId
-              ? {
-                  ...p,
-                  replies: [...(p.replies || []), ...newReplies],
-                  replyCount: (p.replyCount || 0) + newReplies.length,
-                }
-              : p,
-          ),
-        }));
+        setForumData((prev) => {
+          const updated = {
+            ...prev,
+            posts: prev.posts.map((p) =>
+              p.id === threadId
+                ? {
+                    ...p,
+                    replies: [...(p.replies || []), ...newReplies],
+                    replyCount: (p.replyCount || 0) + newReplies.length,
+                  }
+                : p,
+            ),
+          };
+          syncForumInteractions(updated);
+          return updated;
+        });
         if (mode === "Manual") showToast("success", "已刷新评论");
       }
     } finally {
@@ -604,26 +672,36 @@ ${realNameContext}
       replyTo: replyTo,
       isUser: true,
     };
-    setForumData((prev) => ({
-      ...prev,
-      posts: prev.posts.map((p) =>
-        p.id === threadId
-          ? {
-              ...p,
-              replies: [...(p.replies || []), newReply],
-              replyCount: (p.replyCount || 0) + 1,
-            }
-          : p,
-      ),
-    }));
+    setForumData((prev) => {
+      const updated = {
+        ...prev,
+        posts: prev.posts.map((p) =>
+          p.id === threadId
+            ? {
+                ...p,
+                replies: [...(p.replies || []), newReply],
+                replyCount: (p.replyCount || 0) + 1,
+              }
+            : p,
+        ),
+      };
+      if (type === "me") {
+        syncForumInteractions(updated);
+      }
+      return updated;
+    });
   };
 
   const handleDeletePost = async (postId) => {
     if (await customConfirm("确定彻底删除这篇帖子吗？", "删除帖子")) {
-      setForumData((prev) => ({
-        ...prev,
-        posts: prev.posts.filter((p) => p.id !== postId),
-      }));
+      setForumData((prev) => {
+        const updated = {
+          ...prev,
+          posts: prev.posts.filter((p) => p.id !== postId),
+        };
+        syncForumInteractions(updated);
+        return updated;
+      });
       if (activeThreadId === postId) setActiveThreadId(null);
       showToast("success", "帖子已删除");
     }
@@ -631,14 +709,18 @@ ${realNameContext}
 
   const handleDeleteReply = async (threadId, replyId) => {
     if (await customConfirm("确定删除这条评论？")) {
-      setForumData((prev) => ({
-        ...prev,
-        posts: prev.posts.map((p) => {
-          if (p.id !== threadId) return p;
-          const newReplies = (p.replies || []).filter((r) => r.id !== replyId);
-          return { ...p, replies: newReplies, replyCount: newReplies.length };
-        }),
-      }));
+      setForumData((prev) => {
+        const updated = {
+          ...prev,
+          posts: prev.posts.map((p) => {
+            if (p.id !== threadId) return p;
+            const newReplies = (p.replies || []).filter((r) => r.id !== replyId);
+            return { ...p, replies: newReplies, replyCount: newReplies.length };
+          }),
+        };
+        syncForumInteractions(updated);
+        return updated;
+      });
       showToast("success", "评论已删除");
     }
   };

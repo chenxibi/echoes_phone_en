@@ -2708,6 +2708,11 @@ Requirements:
       ? `\n**Forwarded Content Context**: ${replacePlaceholders(rawForwardContext, persona.name, userName || "你")}`
       : "";
 
+    // Forum interaction context (hidden, for AI only)
+    const forumInteractionSection = forumInteractionContext
+      ? `\n**Recent Forum Interaction**: ${replacePlaceholders(forumInteractionContext, persona.name, userName || "你")}`
+      : "";
+
     // 交互模式 instruction 抽取到 prompts.js 中
     // Pre-replace {{char}}/{{user}} in specialInst before it gets injected via {{SPECIAL_INSTRUCTION}}
     if (specialInst) {
@@ -2737,6 +2742,7 @@ Requirements:
       .replaceAll("{{user}}", effectiveUserName)
       .replaceAll("{{MODE_INSTRUCTION}}", modeInstruction)
       .replaceAll("{{FORWARD_CONTEXT}}", finalForwardSection)
+      .replaceAll("{{FORUM_INTERACTION}}", forumInteractionSection)
       .replaceAll("{{SPECIAL_INSTRUCTION}}", specialInst);
 
     const systemPrompt = prompts.system
@@ -3567,6 +3573,8 @@ Requirements:
   });
   // 转发内容的临时存储 (用于传给 Chat Prompt)
   const [forwardContext, setForwardContext] = useState(null);
+  // Forum interaction context (hidden, passed to AI)
+  const [forumInteractionContext, setForumInteractionContext] = useState(null);
 
   // Chat Multi-select State (聊天多选状态)
   const [isMultiSelectMode, setIsMultiSelectMode] = useState(false);
@@ -5363,6 +5371,8 @@ Requirements:
             setMsgCountSinceSummary={setMsgCountSinceSummary}
             setForwardContext={setForwardContext}
             setActiveApp={setActiveApp}
+            forumInteractionContext={forumInteractionContext}
+            setForumInteractionContext={setForumInteractionContext}
           />
           {/* APP: SMART WATCH (智能看看) */}
           <AppWindow
