@@ -50,6 +50,8 @@ const Forum = ({
   onChatEventPost, // 聊天事件触发发帖的回调
   forumInteractionContext, // 论坛互动上下文（隐式传给AI）
   setForumInteractionContext, // 更新论坛互动上下文的回调
+  dialogsShown, // [新增] Track which guidance dialogs have been shown
+  setDialogsShown, // [新增] Mark dialog as shown
 }) => {
   // --- 内部状态管理 ---
   const [forumData, setForumData] = useStickyState(
@@ -199,14 +201,15 @@ const Forum = ({
     if (!persona) return;
     if (!checkCanGenerate()) return;
 
-    // If World Book is empty or has no enabled entries, show confirmation dialog
+    // If World Book is empty or has no enabled entries, show confirmation dialog (only first time)
     const worldBookArr = worldBook || [];
     const hasEnabledEntries = worldBookArr.length > 0 && worldBookArr.some((e) => e.enabled);
-    if (!hasEnabledEntries) {
+    if (!hasEnabledEntries && !dialogsShown.forumNoWorld) {
+      setDialogsShown((prev) => ({ ...prev, forumNoWorld: true }));
       const confirmed = await customConfirm(
         worldBookArr.length === 0
-          ? "No entries in World Book. Initializing will generate content in an environment with 'no world settings', which may lack regional context and background connections.\n\nContinue initializing?"
-          : "World Book has entries but all are disabled. Initializing will generate content in an environment with 'inactive world settings'.\n\nContinue initializing?",
+          ? "No entries in World Book. Content may be generated without world settings.\n\nContinue initializing?"
+          : "World Book entries are all disabled. Content may be generated without world settings.\n\nContinue initializing?",
         "Reminder",
         false
       );

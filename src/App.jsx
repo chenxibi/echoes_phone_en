@@ -863,6 +863,14 @@ const App = () => {
     true,
     "echoes_real_time_enabled",
   );
+  // Track which guidance dialogs have been shown (show only once)
+  const [dialogsShown, setDialogsShown, dialogsShownLoaded] = useStickyState(
+    {},
+    "echoes_dialogs_shown",
+  );
+  const markDialogShown = (key) => {
+    setDialogsShown((prev) => ({ ...prev, [key]: true }));
+  };
   const chatScrollRef = useRef(null);
   const virtuosoRef = useRef(null);
   const isAtBottomRef = useRef(true);
@@ -2419,10 +2427,11 @@ Requirements:
     sticker = null,
     extraData = null,
   ) => {
-    // If userName is empty, show confirmation dialog
-    if (!userName || !userName.trim()) {
+    // If userName is empty, show confirmation dialog (only first time)
+    if (!dialogsShown.sendEmptyName && (!userName || !userName.trim())) {
+      setDialogsShown((prev) => ({ ...prev, sendEmptyName: true }));
       const confirmed = await customConfirm(
-        "You haven't set your personal info yet. The AI may not correctly identify you. We recommend going to Settings to fill in your name and self-introduction.\n\nContinue sending anyway?",
+        "You haven't set your personal info yet. The AI may not correctly identify you. We recommend going to User Settings to fill in your name and self-introduction.\n\nContinue sending anyway?",
         "Reminder",
         false
       );
@@ -3264,13 +3273,14 @@ Requirements:
     if (!persona) return;
     if (!checkCanGenerate()) return;
 
-    // If World Book is empty or has no enabled entries, show confirmation dialog
+    // If World Book is empty or has no enabled entries, show confirmation dialog (only first time)
     const hasEnabledEntries = worldBook && worldBook.length > 0 && worldBook.some((e) => e.enabled);
-    if (!hasEnabledEntries) {
+    if (!hasEnabledEntries && !dialogsShown.smartWatchNoWorld) {
+      setDialogsShown((prev) => ({ ...prev, smartWatchNoWorld: true }));
       const confirmed = await customConfirm(
         worldBook.length === 0
-          ? "No entries in World Book. Initializing will place the character in an environment with 'no world settings', and generated content may lack direction.\n\nContinue initializing?"
-          : "World Book has entries but all are disabled. Initializing will place the character in an environment with 'inactive world settings'.\n\nContinue initializing?",
+          ? "No entries in World Book. Content may be generated without world settings.\n\nContinue initializing?"
+          : "World Book entries are all disabled. Content may be generated without world settings.\n\nContinue initializing?",
         "Reminder",
         false
       );
@@ -5398,6 +5408,8 @@ Requirements:
             setActiveApp={setActiveApp}
             forumInteractionContext={forumInteractionContext}
             setForumInteractionContext={setForumInteractionContext}
+            dialogsShown={dialogsShown}
+            setDialogsShown={setDialogsShown}
           />
           {/* APP: SMART WATCH (智能看看) */}
           <AppWindow
