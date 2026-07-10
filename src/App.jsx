@@ -1179,17 +1179,6 @@ const App = () => {
   useEffect(() => {
     if (messageQueue.length > 0 && !isTyping) {
       setIsTyping(true);
-      // Scroll to bottom when typing starts, only if user is already at bottom
-      if (isAtBottomRef.current && virtuosoRef.current) {
-        setTimeout(() => {
-          if (virtuosoRef.current) {
-            virtuosoRef.current.scrollToIndex({
-              index: chatHistory.length - 1,
-              behavior: "smooth",
-            });
-          }
-        }, 100);
-      }
     }
   }, [messageQueue, isTyping]);
 
@@ -1204,17 +1193,6 @@ const App = () => {
         setChatHistory((prev) => [...prev, nextMsg]);
         setMessageQueue((prev) => prev.slice(1));
         setIsTyping(false); // This triggers Effect 1 again if queue > 0
-        // Scroll to bottom after new message, only if user is at bottom
-        if (isAtBottomRef.current && virtuosoRef.current) {
-          setTimeout(() => {
-            if (virtuosoRef.current) {
-              virtuosoRef.current.scrollToIndex({
-                index: "LAST",
-                behavior: "smooth",
-              });
-            }
-          }, 50);
-        }
       }, delay);
 
       return () => clearTimeout(timer);
@@ -2591,6 +2569,15 @@ Requirements:
     if (abortControllerRef.current) abortControllerRef.current.abort();
     const abortController = new AbortController();
     abortControllerRef.current = abortController;
+
+    // Scroll to bottom when typing starts, only if user is at bottom
+    if (isAtBottomRef.current && virtuosoRef.current) {
+      setTimeout(() => {
+        if (virtuosoRef.current) {
+          virtuosoRef.current.scrollToIndex({ index: "LAST", behavior: "smooth" });
+        }
+      }, 100);
+    }
 
     const effectiveUserName = userName || "你";
 
