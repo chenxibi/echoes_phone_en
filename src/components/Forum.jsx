@@ -35,6 +35,7 @@ const Forum = ({
   generateContent,
   showToast,
   worldInfoString, // [关键修改] 直接接收字符串，不再调用 getWorldInfoString()
+  worldBook, // [新增] World Book array for confirmation dialog
   getCurrentTimeObj,
   getContextString, // 获取聊天记录上下文
   customConfirm,
@@ -197,6 +198,21 @@ const Forum = ({
   const initForum = async () => {
     if (!persona) return;
     if (!checkCanGenerate()) return;
+
+    // If World Book is empty or has no enabled entries, show confirmation dialog
+    const worldBookArr = worldBook || [];
+    const hasEnabledEntries = worldBookArr.length > 0 && worldBookArr.some((e) => e.enabled);
+    if (!hasEnabledEntries) {
+      const confirmed = await customConfirm(
+        worldBookArr.length === 0
+          ? "No entries in World Book. Initializing will generate content in an environment with 'no world settings', which may lack regional context and background connections.\n\nContinue initializing?"
+          : "World Book has entries but all are disabled. Initializing will generate content in an environment with 'inactive world settings'.\n\nContinue initializing?",
+        "Reminder",
+        false
+      );
+      if (!confirmed) return;
+    }
+
     setLoading((prev) => ({ ...prev, forum: true }));
 
     const prompt = prompts.forum_init

@@ -2413,12 +2413,22 @@ Requirements:
     }
   };
 
-  const handleUserSend = (
+  const handleUserSend = async (
     content,
     type = "text",
     sticker = null,
     extraData = null,
   ) => {
+    // If userName is empty, show confirmation dialog
+    if (!userName || !userName.trim()) {
+      const confirmed = await customConfirm(
+        "You haven't set your personal info yet. The AI may not correctly identify you. We recommend going to Settings to fill in your name and self-introduction.\n\nContinue sending anyway?",
+        "Reminder",
+        false
+      );
+      if (!confirmed) return;
+    }
+
     let displayText = "";
     const stickerId = sticker?.id;
 
@@ -3253,6 +3263,20 @@ Requirements:
   const initSmartWatch = async () => {
     if (!persona) return;
     if (!checkCanGenerate()) return;
+
+    // If World Book is empty or has no enabled entries, show confirmation dialog
+    const hasEnabledEntries = worldBook && worldBook.length > 0 && worldBook.some((e) => e.enabled);
+    if (!hasEnabledEntries) {
+      const confirmed = await customConfirm(
+        worldBook.length === 0
+          ? "No entries in World Book. Initializing will place the character in an environment with 'no world settings', and generated content may lack direction.\n\nContinue initializing?"
+          : "World Book has entries but all are disabled. Initializing will place the character in an environment with 'inactive world settings'.\n\nContinue initializing?",
+        "Reminder",
+        false
+      );
+      if (!confirmed) return;
+    }
+
     setLoading((prev) => ({ ...prev, smartwatch: true }));
 
     try {
@@ -5360,6 +5384,7 @@ Requirements:
             generateContent={generateContent}
             showToast={showToast}
             worldInfoString={currentWorldInfoString} // 传字符串进去
+            worldBook={worldBook} // Pass World Book array for confirmation dialog
             getCurrentTimeObj={getCurrentTimeObj}
             getContextString={getContextString}
             customConfirm={customConfirm}
