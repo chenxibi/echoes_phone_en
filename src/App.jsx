@@ -2734,8 +2734,9 @@ Requirements:
       specialInst += `\n[Crisis Support Protocol]: ${emotionalSupportPrompt}`;
     }
 
+    // Forward context (valid only for current turn, cleared after API response)
+    // The forwarded message content is already in the message text, subject to context limit like normal messages
     const rawForwardContext = overrideContext || forwardContext;
-    // 核心修复：对 forwardContext 进行占位符替换处理
     const finalForwardSection = rawForwardContext
       ? `\n**Forwarded Content Context**: ${replacePlaceholders(rawForwardContext, persona.name, userName || "你")}`
       : "";
