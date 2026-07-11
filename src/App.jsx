@@ -2510,9 +2510,9 @@ Requirements:
 
     setChatHistory((prev) => [...prev, newMsg]);
     setChatInput("");
-    // Scroll to bottom after sending, only if user is at bottom
+    // Scroll to bottom after sending (user actively sent, must show their message)
     setTimeout(() => {
-      if (virtuosoRef.current && isAtBottomRef.current) {
+      if (virtuosoRef.current) {
         virtuosoRef.current.scrollToIndex({ index: "LAST", behavior: "smooth" });
       }
     }, 100);
