@@ -2511,9 +2511,10 @@ Requirements:
     setChatHistory((prev) => [...prev, newMsg]);
     setChatInput("");
     // Scroll to bottom after sending (user actively sent, must show their message)
+    const targetIndex = chatHistory.length;
     setTimeout(() => {
       if (virtuosoRef.current) {
-        virtuosoRef.current.scrollToIndex({ index: "LAST", behavior: "smooth" });
+        virtuosoRef.current.scrollToIndex({ index: targetIndex, behavior: "smooth" });
       }
     }, 100);
     lastUserSendTimeRef.current = Date.now();
@@ -2572,9 +2573,10 @@ Requirements:
 
     // Scroll to bottom when typing starts, only if user is at bottom
     if (isAtBottomRef.current && virtuosoRef.current) {
+      const latestIndex = newHistory.length - 1;
       setTimeout(() => {
         if (virtuosoRef.current) {
-          virtuosoRef.current.scrollToIndex({ index: "LAST", behavior: "smooth" });
+          virtuosoRef.current.scrollToIndex({ index: latestIndex, behavior: "smooth" });
         }
       }, 100);
     }
