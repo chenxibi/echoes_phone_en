@@ -45,7 +45,7 @@ export const APP_LIST = [
   { id: "forum", label: "生活圈", icon: Hash },
   { id: "smartwatch", label: "智能家", icon: ScanEye },
   { id: "browser", label: "浏览器", icon: Globe },
-  { id: "journal", label: "日记", icon: Book },
+  { id: "journal", label: " diaries", icon: Book },
   { id: "traces", label: "生活痕迹", icon: Receipt },
 // 
   { id: "worldbook", label: "世界书", icon: BookOpen },
@@ -295,7 +295,7 @@ export const generateContent = async (params, apiConfig, onError, signal) => {
   try {
     if (apiConfig.baseUrl && apiConfig.key) {
       // 支持两种模式：
-      // 1. 传入 messages 数组（多模态/自定义消息格式）
+      // 1. 传入 messages 数 sets（多模态/自定义消息格式）
       // 2. 传统 prompt + systemInstruction 模式
       const messages = customMessages
         ? [
@@ -466,7 +466,7 @@ export const cleanCharacterJson = (jsonContent) => {
       richDescription += `\n\n[Personality Traits]: ${outerData.personality}`;
     }
 
-    // 5. 组合最终文本 Key
+    // 5.  sets合最终文本 Key
     let cleanText = `Name: ${name}\n\nDescription:\n${richDescription}`;
 
     // 6. 处理 WorldBook (世界书)
@@ -488,7 +488,7 @@ export const cleanCharacterJson = (jsonContent) => {
         name: entry.comment || entry.keys?.[0] || entry.name || `Entry`,
         content: entry.content,
         enabled: entry.enabled !== false,
-        group: entry.group || name || "默认分组",
+        group: entry.group || name || "默认分 sets",
       }))
       .filter((e) => e.content);
 
@@ -632,7 +632,7 @@ export const MinimalCard = ({ item, type = "fact", onDelete, onEdit }) => {
   );
 };
 
-// [新增通用组件] AI 代写按钮 (GhostButton)
+// [新增通用 sets件] AI 代写按钮 (GhostButton)
 export const GhostButton = ({ loading, onClick, className = "" }) => {
   return (
     <button
@@ -914,7 +914,7 @@ export const StatusPanel = ({ statusHistory, onClose, onDelete }) => (
         <p className="text-center text-gray-400 text-xs py-10">暂无状态记录</p>
       )}
       {[...statusHistory].reverse().map((entry, i) => {
-        // [新增] 计算原始索引：因为列表倒序了，所以要反算回原始数组的索引
+        // [新增] 计算原始索引：因为列表倒序了，所以要反算回原始数 sets的索引
         const originalIndex = statusHistory.length - 1 - i;
 
         return (
@@ -1201,7 +1201,7 @@ export const CustomDialog = ({ config, onClose }) => {
           />
         )}
 
-        {/* 按钮组 */}
+        {/* 按钮 sets */}
         <div className="flex gap-3 pt-2">
           {config.type !== "alert" && (
             <button

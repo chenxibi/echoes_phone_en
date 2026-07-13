@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect } from "react";
 import {
   CloudFog,
   RefreshCw,
@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 
 const SettingsPanel = ({
-  // --- 连接配置参数 ---
+  // --- Connection Setup参数 ---
   apiConfig,
   setApiConfig,
   connectionStatus,
@@ -45,7 +45,7 @@ const SettingsPanel = ({
   onSimplify,
   isSimplifying,
 
-  // --- 聊天设置参数 ---
+  // --- Chat Settings参数 ---
   chatStyle,
   setChatStyle,
   interactionMode,
@@ -96,11 +96,11 @@ const SettingsPanel = ({
   <div className="flex flex-col h-full">
     <div className="space-y-10 overflow-y-auto custom-scrollbar flex-grow px-1 pb-10">
       {/* ---------------------------------------------------------
-          连接配置
+          Connection Setup
          --------------------------------------------------------- */}
       <section>
         <h3 className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-4 border-b border-gray-200/50 pb-2">
-          连接配置
+          Connection Setup
         </h3>
         <div className="glass-card p-4 rounded-xl space-y-4">
           {/* API Base URL */}
@@ -192,7 +192,7 @@ const SettingsPanel = ({
             </div>
           </div>
 
-          {/* 测试连接按钮 (紧跟连接配置) */}
+          {/* 测试连接按钮 (紧跟Connection Setup) */}
           <div className="pt-2">
             <button
               onClick={testConnection}
@@ -335,7 +335,7 @@ const SettingsPanel = ({
               <div>
                 <div className="flex justify-between items-end mb-2">
                   <label className="text-[10px] uppercase font-bold text-gray-400">
-                    记忆详情 (Prompt)
+                    Memory Details (Prompt)
                   </label>
                   <div className="flex items-center gap-2">
                     <button
@@ -381,18 +381,18 @@ const SettingsPanel = ({
           </section>
 
           {/* ---------------------------------------------------------
-          SECTION 3: 聊天设置 (独立区块)
+          SECTION 3: Chat Settings (独立区块)
          --------------------------------------------------------- */}
           {chatStyle && (
             <section>
               <h3 className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-4 border-b border-gray-200/50 pb-2">
-                聊天设置
+                Chat Settings
               </h3>
               <div className="glass-card p-4 rounded-xl space-y-4">
                 {/* 风格 */}
                 <div>
                   <label className="block text-[10px] font-bold uppercase text-gray-500 mb-2">
-                    风格 (Style)
+                    Style
                   </label>
                   <div className="grid grid-cols-2 gap-2">
                     {[
@@ -432,10 +432,10 @@ const SettingsPanel = ({
                   </div>
                 </div>
 
-                {/* 交互模式 */}
+                {/* Interaction Mode */}
                 <div>
                   <label className="block text-[10px] font-bold uppercase text-gray-500 mb-2">
-                    交互模式 (Mode)
+                    Interaction Mode (Mode)
                   </label>
                   <div className="flex gap-2">
                     <button
@@ -446,7 +446,7 @@ const SettingsPanel = ({
                           : "bg-white/50 text-gray-500 hover:bg-white"
                       }`}
                     >
-                      <Smartphone size={12} /> 线上 (Phone)
+                      <Smartphone size={12} /> Online (Phone)
                     </button>
                     <button
                       onClick={() => setInteractionMode("offline")}
@@ -456,16 +456,16 @@ const SettingsPanel = ({
                           : "bg-white/50 text-gray-500 hover:bg-white"
                       }`}
                     >
-                      <MapPin size={12} /> 现实 (Reality)
+                      <MapPin size={12} /> Reality (Reality)
                     </button>
                   </div>
                 </div>
 
-                {/* 真实时间感知 */}
+                {/* Real-Time Awareness */}
                 <div className="flex items-center justify-between">
                   <div>
                     <label className="block text-[10px] font-bold uppercase text-gray-500">
-                      真实时间感知
+                      Real-Time Awareness
                     </label>
                     <span className="text-[9px] text-gray-400">【Reality】, 【Novel】 modes: recommended to disable</span>
                   </div>

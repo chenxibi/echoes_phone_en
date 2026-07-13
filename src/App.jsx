@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
+﻿import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { Virtuoso } from "react-virtuoso";
 import { jsonrepair } from "jsonrepair";
 import { PRESET_LOCATION_IMAGES } from "./constants/assets";
@@ -446,7 +446,7 @@ const App = () => {
     setFontName("默认字体");
     await echoesDB.removeItem("custom-font-url");
     await echoesDB.removeItem("custom-font-name");
-    showToast("info", "已恢复默认字体");
+    showToast("info", "Restored默认字体");
   };
 
   // [新增] 自定义图标状态
@@ -599,7 +599,7 @@ const App = () => {
   const prompts = DEFAULT_PROMPTS;
   // const [prompts, setPrompts] = useStickyState(DEFAULT_PROMPTS,"echoes_prompts");
   const [customRules, setCustomRules, customRulesLoaded] = useStickyState(
-    "无特殊规则",
+    "No special rules",
     "echoes_custom_rules",
   );
   const [chatStyle, setChatStyle, chatStyleLoaded] = useStickyState(
@@ -610,7 +610,7 @@ const App = () => {
   const [stickersEnabled, setStickersEnabled, stickersEnabledLoaded] =
     useStickyState(true, "echoes_stickers_enabled");
 
-  // 上下文记忆条数
+  // 上下文记忆 msgs数
   const [contextLimit, setContextLimit, contextLimitLoaded] = useStickyState(
     10,
     "echoes_context_limit",
@@ -674,7 +674,7 @@ const App = () => {
     setPendingHint(hint);
   };
 
-  // [新增] 核心回退逻辑：根据消息 ID 删除它生成的所有 Facts 和 Events
+  // [新增] 核心回退逻辑：根据消息 ID Delete它生成的所有 Facts 和 Events
   const rollbackTrackerData = (sourceMsgId) => {
     if (!sourceMsgId) return;
 
@@ -685,7 +685,7 @@ const App = () => {
         console.log(
           `[Echoes] 已回退关联的 User Facts (${
             prev.length - filtered.length
-          }条)`,
+          } msgs)`,
         );
       }
       return filtered;
@@ -698,7 +698,7 @@ const App = () => {
         console.log(
           `[Echoes] 已回退关联的 Char Facts (${
             prev.length - filtered.length
-          }条)`,
+          } msgs)`,
         );
       }
       return filtered;
@@ -709,7 +709,7 @@ const App = () => {
       const filtered = prev.filter((item) => item.sourceMsgId !== sourceMsgId);
       if (filtered.length !== prev.length) {
         console.log(
-          `[Echoes] 已回退关联的 Events (${prev.length - filtered.length}条)`,
+          `[Echoes] 已回退关联的 Events (${prev.length - filtered.length} msgs)`,
         );
       }
       return filtered;
@@ -835,7 +835,7 @@ const App = () => {
   const [expandedMusicHistory, setExpandedMusicHistory] = useState(null);
   const [activeMenuIndex, setActiveMenuIndex] = useState(null); // 当前哪个消息显示了菜单
   const [pendingHint, setPendingHint] = useState(null);
-  const [editIndex, setEditIndex] = useState(null); // 当前正在编辑哪条消息
+  const [editIndex, setEditIndex] = useState(null); // 当前正在编辑哪 msgs消息
   const [editContent, setEditContent] = useState(""); // 编辑框的内容
   const longPressTimerRef = useRef(null);
   const [isSummarizing, setIsSummarizing] = useState(false); // Loading status
@@ -875,7 +875,7 @@ const App = () => {
   const virtuosoRef = useRef(null);
   const isAtBottomRef = useRef(true);
 
-  // sticker 查找 Map 缓存 (避免每条消息都 .find 遍历数组)
+  // sticker 查找 Map 缓存 (避免每 msgs消息都 .find 遍历数组)
   const charStickerMap = useMemo(() => new Map(charStickers.map(s => [s.id, s])), [charStickers]);
   const userStickerMap = useMemo(() => new Map(userStickers.map(s => [s.id, s])), [userStickers]);
 
@@ -1025,7 +1025,7 @@ const App = () => {
             sourceMsgId: sourceMsgId, // <--- [关键新增]
           }));
           setCharFacts((prev) => [...newEntries, ...prev]);
-          showToast("success", `更新了角色设定 (${newEntries.length}条)`);
+          showToast("success", `更新了角色设定 (${newEntries.length} msgs)`);
         }
 
         // 3. 处理 Events
@@ -1069,7 +1069,7 @@ const App = () => {
   // --- TRACKER HANDLERS ---
 
   const handleDeleteTrackerItem = async (type, id) => {
-    if (!(await customConfirm("确定删除这条记录吗？"))) return;
+    if (!(await customConfirm("确定Delete这 msgs记录吗？"))) return;
 
     // 修复点：兼容 "fact" (User Facts) 和 "userFact"
     if (type === "userFact" || type === "fact") {
@@ -1108,13 +1108,13 @@ const App = () => {
     setTrackerConfig((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
-  // 删除状态记录函数
+  // Delete状态记录函数
   const handleDeleteStatus = async (index) => {
-    if (await customConfirm("确定删除这条状态记录？")) {
+    if (await customConfirm("确定Delete这 msgs状态记录？")) {
       const newHistory = [...statusHistory];
       newHistory.splice(index, 1);
       setStatusHistory(newHistory);
-      showToast("success", "状态记录已删除");
+      showToast("success", "状态记录已Delete");
     }
   };
 
@@ -1275,7 +1275,7 @@ const App = () => {
     return Array.from(groups);
   };
 
-  // 2. 移动世界书条目到新分组
+  // 2. 移动世界书 msgs目到新分组
   const moveWorldBookEntry = async (id, newGroup) => {
     let finalGroup = newGroup;
     if (newGroup === "NEW_GROUP_TRIGGER") {
@@ -1303,16 +1303,16 @@ const App = () => {
     );
   };
 
-  // [新增] 删除世界书分组 (支持自定义弹窗)
+  // [新增] Delete世界书分组 (支持自定义弹窗)
   const deleteWorldBookGroup = async (groupName) => {
     if (
       await customConfirm(
-        `确定删除分组 "${groupName}" 下的所有条目吗？`,
-        "删除分组",
+        `确定Delete分组 "${groupName}" 下的所有 msgs目吗？`,
+        "Delete分组",
       )
     ) {
       setWorldBook((prev) => prev.filter((w) => w.group !== groupName));
-      showToast("success", "分组已删除");
+      showToast("success", "分组已Delete");
     }
   };
 
@@ -1340,12 +1340,12 @@ const App = () => {
     ]);
   };
 
-  // [新增] 删除表情包库
+  // [新增] Delete表情包库
   const deleteStickerGroup = async (groupName) => {
     if (
       await customConfirm(
-        `确定删除库 "${groupName}" 及其中所有表情包吗？`,
-        "删除表情包库",
+        `确定Delete库 "${groupName}" 及其中所有表情包吗？`,
+        "Delete表情包库",
       )
     ) {
       setCharStickers((prev) => prev.filter((s) => s.group !== groupName));
@@ -1403,9 +1403,9 @@ const App = () => {
 
           const formattedEntries = newEntries
             .map((entry, index) => {
-              let name = entry.comment || entry.name || "未命名词条";
+              let name = entry.comment || entry.name || "未命名词 msgs";
 
-              if (!name || name === "未命名词条") {
+              if (!name || name === "未命名词 msgs") {
                 const k = entry.key || entry.keys;
                 if (Array.isArray(k) && k.length > 0) name = k[0];
                 else if (typeof k === "string") name = k;
@@ -1433,10 +1433,10 @@ const App = () => {
             setWorldBook((prev) => [...prev, ...formattedEntries]);
             showToast(
               "success",
-              `已导入 ${formattedEntries.length} 条至 "${defaultGroupName}"`,
+              `已导入 ${formattedEntries.length}  msgs至 "${defaultGroupName}"`,
             );
           } else {
-            showToast("error", "未找到有效的世界书词条");
+            showToast("error", "未找到有效的世界书词 msgs");
           }
         } catch (err) {
           console.error(err);
@@ -1476,7 +1476,7 @@ const App = () => {
         "添加表情包",
       );
       if (!desc) {
-        // 处理取消 (null)
+        // 处理Cancel (null)
         event.target.value = "";
         return;
       }
@@ -1528,9 +1528,9 @@ const App = () => {
     showToast("success", "修改已保存");
   };
 
-  // 删除表情包
+  // Delete表情包
   const handleDeleteSticker = async (id) => {
-    if (await customConfirm("确定删除这个表情包吗？")) {
+    if (await customConfirm("确定Delete这个表情包吗？")) {
       if (editingSticker?.source === "user") {
         setUserStickers((prev) => prev.filter((s) => s.id !== id));
       } else {
@@ -1591,9 +1591,9 @@ const App = () => {
     const firstKey = cat.keys[0];
     const val = data[firstKey];
     if (val === undefined) return "—";
-    if (catId === "chat") return val?.length ? `${val.length} 条消息` : "—";
+    if (catId === "chat") return val?.length ? `${val.length}  msgs消息` : "—";
     if (catId === "persona") return val?.name || "—";
-    if (catId === "worldbook") return val?.length ? `${val.length} 条目` : "—";
+    if (catId === "worldbook") return val?.length ? `${val.length}  msgs目` : "—";
     if (catId === "memory") {
       const mem = data["echoes_long_memory"];
       return mem ? `${mem.length} 字符` : "—";
@@ -1669,7 +1669,7 @@ const App = () => {
     URL.revokeObjectURL(url);
     setShowExportModal(false);
     setExportData(null);
-    showToast("success", "已导出所选数据");
+    showToast("success", "Data exported");
   };
 
   const importFullBackup = (event) => {
@@ -1684,10 +1684,10 @@ const App = () => {
         const categories = Object.keys(BACKUP_CATEGORIES)
           .filter((id) => BACKUP_CATEGORIES[id].keys.some((k) => allData[k] !== undefined))
           .map((id) => ({ id, selected: true }));
-        if (categories.length === 0) { showToast("error", "备份文件中没有可识别的数据"); return; }
+        if (categories.length === 0) { showToast("error", "No recognizable data in backup"); return; }
         setImportData({ allData, categories });
         setShowImportModal(true);
-      } catch (err) { console.error(err); showToast("error", "文件解析失败: " + err.message); }
+      } catch (err) { console.error(err); showToast("error", "Parse failed: " + err.message); }
     };
     reader.readAsText(file);
   };
@@ -1706,7 +1706,7 @@ const App = () => {
     }
     setShowImportModal(false);
     setImportData(null);
-    showToast("success", `已恢复 ${restored} 个数据项，请刷新页面使设置生效`);
+    showToast("success", `Restored ${restored}  items. Refresh to apply.`);
   };
 
   // 兼容旧接口
@@ -1857,7 +1857,7 @@ const App = () => {
     setLoading({});
     setMessageQueue([]);
     setIsTyping(false);
-    showToast("info", "已取消生成");
+    showToast("info", "已Cancel生成");
   };
 
   // Generator Actions
@@ -2099,7 +2099,7 @@ const App = () => {
       setIsLocked(false);
       showToast("success", "终端已解锁");
 
-      // 离线智能家检测：三个条件都满足时自动生成角色离线生活轨迹
+      // 离线智能家检测：三个 msgs件都满足时自动生成角色离线生活轨迹
       if (smartWatchLocations.length > 0 && realTimeEnabled && lastInteractionTimeLoaded) {
         const gapMs = Date.now() - lastInteractionTime;
         const twoHours = 2 * 3600000;
@@ -2598,7 +2598,7 @@ Requirements:
       let content = m.text || "";
 
       if (m.isVoice) {
-        content = `(发送了一条语音): ${m.text.replace("[语音消息] ", "")}`;
+        content = `(发送了一 msgs语音): ${m.text.replace("[语音消息] ", "")}`;
       }
       if (m.sticker) {
         if (!content || !content.trim()) {
@@ -2805,7 +2805,7 @@ Requirements:
         // 多模态模式：将完整 prompt 拆成 system + 对话历史消息
         messagesParam = [
           ...historyMessages,
-          // 最后一条用户消息包含完整 prompt（含角色设定等）
+          // 最后一 msgs用户消息包含完整 prompt（含角色设定等）
           // 这样模型既能看到图片，又能读到完整的上下文指令
           { role: "user", content: prompt },
         ];
@@ -2880,7 +2880,7 @@ Requirements:
           ]);
         }
 
-        // 处理 AI 返回的消息内容
+        // 处理 AI Back的消息内容
         if (responseData.messages && Array.isArray(responseData.messages)) {
           const newMsgs = responseData.messages.map((item, index) => {
             let actualText =
@@ -2959,7 +2959,7 @@ Requirements:
           setMessageQueue(finalizedMsgs);
           setLastInteractionTime(Date.now());
 
-          // 惊喜逻辑：概率触发发帖或app事件更新（位置/日记/浏览器/账单）
+          // 惊喜逻辑：概率触发发帖orapp事件更新（位置/日记/浏览器/账单）
           if (Math.random() < 0.1) {
             setTimeout(() => {
               triggerAppEvents();
@@ -3079,11 +3079,11 @@ Requirements:
     showToast("success", "已修改");
   };
 
-  // 5. 带确认的删除
+  // 5. 带确认的Delete
   const handleDeleteWithConfirm = async (index) => {
     const msgToDelete = chatHistory[index];
 
-    if (await customConfirm("确定要删除这条消息吗？", "删除消息")) {
+    if (await customConfirm("确定要Delete这 msgs消息吗？", "Delete消息")) {
       if (msgToDelete && msgToDelete.id) {
         rollbackTrackerData(msgToDelete.id);
       }
@@ -3108,8 +3108,8 @@ Requirements:
 
     if (
       await customConfirm(
-        `确定要删除选中的 ${selectedMsgs.size} 条消息吗？`,
-        "批量删除",
+        `确定要Delete选中的 ${selectedMsgs.size}  msgs消息吗？`,
+        "批量Delete",
       )
     ) {
       selectedMsgs.forEach((index) => {
@@ -3123,7 +3123,7 @@ Requirements:
 
       setIsMultiSelectMode(false);
       setSelectedMsgs(new Set());
-      showToast("success", "已批量删除");
+      showToast("success", "已批量Delete");
     }
   };
 
@@ -3199,9 +3199,9 @@ ${charFactsList || "None"}
         effectiveUserName,
       );
 
-      // --- [核心修改] 处理最近 5 条聊天记录 ---
+      // --- [核心修改] 处理最近 5  msgs聊天记录 ---
       const historyText = chatHistory
-        .slice(-5) // 取最后 5 条
+        .slice(-5) // 取最后 5  msgs
         .map((m) => {
           // 判断发送者
           const sender = m.sender === "me" ? effectiveUserName : charName;
@@ -3501,7 +3501,7 @@ Requirements:
       const gapM = Math.floor((gapMs % 3600000) / 60000);
       const gapDesc = gapH > 0 ? `${gapH}小时${gapM > 0 ? gapM + "分钟" : ""}` : `${gapM}分钟`;
 
-      // 根据离开时长决定生成条数
+      // 根据离开时长决定生成 msgs数
       let expectedCount;
       if (gapMs < 12 * 3600000) {
         expectedCount = Math.floor(Math.random() * 3); // 0-2
@@ -3563,12 +3563,12 @@ Requirements:
             fixedItem = JSON.parse(jsonString);
           } catch (e) { /* keep original */ }
 
-          // 反向推算时间戳：LLM 返回的 "time" 字段（HH:MM）代表角色在离开期间某个时刻
+          // 反向推算时间戳：LLM Back的 "time" 字段（HH:MM）代表角色在离开期间某个时刻
           // 最早的事件对应现在 - gapMs，最晚的事件接近现在
           const frac = data.length > 1 ? i / (data.length - 1) : 1; // 0(最早) → 1(最晚)
           const eventMs = now.getTime() - gapMs + frac * gapMs;
           const eventDate = new Date(eventMs);
-          // 用 LLM 返回的 HH:MM 修正时分
+          // 用 LLM Back的 HH:MM 修正时分
           const llmTime = fixedItem.time || (fixedItem.locationName && item.time) || item.time;
           if (llmTime && /^(\d{1,2}):(\d{2})$/.test(llmTime.trim())) {
             const [h, m] = llmTime.trim().split(":").map(Number);
@@ -3587,10 +3587,10 @@ Requirements:
           };
         });
 
-        // prompt 要求 LLM 返回最早→最晚，reverse 后 prepend 让最新在最前面
+        // prompt 要求 LLM Back最早→最晚，reverse 后 prepend 让最新在最前面
         newLogs.reverse();
         setSmartWatchLogs((prev) => [...newLogs, ...prev]);
-        showToast("success", `在你离开期间，智能家有 ${newLogs.length} 条新活动`);
+        showToast("success", `While away: ${newLogs.length}  msgs新活动`);
       }
     } catch (e) {
       console.error("Offline smartwatch update failed:", e);
@@ -3628,7 +3628,7 @@ Requirements:
   // Forum interaction context (hidden, passed to AI)
   const [forumInteractionContext, setForumInteractionContext] = useState(null);
 
-  // Chat Multi-select State (聊天多选状态)
+  // Chat Multi-select State (聊天Select状态)
   const [isMultiSelectMode, setIsMultiSelectMode] = useState(false);
   const [selectedMsgs, setSelectedMsgs] = useState(new Set());
 
@@ -3646,7 +3646,7 @@ Requirements:
       <div id="echoes-chat" className="h-screen w-full bg-[#EBEBF0] flex flex-col items-center justify-center gap-4">
         <RefreshCw className="animate-spin text-gray-400" size={32} />
         <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">
-          正在同步本地数据库...
+          Syncing local database......
         </p>
       </div>
     );
@@ -3690,9 +3690,9 @@ Requirements:
                 className="flex items-center text-gray-600 hover:text-black transition-colors px-2 py-1 -ml-2 rounded-lg hover:bg-white/50 active:scale-95"
               >
                 <ChevronLeft size={22} strokeWidth={1.5} />
-                <span className="text-sm font-medium ml-0.5">返回</span>
+                <span className="text-sm font-medium ml-0.5">Back</span>
               </button>
-              <span className="text-sm font-bold text-gray-800">连接配置</span>
+              <span className="text-sm font-bold text-gray-800">Connection Setup</span>
               <div className="w-20"></div>
             </div>
 
@@ -3751,7 +3751,7 @@ Requirements:
               </div>
               {!avatar && (
                 <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[9px] text-gray-400 tracking-widest uppercase opacity-60 whitespace-nowrap">
-                  点击上传头像
+                  Tap to upload avatar
                 </div>
               )}
             </div>
@@ -3779,7 +3779,7 @@ Requirements:
                     inputKey ? "text-green-700" : "text-gray-600"
                   }`}
                 >
-                  {inputKey ? "档案已就绪" : "导入角色卡"}
+                  {inputKey ? "Ready to sync" : "Import Character Card"}
                 </span>
                 <span className="text-[9px] text-gray-400 uppercase tracking-wider mt-1">
                   {inputKey ? "Ready to sync" : "Upload .JSON File"}
@@ -3801,12 +3801,12 @@ Requirements:
               <div className="flex items-center gap-3">
                 <div className="flex-1 h-[1px] bg-gray-300/50"></div>
                 <span className="text-[9px] text-gray-400 uppercase tracking-wider">
-                  或
+                  or
                 </span>
                 <div className="flex-1 h-[1px] bg-gray-300/50"></div>
               </div>
 
-              {/* 创作助手按钮：仅在核心设定为空时显示 */}
+              {/* Creation Assistant按钮：仅在核心设定为空时显示 */}
               {!inputKey && (
               <button
                 onClick={() => {
@@ -3827,10 +3827,10 @@ Requirements:
                 <div className="flex flex-col items-start text-left">
                   {" "}
                   <span className="text-xs font-bold tracking-wide text-gray-600 group-hover:text-[#7A2A3A]">
-                    创作助手
+                    Creation Assistant
                   </span>
                   <span className="text-[9px] text-gray-400 uppercase tracking-wider mt-1">
-                    用一句话生成角色
+                    Describe in one sentence
                   </span>
                 </div>
                 <div className="p-2 rounded-full bg-gray-100 text-gray-400 group-hover:bg-[#7A2A3A]/10 group-hover:text-[#7A2A3A] transition-colors">
@@ -3839,14 +3839,14 @@ Requirements:
               </button>
               )}
 
-              {/* 直接进入：仅在核心设定为空时显示 */}
+              {/* Enter directly：仅在核心设定为空时显示 */}
               {!inputKey && (
                 <button
                   onClick={unlockDeviceDirect}
                   className="w-full text-center text-[11px] text-gray-400 hover:text-[#7A2A3A] transition-colors py-1"
                   style={{ textDecorationLine: "underline", textDecorationThickness: "1px", textUnderlineOffset: "4px" }}
                 >
-                  直接进入
+                  Enter directly
                 </button>
               )}
 
@@ -3863,7 +3863,7 @@ Requirements:
                 onClick={unlockDevice}
                 disabled={isConnecting || !inputKey}
                 className="p-5 bg-[#2C2C2C] text-white rounded-full hover:scale-110 active:scale-95 transition-all shadow-2xl disabled:opacity-50"
-                aria-label={isConnecting ? "正在连接..." : "解锁设备"}
+                aria-label={isConnecting ? "Syncing......" : "Unlock"}
               >
                 {isConnecting ? (
                   <RefreshCw
@@ -3881,7 +3881,7 @@ Requirements:
           <button
             onClick={() => setShowLockSettings(true)}
             className="text-gray-400 hover:text-[#2C2C2C] transition-colors p-3 rounded-full hover:bg-gray-100/50"
-            aria-label="打开设置"
+            aria-label="Settings"
           >
             <SettingsIcon size={18} strokeWidth={1.5} aria-hidden="true" />
           </button>
@@ -4492,7 +4492,7 @@ Requirements:
                     className="block text-[9px] uppercase text-gray-400 mb-1 font-bold"
                     htmlFor="custom-rules-input"
                   >
-                    世界规则
+                    World Rules
                   </label>
                   <textarea
                     id="custom-rules-input"
@@ -4612,7 +4612,7 @@ Requirements:
                 <div className="absolute bottom-0 left-0 right-0 glass-panel p-4 z-[120] animate-in slide-in-from-bottom-10 rounded-t-2xl">
                   <div className="flex justify-between mb-2">
                     <span className="text-xs font-bold uppercase text-gray-500">
-                      重生成指令
+                      Regenerate
                     </span>
                     <button 
                       onClick={() => setRegenerateTarget(null)}
@@ -4626,7 +4626,7 @@ Requirements:
                     name="regen-hint"
                     autoFocus
                     type="text"
-                    placeholder="例：语气更温柔一点..."
+                    placeholder="e.g. Be gentler......"
                     value={regenHint}
                     onChange={(e) => setRegenHint(e.target.value)}
                     className="w-full p-2 bg-white/50 border border-gray-200 rounded-lg text-sm mb-2 outline-none"
@@ -4637,7 +4637,7 @@ Requirements:
                     }
                     className="w-full py-2 bg-black text-white text-xs rounded-lg font-bold"
                   >
-                    确认重生成
+                    Confirm
                   </button>
                 </div>
               )}
@@ -4673,9 +4673,9 @@ Requirements:
                         {!isMultiSelectMode && activeMenuIndex === i && (
                           <div className={`absolute ${i >= chatHistory.length - 2 ? 'bottom-full mb-2' : 'top-full mt-2'} z-50 flex flex-col items-center animate-in fade-in zoom-in-95 duration-200`}>
                             <div className="bg-[#1a1a1a]/95 backdrop-blur-md text-white rounded-xl shadow-2xl p-1.5 flex gap-1 items-center border border-white/20">
-                              <button onClick={(e) => { e.stopPropagation(); setIsMultiSelectMode(true); setSelectedMsgs(new Set([i])); setActiveMenuIndex(null); }} className="flex flex-col items-center gap-1 p-2 hover:bg-white/20 rounded-lg min-w-[40px]"><span className="text-[11px]">多选</span></button>
+                              <button onClick={(e) => { e.stopPropagation(); setIsMultiSelectMode(true); setSelectedMsgs(new Set([i])); setActiveMenuIndex(null); }} className="flex flex-col items-center gap-1 p-2 hover:bg-white/20 rounded-lg min-w-[40px]"><span className="text-[11px]">Select</span></button>
                               <div className="w-[1px] h-4 bg-white/20"></div>
-                              <button onClick={(e) => { e.stopPropagation(); handleDeleteWithConfirm(i); }} className="flex flex-col items-center gap-1 p-2 hover:bg-red-500/50 rounded-lg min-w-[40px] text-red-300 hover:text-white"><span className="text-[11px]">删除</span></button>
+                              <button onClick={(e) => { e.stopPropagation(); handleDeleteWithConfirm(i); }} className="flex flex-col items-center gap-1 p-2 hover:bg-red-500/50 rounded-lg min-w-[40px] text-red-300 hover:text-white"><span className="text-[11px]">Delete</span></button>
                             </div>
                             <div className="fixed inset-0 z-[-1]" onClick={(e) => { e.stopPropagation(); setActiveMenuIndex(null); }}></div>
                           </div>
@@ -4718,7 +4718,7 @@ Requirements:
                             <div className="flex flex-col gap-2 w-64 animate-in zoom-in-95">
                               <textarea value={editContent} onChange={(e) => setEditContent(e.target.value)} className="w-full p-2 text-sm border border-gray-300 rounded-xl outline-none focus:border-black transition-colors resize-none h-24 bg-white/90" />
                               <div className="flex gap-2 justify-end">
-                                <button onClick={() => setEditIndex(null)} className="px-3 py-1 text-xs bg-gray-200 rounded-full text-gray-600">取消</button>
+                                <button onClick={() => setEditIndex(null)} className="px-3 py-1 text-xs bg-gray-200 rounded-full text-gray-600">Cancel</button>
                                 <button onClick={() => saveEdit(i)} className="px-3 py-1 text-xs bg-black text-white rounded-full">保存</button>
                               </div>
                             </div>
@@ -4775,9 +4775,9 @@ Requirements:
                                 <div className="w-[1px] h-4 bg-white/20"></div>
                                 <button onClick={(e) => { e.stopPropagation(); startEdit(i, msg.text); }} className="flex flex-col items-center gap-1 p-2 hover:bg-white/20 rounded-lg min-w-[40px]"><span className="text-[11px]">改写</span></button>
                                 <div className="w-[1px] h-4 bg-white/20"></div>
-                                <button onClick={(e) => { e.stopPropagation(); setIsMultiSelectMode(true); setSelectedMsgs(new Set([i])); setActiveMenuIndex(null); }} className="flex flex-col items-center gap-1 p-2 hover:bg-white/20 rounded-lg min-w-[40px]"><span className="text-[11px]">多选</span></button>
+                                <button onClick={(e) => { e.stopPropagation(); setIsMultiSelectMode(true); setSelectedMsgs(new Set([i])); setActiveMenuIndex(null); }} className="flex flex-col items-center gap-1 p-2 hover:bg-white/20 rounded-lg min-w-[40px]"><span className="text-[11px]">Select</span></button>
                                 <div className="w-[1px] h-4 bg-white/20"></div>
-                                <button onClick={(e) => { e.stopPropagation(); handleDeleteWithConfirm(i); }} className="flex flex-col items-center gap-1 p-2 hover:bg-red-500/50 rounded-lg min-w-[40px] text-red-300 hover:text-white"><span className="text-[11px]">删除</span></button>
+                                <button onClick={(e) => { e.stopPropagation(); handleDeleteWithConfirm(i); }} className="flex flex-col items-center gap-1 p-2 hover:bg-red-500/50 rounded-lg min-w-[40px] text-red-300 hover:text-white"><span className="text-[11px]">Delete</span></button>
                               </div>
                               <div className="fixed inset-0 z-[-1]" onClick={(e) => { e.stopPropagation(); setActiveMenuIndex(null); }}></div>
                             </div>
@@ -4836,7 +4836,7 @@ Requirements:
               />
 
               {isMultiSelectMode ? (
-                /* 多选操作栏 */
+                /* Select操作栏 */
                 <div className="flex items-center justify-between px-2 animate-in slide-in-from-bottom-2">
                   <button
                       onClick={() => {
@@ -4845,10 +4845,10 @@ Requirements:
                       }}
                       className="px-6 py-2 bg-gray-200 text-gray-700 rounded-full text-xs font-bold"
                     >
-                      取消
+                      Cancel
                     </button>
                     <span className="text-xs font-bold text-gray-500">
-                      已选 {selectedMsgs.size} 条
+                      Selected {selectedMsgs.size}  msgs
                     </span>
                     <button
                       onClick={handleBatchDelete}
@@ -4856,7 +4856,7 @@ Requirements:
                       className="px-6 py-2 bg-red-500 text-white rounded-full text-xs font-bold disabled:opacity-50 flex items-center gap-2"
                     >
                       <Trash2 size={14} />
-                      删除
+                      Delete
                     </button>
                   </div>
                 ) : (
@@ -4925,7 +4925,7 @@ Requirements:
                         onClick={stopGeneration}
                         className="w-full py-2.5 bg-red-50 text-red-500 rounded-full text-xs font-bold flex items-center justify-center gap-2 animate-pulse"
                       >
-                        <X size={14} /> 取消生成
+                        <X size={14} /> Cancel生成
                       </button>
                     ) : (
                       <>
@@ -5041,7 +5041,7 @@ Requirements:
                             <button
                               onClick={() => triggerAIResponse()}
                               className="p-2 md:p-2.5 bg-[#2C2C2C] text-white rounded-full hover:bg-gray-200 border border-gray-200 transition-all active:scale-95"
-                              title="让对方回复"
+                              title="Trigger reply"
                             >
                               <MessageSquare size={18} strokeWidth={1.5} />
                             </button>
@@ -5057,7 +5057,7 @@ Requirements:
           {/* APP: SETTINGS */}
           <AppWindow
             isOpen={activeApp === "settings"}
-            title="系统设置"
+            title="Settings"
             onClose={() => setActiveApp(previousApp)}
           >
             <div className="h-full pt-4">
@@ -5164,7 +5164,7 @@ Requirements:
               {showEventsInDiary ? (
                 /* --- A. 共同经历列表 (原 Identity 里的代码移过来) --- */
                 <div className="animate-in slide-in-from-right-4">
-                  {/* 统计条 */}
+                  {/* 统计 msgs */}
                   <div className="flex gap-2 mb-4">
                     <div className="flex-1 bg-white p-3 rounded-xl border border-gray-100 text-center">
                       <div className="text-lg font-bold text-black">
@@ -5405,7 +5405,7 @@ Requirements:
             onClose={() => setActiveApp(null)}
             persona={persona}
             userName={userName}
-            userPersona={inputKey} // 或者是你的 charDescription 变量名
+            userPersona={inputKey} // or者是你的 charDescription 变量名
             apiConfig={apiConfig}
             prompts={prompts}
             generateContent={generateContent}
@@ -6034,7 +6034,7 @@ Requirements:
                 <input
                   id="loc-addr-input"
                   className="w-full bg-gray-50 border border-gray-200 rounded-lg p-2.5 text-sm focus:border-[#7A2A3A] focus:outline-none transition-colors"
-                  placeholder="自动生成或手动输入..."
+                  placeholder="自动生成or手动输入..."
                 />
               </div>
             </div>
@@ -6045,7 +6045,7 @@ Requirements:
                 onClick={() => setShowLocationModal(false)}
                 className="flex-1 py-2.5 bg-gray-100 text-gray-600 rounded-xl text-sm font-medium hover:bg-gray-200 transition-colors"
               >
-                取消
+                Cancel
               </button>
               <button
                 onClick={() => {
@@ -6099,7 +6099,7 @@ Requirements:
             {/* 分隔线 */}
             <div className="flex items-center gap-3">
               <div className="flex-1 h-px bg-gray-200" />
-              <span className="text-xs text-gray-400">或</span>
+              <span className="text-xs text-gray-400">or</span>
               <div className="flex-1 h-px bg-gray-200" />
             </div>
 
@@ -6112,12 +6112,12 @@ Requirements:
               输入图片描述
             </button>
 
-            {/* 取消按钮 */}
+            {/* Cancel按钮 */}
             <button
               onClick={() => setShowImageModal(false)}
               className="w-full py-2.5 text-gray-400 text-sm hover:text-gray-600 transition-colors"
             >
-              取消
+              Cancel
             </button>
           </div>
         </div>
@@ -6128,8 +6128,8 @@ Requirements:
         <div className="fixed inset-0 z-[250] bg-black/40 backdrop-blur-sm flex items-center justify-center p-6">
           <div className="bg-white/95 backdrop-blur-xl w-full max-w-sm rounded-2xl shadow-2xl p-5 border border-white/50 flex flex-col gap-4 max-h-[80vh] overflow-y-auto">
             <div className="text-center">
-              <h3 className="text-base font-bold text-gray-800">恢复备份</h3>
-              <p className="text-[11px] text-gray-400 mt-1">勾选需要恢复的数据分类</p>
+              <h3 className="text-base font-bold text-gray-800">Restore Backup</h3>
+              <p className="text-[11px] text-gray-400 mt-1">Select categories to restore</p>
             </div>
 
             <div className="space-y-1.5">
@@ -6175,26 +6175,26 @@ Requirements:
                 onClick={() => { setShowImportModal(false); setImportData(null); }}
                 className="flex-1 py-2.5 text-gray-500 bg-gray-100 rounded-xl text-sm font-medium hover:bg-gray-200 transition-colors"
               >
-                取消
+                Cancel
               </button>
               <button
                 onClick={doImport}
                 className="flex-1 py-2.5 bg-black text-white rounded-xl text-sm font-bold hover:bg-gray-800 transition-colors"
               >
-                恢复选中
+                Restore selected
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* 导出备份勾选弹窗 */}
+      {/* Export Backup勾选弹窗 */}
       {showExportModal && exportData && (
         <div className="fixed inset-0 z-[250] bg-black/40 backdrop-blur-sm flex items-center justify-center p-6">
           <div className="bg-white/95 backdrop-blur-xl w-full max-w-sm rounded-2xl shadow-2xl p-5 border border-white/50 flex flex-col gap-4 max-h-[80vh] overflow-y-auto">
             <div className="text-center">
-              <h3 className="text-base font-bold text-gray-800">导出备份</h3>
-              <p className="text-[11px] text-gray-400 mt-1">勾选需要导出的数据分类</p>
+              <h3 className="text-base font-bold text-gray-800">Export Backup</h3>
+              <p className="text-[11px] text-gray-400 mt-1">Select categories to export</p>
             </div>
 
             <div className="space-y-1.5">
@@ -6240,13 +6240,13 @@ Requirements:
                 onClick={() => { setShowExportModal(false); setExportData(null); }}
                 className="flex-1 py-2.5 text-gray-500 bg-gray-100 rounded-xl text-sm font-medium hover:bg-gray-200 transition-colors"
               >
-                取消
+                Cancel
               </button>
               <button
                 onClick={doExport}
                 className="flex-1 py-2.5 bg-black text-white rounded-xl text-sm font-bold hover:bg-gray-800 transition-colors"
               >
-                导出选中
+                Export selected
               </button>
             </div>
           </div>
@@ -6287,7 +6287,7 @@ const SoulLink = () => (
       fill="none"
       // 修改2：添加黑色描边
       stroke="black"
-      // 修改3：设置描边宽度（可根据需要微调，例如 1 或 2）
+      // 修改3：设置描边宽度（可根据需要微调，例如 1 or 2）
       strokeWidth="1.5"
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -6356,11 +6356,11 @@ const StickerGroup = ({
             <Edit2 size={12} />
           </button>
 
-          {/* 删除 */}
+          {/* Delete */}
           <button
             onClick={() => deleteStickerGroup(group)}
             className="text-gray-300 hover:text-red-500 p-1 transition-colors"
-            title="删除库"
+            title="Delete库"
           >
             <Trash2 size={12} />
           </button>

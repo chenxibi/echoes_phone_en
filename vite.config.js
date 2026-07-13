@@ -10,10 +10,10 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      // 2. 自动更新模式
-      registerType: "autoUpdate",
+      // 2. 提示更新模式（检测到新版本时弹窗让用户确认）
+      registerType: "prompt",
 
-      // 3. 包含图标和 favicon
+      // 3. 包含图标�?favicon
       includeAssets: [
         "favicon.ico",
         "apple-touch-icon_v3.png",
@@ -29,7 +29,7 @@ export default defineConfig({
         background_color: "#ffffff",
         display: "standalone", // 设为 standalone 才能全屏运行
 
-        // 【关键】配置图标，Vite 会自动根据 base 路径处理
+        // 【关键】配置图标，Vite 会自动根�?base 路径处理
         icons: [
           {
             src: "pwa-192x192_v3.png",

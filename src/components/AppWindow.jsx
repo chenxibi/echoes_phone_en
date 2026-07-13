@@ -34,7 +34,7 @@ const AppWindow = ({ isOpen, title, children, onClose, isChat, actions }) => {
           aria-label="Go back"
         >
           <ChevronLeft size={22} strokeWidth={1.5} aria-hidden="true" />
-          <span className="text-sm font-medium ml-0.5">Back</span>
+          <span className="text-sm font-medium ml-0.5">返回</span>
         </button>
         <span className="text-sm font-bold text-gray-800">{title}</span>
         <div className="flex items-center gap-2">
