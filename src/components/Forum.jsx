@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+﻿import React, { useState, useEffect, useRef } from "react";
 import {
   RefreshCw,
   Hash,
@@ -35,7 +35,7 @@ const Forum = ({
   generateContent,
   showToast,
   worldInfoString, // [关键修改] 直接接收字符串，不再调用 getWorldInfoString()
-  worldBook, // [新增] World Book array for confirmation dialog
+  worldBook, // [新增] 世界书数组，用于二次确认判断
   getCurrentTimeObj,
   getContextString, // 获取聊天记录上下文
   customConfirm,
@@ -50,8 +50,11 @@ const Forum = ({
   onChatEventPost, // 聊天事件触发发帖的回调
   forumInteractionContext, // 论坛互动上下文（隐式传给AI）
   setForumInteractionContext, // 更新论坛互动上下文的回调
-  dialogsShown, // [新增] Track which guidance dialogs have been shown
-  setDialogsShown, // [新增] Mark dialog as shown
+  dialogsShown, // [新增] 引导弹窗已显示追踪
+  setDialogsShown, // [新增] 标记弹窗已显示
+  unseenAuto, // App 图标红点状态
+  markUnseen, // 标记未读
+  clearUnseen, // 清除未读
 }) => {
   // --- 内部状态管理 ---
   const [forumData, setForumData] = useStickyState(
@@ -95,13 +98,13 @@ const Forum = ({
 
   // --- 辅助逻辑 ---
   const getForumName = (type) => {
-    if (type === "me") return forumSettings.userNick || userName || "User本U";
+    if (type === "me") return forumSettings.userNick || "User本U";
     if (type === "char")
-      return forumSettings.charNick || persona?.name || "匿名用户";
+      return forumSettings.charNick || "匿名用户";
     return "匿名网友";
   };
 
-  // Format author name for interaction context: nickname (real name)
+  // 格式化论坛作者名：网名（真名），用于互动上下文
   const formatAuthorWithRealName = (author, authorType) => {
     if (authorType === "me" || authorType === "smurf") {
       return `${author}（${userName || "User"}）`;
@@ -112,7 +115,8 @@ const Forum = ({
     return author;
   };
 
-  // Scan all forum posts for char-user interactions, generate hidden context for AI
+  // 扫描整个论坛数据，检测 char 和 user 大号之间的所有互动
+  // 生成隐式上下文，传给聊天 prompt
   const syncForumInteractions = (forumDataSnapshot) => {
     const charNick = forumSettings.charNick || "匿名用户";
     const userNick = forumSettings.userNick || "User本U";
@@ -130,9 +134,13 @@ const Forum = ({
         const isUserReply = (r.authorType === "me" || r.author === userNick) && !r.isSmurfReply;
         const isUserMainReply = r.authorType === "me" || (r.author === userNick && r.authorType !== "smurf");
         
+        // char 回复了 user 大号
         const charRepliedUser = isCharReply && r.replyTo && r.replyTo === userNick;
+        // user 大号回复了 char
         const userRepliedChar = isUserReply && r.replyTo && r.replyTo === charNick;
+        // char 在 user 的帖子里评论
         const charInUserThread = isCharReply && post.authorType === "me";
+        // user 在 char 的帖子里评论
         const userInCharThread = isUserMainReply && post.authorType === "char";
         
         if (charRepliedUser || userRepliedChar || charInUserThread || userInCharThread) {
@@ -142,8 +150,9 @@ const Forum = ({
       }
       
       if (hasCharUserInteraction) {
+        // 构建完整帖子上下文
         const threadAuthor = formatAuthorWithRealName(post.author, post.authorType);
-        let context = `Thread: ${post.title}\nAuthor: ${threadAuthor}\nContent: ${post.content}\n\nReplies:\n`;
+        let context = `帖子标题：${post.title}\n作者：${threadAuthor}\n内容：${post.content}\n\n回复：\n`;
         for (const r of replies) {
           const rAuthor = formatAuthorWithRealName(r.author, r.authorType || (r.isCharacter ? "char" : r.authorType));
           const rReplyTo = r.replyTo 
@@ -157,7 +166,7 @@ const Forum = ({
     
     if (interactions.length > 0) {
       const joined = interactions.join("\n\n---\n\n");
-      setForumInteractionContext(`${charName} and ${currentUserName} interacted in the forum:\n\n${joined}`);
+      setForumInteractionContext(`${charName}和${currentUserName}刚刚在论坛中发生了以下互动：\n\n${joined}`);
     } else {
       setForumInteractionContext(null);
     }
@@ -201,16 +210,16 @@ const Forum = ({
     if (!persona) return;
     if (!checkCanGenerate()) return;
 
-    // If World Book is empty or has no enabled entries, show confirmation dialog (only first time)
+    // 如果世界书为空或没有启用条目，弹出二次确认（仅首次）
     const worldBookArr = worldBook || [];
     const hasEnabledEntries = worldBookArr.length > 0 && worldBookArr.some((e) => e.enabled);
     if (!hasEnabledEntries && !dialogsShown.forumNoWorld) {
       setDialogsShown((prev) => ({ ...prev, forumNoWorld: true }));
       const confirmed = await customConfirm(
         worldBookArr.length === 0
-          ? "No entries in World Book. Content may be generated without world settings.\n\nContinue initializing?"
-          : "World Book entries are all disabled. Content may be generated without world settings.\n\nContinue initializing?",
-        "Reminder",
+          ? "世界书中没有任何条目，可能会在「无世界观设定」的环境中生成初始内容。\n\n是否确定继续初始化？"
+          : "世界书中的条目处于关闭状态，可能会在「无世界观设定」的环境中生成初始内容。\n\n是否确定继续初始化？",
+        "提醒",
         false
       );
       if (!confirmed) return;
@@ -225,7 +234,7 @@ const Forum = ({
 
     try {
       const data = await generateContent(
-        // 【修改处】使用格式化后的系统提示词
+        // 【修改处】使用格式化后的System Prompt
         { prompt, systemInstruction: getFormattedSystemPrompt() },
         apiConfig,
         (err) => showToast("error", err),
@@ -330,8 +339,15 @@ const Forum = ({
       userLastReplyIndex !== -1 ? allReplies[userLastReplyIndex] : null;
     const isSmurfReply = userLastReply && userLastReply.authorType === "smurf";
 
+    // 取最近的评论作为 AI 上下文
+    let contextList = allReplies.slice(-MAX_AI_REPLY_CONTEXT);
+
+    // 声明网名变量（后续 map 回调里用到，必须在声明之前引用）
+    const userNick = forumSettings.userNick || "User本U";
+    const charNick = forumSettings.charNick || "匿名用户";
+
         if (allReplies.length > MAX_AI_REPLY_CONTEXT) {
-      showToast("warning", `Thread has more than ${MAX_AI_REPLY_CONTEXT} replies. Only the latest ${MAX_AI_REPLY_CONTEXT} will be used. Consider deleting older comments for better interaction.`);
+      showToast("warning", `当前帖子评论超过${MAX_AI_REPLY_CONTEXT}条，将仅使用最新的${MAX_AI_REPLY_CONTEXT}条评论。建议删除靠前的旧评论以获得更好的互动体验。`);
     }
     if (userLastReply && !contextList.find((r) => r.id === userLastReply.id)) {
       contextList = [userLastReply, ...contextList];
@@ -339,10 +355,20 @@ const Forum = ({
 
     const existingRepliesStr = contextList
       .map((r) => {
-        if (r.replyTo) {
-          return `${r.author} → ${r.replyTo}: ${r.content}`;
+        // 动态替换 char/user 的显示名，避免改网名后出现新旧名字
+        let displayAuthor = r.author;
+        if (r.isCharacter) displayAuthor = charNick;
+        else if (r.isUser || r.authorType === "me") displayAuthor = userNick;
+        let displayReplyTo = r.replyTo;
+        if (displayReplyTo) {
+          const target = contextList.find(c => c.author === r.replyTo);
+          if (target?.isCharacter) displayReplyTo = charNick;
+          else if (target?.isUser || target?.authorType === "me") displayReplyTo = userNick;
         }
-        return `${r.author}: ${r.content}`;
+        if (displayReplyTo) {
+          return `${displayAuthor} → ${displayReplyTo}: ${r.content}`;
+        }
+        return `${displayAuthor}: ${r.content}`;
       })
       .join("\n");
 
@@ -366,8 +392,6 @@ const Forum = ({
       !isSmurfReply;
     const aiPromptMode = (isCharThread || mode === "Manual" || hasMainUserReplied) ? "Manual" : "Auto";
     const currentUserName = userName || "User";
-    const userNick = forumSettings.userNick || userName || "User本U";
-    const charNick = forumSettings.charNick || persona.name || "匿名用户";
 
     let targetInstruction = "";
     if (isSmurfReply) {
@@ -390,7 +414,7 @@ const Forum = ({
     } else if (!charHasRepliedToUser) {
       targetInstruction = `
         - **Targeting Priority**: "${userNick}" just commented and is waiting for a reply.
-        - **Action**: ${persona.name} MUST prioritize replying to "${userNick}"'s latest comment.
+        - **Action**: {{char}} MUST prioritize replying to "${userNick}"'s latest comment.
         `;
     } else {
       targetInstruction = `
@@ -418,8 +442,9 @@ ${recentHistory}
 [USER IDENTITY INFO - CRITICAL]:
 - Real User Name: "${currentUserName}"
 - User's Current Forum Nickname: "${userNick}"
-${isUserThread ? `- **CRITICAL**: "${userNick}" IS the author (OP) of this thread. ${persona.name} and the NPCs will treat them as one identity.` : ""}
-- **ABSOLUTE RULE**: "${persona.name}" KNOWS that "${userNick}" is "${currentUserName}".
+${isUserThread ? `- **CRITICAL**: "${userNick}" IS the author (OP) of this thread. {{char}} and the NPCs will treat them as one identity. "${userNick}" is "${currentUserName}"'s forum nickname — they are the SAME PERSON.` : ""}
+- **Character Self-Awareness**: {{char}}'s forum nickname is "${charNick}". Any reply in the context from "${charNick}" is sent by {{char}}. When others reply targeting "${charNick}", they are talking to {{char}}.
+- **ABSOLUTE RULE**: "{{char}}" KNOWS that "${userNick}" is "${currentUserName}".
 - **Netizen Logic**: Random NPCs should react to "${userNick}" if they comment.
 ${realNameContext}
 - **Character Logic**: 
@@ -431,7 +456,7 @@ ${realNameContext}
 [SCENARIO CONSTRAINT]:
 - This is a random background thread.
 - **Netizen Logic**: Normal internet users discussing the topic "{{TITLE}}".
-- **Character Logic**: ${persona.name} should ONLY reply if the topic is extremely interesting.
+- **Character Logic**: {{char}} should ONLY reply if the topic is extremely interesting.
 `;
     }
 
@@ -453,12 +478,16 @@ ${realNameContext}
       .replaceAll("{{EXISTING_REPLIES}}", existingRepliesStr || "None")
       .replaceAll("{{RELATIONSHIP_CONTEXT}}", relationshipContextBlock)
       .replaceAll("{{char}}", persona.name)
+      .replaceAll("{{user}}", currentUserName)
       .replaceAll("{{CHAR_NICK}}", charNick)
       .replaceAll("{{USER_NICK}}", userNick)
       .replaceAll(
         "{{CHAR_DESCRIPTION}}",
         userPersona + "\n" + charTrackerContext,
       )
+      .replaceAll("{{CHARACTER_INSTRUCTION}}", aiPromptMode === "Manual"
+        ? "{{char}} MUST reply to this thread. If {{user}} has commented, {{char}}'s FIRST reply MUST target {{user}} (replyTo: {{USER_NICK}}). {{char}} may also reply to other NPCs if relevant, but this is optional."
+        : "{{char}} should ONLY reply if the topic is *directly* related to their specific interests. Otherwise, return NO character reply.")
       .replaceAll("{{WORLD_INFO}}", cleanWorldInfo);
 
     try {
@@ -561,7 +590,7 @@ ${realNameContext}
     setLoading((prev) => ({ ...prev, chat_event_post: true }));
 
     const currentUserName = userName || "User";
-    const charNick = forumSettings.charNick || persona.name || "匿名用户";
+    const charNick = forumSettings.charNick || "匿名用户";
     const cleanWorldInfo = worldInfoString || "";
 
     const prompt = prompts.forum_chat_event
@@ -581,7 +610,7 @@ ${realNameContext}
         (err) => showToast("error", err),
       );
 
-      if (data && data.shouldPost && data.title && data.content) {
+      if (data && data.title && data.content) {
         const newPost = {
           id: `char_${Date.now()}`,
           author: charNick,
@@ -616,6 +645,7 @@ ${realNameContext}
         }
         if (onChatEventPost) {
           onChatEventPost(newPost);
+          markUnseenDot("forum");
         }
         if (typeof showToast === "function") showToast("info", `${charNick}在生活圈发布了一条帖子`);
       }
@@ -671,7 +701,7 @@ ${realNameContext}
     if (!content.trim()) return;
     const replyAuthor =
       type === "smurf"
-        ? forumSettings.smurfNick || "马甲用户"
+        ? forumSettings.smurfNick || "不是小号"
         : getForumName("me");
     
     // Extract replyTo from "回复 xxx: " prefix
@@ -744,17 +774,22 @@ ${realNameContext}
     }
   };
 
-  const handleForwardToChat = (item, type = "post", parentTitle = "") => {
+  const handleForwardToChat = (item, type = "post", parentTitle = "", thread = null) => {
     const content =
       type === "post"
         ? `【转发帖子】\n标题：${item.title}\n作者：${item.author}\n内容：${item.content}`
         : `【转发评论】\n来源帖子：${parentTitle}\n评论人：${item.author}\n内容：${item.content}`;
 
+    // 转发时附带上完整帖子上下文（标题+内容+所有评论），方便 AI 理解前因后果
+    const fullContext = thread
+      ? `【帖子】${thread.title}\n楼主：${thread.author}\n${thread.content}\n\n--- 评论区 ---\n${(thread.replies || []).map((r) => `${r.author}${r.replyTo ? ' → ' + r.replyTo : ''}: ${r.content}`).join('\n')}`
+      : item.content;
+
     const newMsg = {
       sender: "me",
       text: content,
       isForward: true,
-      forwardData: { ...item, type, parentTitle },
+      forwardData: { ...item, type, parentTitle, fullContext },
       time: formatTime(getCurrentTimeObj()),
     };
 
@@ -762,11 +797,12 @@ ${realNameContext}
     setMsgCountSinceSummary((prev) => prev + 1);
 
     const isUserAuthor =
-      item.author === getForumName("me") || item.authorType === "me";
+      item.author === getForumName("me") || item.authorType === "me" || item.isUser;
     const isCharAuthor =
-      item.author === getForumName("char") ||
+      item.isCharacter ||
       item.authorType === "char" ||
-      item.isCharacter;
+      item.author === getForumName("char") ||
+      item.author === (persona?.name || "");
 
     let contextStr = "";
     if (isUserAuthor) {
@@ -987,11 +1023,21 @@ ${realNameContext}
                         </span>
                       </div>
                     </div>
-                    {reply.replyTo && (
-                      <span className="text-[10px] font-medium text-gray-400 mr-1">
-                        回复 {reply.replyTo}：
-                      </span>
-                    )}
+                    {reply.replyTo && (() => {
+                      // 动态映射 replyTo 为正确的显示名
+                      const charNick = forumSettings.charNick || "匿名用户";
+                      const userNick = forumSettings.userNick || "User本U";
+                      let displayReplyTo = reply.replyTo;
+                      // 检查 replyTo 是否指向 char（比较真名或 isCharacter）
+                      const targetReply = (thread.replies || []).find(r => r.author === reply.replyTo);
+                      if (targetReply?.isCharacter || reply.replyTo === (persona?.name || "")) displayReplyTo = charNick;
+                      else if (targetReply?.isUser || targetReply?.authorType === "me" || reply.replyTo === (userName || "User")) displayReplyTo = userNick;
+                      return (
+                        <span className="text-[10px] font-medium text-gray-400 mr-1">
+                          回复 {displayReplyTo}：
+                        </span>
+                      );
+                    })()}
                     <p className="text-gray-800 leading-relaxed break-words">
                       {reply.content}
                     </p>
@@ -1008,10 +1054,10 @@ ${realNameContext}
                         className="bg-transparent font-bold outline-none text-white appearance-none cursor-pointer text-center min-w-[60px]"
                       >
                         <option value="me" className="text-black">
-                          大号 ({forumSettings.userNick || "我"})
+                          大号 ({forumSettings.userNick || "User本U"})
                         </option>
                         <option value="smurf" className="text-black">
-                          小号 ({forumSettings.smurfNick || "马甲"})
+                          小号 ({forumSettings.smurfNick || "不是小号"})
                         </option>
                       </select>
                       <ChevronDown size={10} className="opacity-60 mr-1" />
