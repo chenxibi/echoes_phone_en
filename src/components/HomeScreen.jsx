@@ -10,24 +10,24 @@ const HomeScreen = ({
   useStickyState,
 }) => {
   const [currentPage, setCurrentPage] = useState(0);
-  // 存储每个图标的坐标 { app_id: {x, y} }
+  // Store each icon's coordinates { app_id: {x, y} }
   const [positions, setPositions] = useStickyState({}, "echoes_icon_positions");
   const [draggingApp, setDraggingApp] = useState(null);
   const containerRef = useRef(null);
 
-  // 处理拖拽开始
+  // Handle drag start
   const handleDragStart = (id, e) => {
     setDraggingApp(id);
     e.dataTransfer.setData("text/plain", id);
   };
 
-  // 处理拖拽放置
+  // Handle drop
   const handleDrop = (e) => {
     e.preventDefault();
     if (!draggingApp || !containerRef.current) return;
 
     const rect = containerRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left - 30; // 居中修正
+    const x = e.clientX - rect.left - 30; // Center correction
     const y = e.clientY - rect.top - 30;
 
     setPositions({
@@ -44,10 +44,10 @@ const HomeScreen = ({
       onDragOver={(e) => e.preventDefault()}
       onDrop={handleDrop}
     >
-      {/* 页面 1：App 与 黑胶组件 */}
+      {/* Page 1: Apps & Vinyl Widget */}
       {currentPage === 0 && (
         <div className="w-full h-full p-8">
-          {/* 2x2 黑胶挂件 (固定或拖拽) */}
+          {/* 2x2 Vinyl Widget (fixed or draggable) */}
           <div
             className="absolute z-20 group"
             style={{
@@ -82,7 +82,7 @@ const HomeScreen = ({
             </div>
           </div>
 
-          {/* 渲染 App 图标 */}
+          {/* Render App Icons */}
           {apps.map((app) => (
             <div
               key={app.id}
@@ -96,7 +96,7 @@ const HomeScreen = ({
               }}
             >
               <div className="w-14 h-14 bg-white rounded-2xl shadow-sm flex items-center justify-center text-[#7A2A3A] group-active:scale-90 transition-all">
-                {/* 修改这里：如果是组件则渲染为标签，如果是元素则直接渲染 */}
+                {/* Modified: if it's a component render as tag, if element render directly */}
                 {typeof app.icon === "function" ||
                 (typeof app.icon === "object" && app.icon.$$typeof) ? (
                   <app.icon size={24} />
@@ -112,7 +112,7 @@ const HomeScreen = ({
         </div>
       )}
 
-      {/* 页面 2：系统操作 */}
+      {/* Page 2: System Actions */}
       {currentPage === 1 && (
         <div className="w-full h-full flex flex-col items-center justify-center p-10 animate-in fade-in zoom-in duration-300">
           <button
@@ -128,7 +128,7 @@ const HomeScreen = ({
         </div>
       )}
 
-      {/* 底部页面指示器 */}
+      {/* Bottom page indicator */}
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-3">
         {[0, 1].map((i) => (
           <div

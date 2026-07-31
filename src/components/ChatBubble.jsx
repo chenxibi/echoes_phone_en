@@ -21,7 +21,7 @@ import { echoesDB } from "../utils/appHelpers";
    - Screen reader support
    ============================================ */
 
-// 2D 骰子面（静态展示）
+// 2D dice face (static display)
 const DiceFace = ({ value, bg = "#ffffff", dotColor = "#1a1a1a", className = "" }) => {
   const dots = {
     1: [[1,1]],
@@ -75,7 +75,7 @@ const ChatBubble = ({
   const isRealImage = msg.isImage && msg.imageKey;
   const hasStatus = msg.sender === "char" && msg.status;
 
-  // 加载真实图片
+  // Load real image
   const [realImageUrl, setRealImageUrl] = useState(null);
   useEffect(() => {
     if (isRealImage && msg.imageKey) {
@@ -107,7 +107,7 @@ const ChatBubble = ({
       >
         <button
           className="bg-gray-200/60 backdrop-blur-sm text-gray-500 text-[10px] font-bold px-3 py-1 rounded-full shadow-sm cursor-pointer transition-default hover:bg-gray-200"
-          aria-label={`系统消息: ${msg.text}`}
+          aria-label={`System message: ${msg.text}`}
           onClick={() => {}}
           onContextMenu={(e) => e.preventDefault()}
         >
@@ -128,8 +128,8 @@ const ChatBubble = ({
       role="listitem"
       aria-label={
         isMe
-          ? `我的消息: ${msg.text?.substring(0, 50)}${msg.text?.length > 50 ? "..." : ""}`
-          : `${persona?.name || "AI"}的消息: ${msg.text?.substring(0, 50)}${msg.text?.length > 50 ? "..." : ""}`
+          ? `My message: ${msg.text?.substring(0, 50)}${msg.text?.length > 50 ? "..." : ""}`
+          : `${persona?.name || "AI"}'s message: ${msg.text?.substring(0, 50)}${msg.text?.length > 50 ? "..." : ""}`
       }
     >
       {/* Multi-select checkbox */}
@@ -195,7 +195,7 @@ const ChatBubble = ({
         {/* Sticker */}
         {stickerUrl && !isTransfer && (
           <div className="w-32 rounded-xl overflow-hidden shadow-sm border border-gray-100">
-            <img src={stickerUrl} alt={msg.sticker?.desc || "表情包"} />
+            <img src={stickerUrl} alt={msg.sticker?.desc || "sticker"} />
           </div>
         )}
 
@@ -206,7 +206,7 @@ const ChatBubble = ({
 
         {/* Location */}
         {isLocation && !isTransfer && (
-          <LocationBubble name={msg.location?.name || "地点"} address={msg.location?.address || ""} />
+          <LocationBubble name={msg.location?.name || "Location"} address={msg.location?.address || ""} />
         )}
 
         {/* Dice */}
@@ -219,12 +219,12 @@ const ChatBubble = ({
           <div
             className="cursor-pointer overflow-hidden rounded-xl border-2 border-white shadow-sm bg-white relative group/img transition-default active:scale-95"
             role="img"
-            aria-label="发送的图片"
+            aria-label="Sent image"
           >
             {realImageUrl ? (
               <img
                 src={realImageUrl}
-                alt="发送的图片"
+                alt="Sent image"
                 className="w-48 max-h-64 object-cover rounded-xl"
               />
             ) : (
@@ -241,7 +241,7 @@ const ChatBubble = ({
             className="cursor-pointer overflow-hidden rounded-xl border-2 border-white shadow-sm bg-white relative group/img transition-default active:scale-95"
             onClick={() => {}}
             role="img"
-            aria-label={`图片: ${msg.text.replace("[图片] ", "")}`}
+            aria-label={`Image: ${msg.text.replace("[图片] ", "")}`}
           >
             <div className="w-48 h-32 bg-gray-200 flex items-center justify-center">
               <Camera size={24} className="text-gray-400" aria-hidden="true" />
@@ -328,7 +328,7 @@ const ChatBubble = ({
               }
             `}
             aria-label={
-              expandedChatStatusIndex === index ? "收起状态详情" : "查看状态详情"
+              expandedChatStatusIndex === index ? "Collapse status details" : "View status details"
             }
             aria-expanded={expandedChatStatusIndex === index}
           >
@@ -349,8 +349,8 @@ const ChatBubble = ({
               <button
                 onClick={() => onRegenerate(index)}
                 className="text-gray-300 hover:text-black transition-default p-1 touch-target"
-                aria-label="重新生成此条回复"
-                title="重新生成"
+                aria-label="Regenerate this reply"
+                title="Regenerate"
               >
                 <RotateCcw size={11} aria-hidden="true" />
               </button>
@@ -363,7 +363,7 @@ const ChatBubble = ({
           <div
             className="ml-12 mt-1 w-64 glass-card p-3 rounded-xl animate-bubble-in border border-gray-200/50 relative z-10"
             role="region"
-            aria-label="AI状态详情"
+            aria-label="AI status details"
           >
             <StatusCard status={msg.status} />
           </div>
@@ -392,23 +392,23 @@ const TransferBubble = ({ msg, isMe, onCopy, onEdit, onDelete, isMultiSelectMode
         }
       `}
       role="article"
-      aria-label={`转账: ¥${msg.transfer?.amount || 0}${msg.transfer?.note ? `, 备注: ${msg.transfer.note}` : ""}`}
+      aria-label={`Transfer: ¥${msg.transfer?.amount || 0}${msg.transfer?.note ? `, Note: ${msg.transfer.note}` : ""}`}
     >
       <div className="flex items-center gap-2 mb-1">
         <span className="text-lg font-bold">¥{msg.transfer?.amount || 0}</span>
         {msg.transfer?.status === "pending" && !isMe && (
           <span className="text-[10px] bg-yellow-100 text-yellow-700 px-1.5 py-0.5 rounded-full">
-            待确认
+            Pending
           </span>
         )}
         {msg.transfer?.status === "accepted" && (
           <span className="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded-full">
-            已收款
+            Received
           </span>
         )}
         {msg.transfer?.status === "rejected" && (
           <span className="text-[10px] bg-red-100 text-red-700 px-1.5 py-0.5 rounded-full">
-            已退还
+            Refunded
           </span>
         )}
       </div>
@@ -431,7 +431,7 @@ const VoiceMessageBubble = ({ msg, isMe }) => {
         }
       `}
       role="article"
-      aria-label={`语音消息: ${msg.text?.replace("[语音消息] ", "")}`}
+      aria-label={`Voice message: ${msg.text?.replace("[语音消息] ", "")}`}
     >
       <span className="text-lg">🎤</span>
       <div className="flex-1 h-1 bg-gray-200 rounded-full overflow-hidden">
@@ -452,7 +452,7 @@ const LocationBubble = ({ name, address }) => {
     <div
       className="bg-white border border-gray-100 rounded-2xl p-3 shadow-sm min-w-[180px]"
       role="article"
-      aria-label={`位置: ${name}, ${address}`}
+      aria-label={`Location: ${name}, ${address}`}
     >
       <div className="flex items-start gap-2">
         <span className="text-lg">📍</span>

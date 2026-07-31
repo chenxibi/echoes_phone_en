@@ -2,36 +2,36 @@ import React from "react";
 import { Upload, RotateCcw, Asterisk, Type, Monitor, Grid, Palette } from "lucide-react";
 
 // ============================================================
-// 官方皮肤预设
-// 每个皮肤是一个自包含的 CSS 片段, 通过 <style> 注入到 #echoes-chat
+// Official skin presets
+// Each skin is a self-contained CSS snippet injected via <style> into #echoes-chat
 // ============================================================
 const OFFICIAL_SKINS = [
   {
     id: "freebreeze",
-    name: "自由清风",
-    desc: "盐系低饱和，清爽海风质感",
+    name: "Free Breeze",
+    desc: "Low-saturation salt style, refreshing sea breeze",
     preview: "bg-[#f2f7f9]",
     previewColor: "#f2f7f9",
     borderColor: "#5da9ad",
-    css: `/* 自由清风 */
+    css: `/* Free Breeze */
 #echoes-chat { --skin-bg: #f2f7f9; --skin-surface: #ffffff; --skin-card: #fcfdfe; --skin-text: #2c3e50; --skin-sub: #7f8c8d; --skin-accent: #5da9ad; --skin-accent-hover: #4a8d91; }
 
-/* 全局基础样式：采用无衬线现代字体，增加字间距带来的呼吸感 */
+/* Global base style: sans-serif modern font, increased letter spacing for breathing feel */
 #echoes-chat { background-color: #f2f7f9 !important; background-image: linear-gradient(180deg, #f2f7f9 0%, #e6eeee 100%) !important; color: #2c3e50 !important; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important; }
 
-/* 容器与背景 */
+/* Container & Background */
 #echoes-chat .bg-\[\#F2F2F7\] { background-color: #f2f7f9 !important; }
 #echoes-chat .bg-\[\#EBEBF0\] { background: #e0eadd !important; background-color: #e2e8f0 !important; }
 #echoes-chat [class*="bg-\[\#F2F2F7"] { background-color: #f2f7f9 !important; }
 #echoes-chat [class*="bg-\[\#EBEBF0"] { background: #e2e8f0 !important; }
 
-/* 不同层级的淡色背景 */
+/* Different levels of light background */
 #echoes-chat .bg-blue-50\/50 { background: #f0f7f8 !important; }
 #echoes-chat .bg-gray-100\/60 { background: #edf2f7 !important; }
 #echoes-chat .bg-gray-300\/50 { background: #e2e8f0 !important; }
 #echoes-chat .bg-white\\/50 { background: rgba(255, 255, 255, 0.6) !important; }
 
-/* 文字颜色：确保高可读性 */
+/* Text colors: ensure high readability */
 #echoes-chat .text-\[\#1a1a1a\] { color: #2c3e50 !important; }
 #echoes-chat .text-\[\#2C2C2C\] { color: #34495e !important; }
 #echoes-chat .text-gray-800 { color: #2c3e50 !important; }
@@ -41,21 +41,21 @@ const OFFICIAL_SKINS = [
 #echoes-chat .text-gray-400 { color: #95a5a6 !important; }
 #echoes-chat .text-gray-300 { color: #bdc3c7 !important; }
 
-/* 头部样式 */
+/* Header style */
 #echoes-chat header { color: #4a8d91 !important; font-weight: 600 !important; letter-spacing: 0.05em !important; }
 
-/* 面板与卡片：轻微阴影，模拟透明海水的质感 */
+/* Panels & cards: subtle shadow, mimicking transparent seawater texture */
 #echoes-chat .glass-panel { background: rgba(255, 255, 255, 0.8) !important; backdrop-filter: blur(8px) !important; -webkit-backdrop-filter: blur(8px) !important; border: 1px solid rgba(93, 169, 173, 0.2) !important; color: #2c3e50 !important; border-radius: 12px !important; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03) !important; }
 #echoes-chat .glass-card { background: #ffffff !important; border: 1px solid #e2e8f0 !important; border-radius: 12px !important; color: #2c3e50 !important; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02) !important; }
 #echoes-chat .glass-card label { color: #34495e !important; }
 #echoes-chat .glass-card p, #echoes-chat .glass-card span { color: #7f8c8d !important; }
 
-/* 列表与背景快 */
+/* Lists & background blocks */
 #echoes-chat [class*="bg-white"] { background: #ffffff !important; border-radius: 10px !important; }
 #echoes-chat [class*="bg-gray-50"] { background: #f8fafc !important; }
 #echoes-chat [class*="bg-gray-100"] { background: #f1f5f9 !important; }
 
-/* 重点按钮：礁石灰/深海蓝 */
+/* Key buttons: reef stone gray / deep sea blue */
 #echoes-chat [class*="bg-black"] { background: #5da9ad !important; border-color: #5da9ad !important; color: #ffffff !important; transition: all 0.3s ease !important; }
 #echoes-chat [class*="bg-black"]:hover { background: #4a8d91 !important; box-shadow: 0 4px 10px rgba(93, 169, 173, 0.3) !important; }
 #echoes-chat button.bg-black { background: #5da9ad !important; }
@@ -65,12 +65,12 @@ const OFFICIAL_SKINS = [
 #echoes-chat [class*="bg-gray-800"] { background: #34495e !important; }
 #echoes-chat :not(button):not(button *)[class*="text-white"] { color: #ffffff !important; }
 
-/* 输入框样式 */
+/* Input field style */
 #echoes-chat input, #echoes-chat textarea, #echoes-chat [contenteditable] { background: #ffffff !important; color: #2c3e50 !important; border: 1px solid #cfd8dc !important; border-radius: 8px !important; transition: border-color 0.3s !important; }
 #echoes-chat input:focus, #echoes-chat textarea:focus { border-color: #5da9ad !important; ring: none !important; outline: none !important; }
 #echoes-chat input::placeholder, #echoes-chat textarea::placeholder { color: #bdc3c7 !important; }
 
-/* 边框颜色 */
+/* Border colors */
 #echoes-chat .border-gray-200 { border-color: #e2e8f0 !important; }
 #echoes-chat .border-gray-200\/50 { border-color: #edf2f7 !important; }
 #echoes-chat .border-white\/50 { border-color: rgba(255, 255, 255, 0.5) !important; }
@@ -78,43 +78,43 @@ const OFFICIAL_SKINS = [
 #echoes-chat .ring-black\/5 { --tw-ring-color: rgba(93, 169, 173, 0.1) !important; }
 #echoes-chat .border-white { border-color: #ffffff !important; }
 
-/* 悬停交互 */
+/* Hover interactions */
 #echoes-chat .text-gray-700.group-hover\:text-black { color: #7f8c8d !important; }
 #echoes-chat .text-gray-700.group-hover\:text-black:hover { color: #5da9ad !important; }
 
-/* 图标颜色 */
+/* Icon colors */
 #echoes-chat .glass-panel svg { stroke: #5da9ad; }
 #echoes-chat [class*="bg-white"] svg { stroke: #5da9ad; }
 #echoes-chat [class*="rounded-\[24px\]"].glass-panel svg, #echoes-chat .flex.justify-around svg { stroke: #5da9ad; }
-/* 保护深色发送按钮内图标为白色 */
+/* Protect dark send button icons as white */
 #echoes-chat [class*="bg-\[\#2C2C2C\]"] svg { stroke: #ffffff !important; }
 
-/* 状态颜色 */
-#echoes-chat .bg-green-500 { background: #81b29a !important; } /* 森林绿点缀 */
-#echoes-chat .text-red-500 { color: #e07a5f !important; } /* 晚霞橘提醒 */
+/* Status colors */
+#echoes-chat .bg-green-500 { background: #81b29a !important; } /* Forest green accent */
+#echoes-chat .text-red-500 { color: #e07a5f !important; } /* Sunset orange reminder */
 #echoes-chat .bg-green-50\/50 { background: #f2f9f6 !important; }
 #echoes-chat .bg-green-100 { background: #e8f3ee !important; }
 #echoes-chat .text-green-700 { color: #6d9785 !important; }
 #echoes-chat .text-green-600 { color: #81b29a !important; }
 #echoes-chat .border-green-100 { border-color: #d1e5dc !important; }
 
-/* 圆角统一：盐系偏向方圆结合，不过度圆润，保持干练 */
+/* Unified border radius: salt style prefers square-round combination, not overly round, keeping it clean */
 #echoes-chat [class*="rounded-lg"], #echoes-chat [class*="rounded-xl"], #echoes-chat [class*="rounded-2xl"], #echoes-chat [class*="rounded-\[16px\]"], #echoes-chat [class*="rounded-\[22px\]"], #echoes-chat [class*="rounded-\[24px\]"], #echoes-chat [class*="rounded-full"], #echoes-chat [class*="rounded-\[48px\]"] { border-radius: 10px !important; }
 #echoes-chat [class*="rounded-full"] { border-radius: 9999px !important; }
 
-/* 隐藏滚动条但保留功能，增加整洁感 */
+/* Hide scrollbar but keep functionality for cleanliness */
 #echoes-chat ::-webkit-scrollbar { width: 4px; }
 #echoes-chat ::-webkit-scrollbar-track { background: transparent; }
 #echoes-chat ::-webkit-scrollbar-thumb { background: #cfd8dc; border-radius: 10px; }
 #echoes-chat ::-webkit-scrollbar-thumb:hover { background: #bdc3c7; }
 
-/* 弹窗保持半透明 */
+/* Modal stays semi-transparent */
 #echoes-chat .fixed.inset-0 { background: rgba(0,0,0,0.5) !important; }
 #echoes-chat .bg-white\\/90 { background: rgba(255,255,255,0.85) !important; backdrop-filter: blur(20px) !important; -webkit-backdrop-filter: blur(20px) !important; }
 #echoes-chat [class*="bg-white"].rounded-2xl { background: rgba(255,255,255,0.92) !important; }
 #echoes-chat .bg-black\/50 { background: rgba(0,0,0,0.5) !important; }
 #echoes-chat .bg-black\/40 { background: rgba(0,0,0,0.4) !important; }
-/* 消息菜单：浅色主题匹配 */
+/* Message menu: light theme match */
 #echoes-chat [class*="bg-[#1a1a1a]"] { background: rgba(255,255,255,0.95) !important; color: #2c3e50 !important; }
 #echoes-chat [class*="bg-[#1a1a1a]"] * { color: #2c3e50 !important; }
 #echoes-chat .bg-\[\#1a1a1a\]\/95 { background: rgba(255,255,255,0.95) !important; color: #2c3e50 !important; }
@@ -125,10 +125,10 @@ const OFFICIAL_SKINS = [
 #echoes-chat .border-white\/20 { border-color: rgba(0,0,0,0.1) !important; }
 #echoes-chat .text-red-300 { color: #e07a5f !important; }
 
-/* 开关主题色 */
+/* Toggle theme color */
 #echoes-chat .bg-green-500 { background: #81b29a !important; }
 #echoes-chat .bg-gray-300 { background: #d1e5dc !important; }
-/* 按钮选中态白字 */
+/* Button selected state white text */
 #echoes-chat button.bg-black { color: #fff !important; }
 #echoes-chat button.bg-black:hover { color: #fff !important; }
 #echoes-chat button.bg-black * { color: #fff !important; }
@@ -138,12 +138,12 @@ const OFFICIAL_SKINS = [
   },
   {
     id: "latte",
-    name: "燕麦拿铁",
-    desc: "暖调配色，温柔奶油感",
+    name: "Oat Latte",
+    desc: "Warm palette, gentle creamy feel",
     preview: "bg-[#faf0e6]",
     previewColor: "#faf0e6",
     borderColor: "#c4956a",
-    css: `/* == 燕麦拿铁 == */
+    css: `/* == Oat Latte == */
 #echoes-chat {
   --skin-bg: #faf0e6;
   --skin-surface: #f5e6d3;
@@ -156,7 +156,7 @@ const OFFICIAL_SKINS = [
 #echoes-chat .bg-\\[\\#F2F2F7\\] { background: #faf0e6 !important; }
 #echoes-chat [class*="bg-\\[\\#F2F2F7"] { background: #faf0e6 !important; }
 #echoes-chat .bg-\\[\\#EBEBF0\\] { background: #f0e4d8 !important; }
-/* 锁屏装饰 */
+/* Lock screen decoration */
 #echoes-chat .bg-blue-50\\/50 { background: rgba(196,180,160,0.3) !important; }
 #echoes-chat .bg-gray-100\\/60 { background: rgba(196,150,106,0.2) !important; }
 #echoes-chat .bg-gray-300\\/50 { background: rgba(196,150,106,0.2) !important; }
@@ -231,12 +231,12 @@ const OFFICIAL_SKINS = [
 #echoes-chat .hover\:bg-white\/20:active, #echoes-chat .hover\:bg-white\/20:hover { background: rgba(74,55,40,0.08) !important; }
 #echoes-chat .hover\:bg-red-500\/50:active, #echoes-chat .hover\:bg-red-500\/50:hover { background: rgba(196,149,106,0.15) !important; }
 #echoes-chat .bg-green-500 { background: #8bb06a !important; }
-/* 弹窗背景保留半透明 */
+/* Modal background stays semi-transparent */
 #echoes-chat .fixed.inset-0 { background: rgba(0,0,0,0.5) !important; }
 #echoes-chat .bg-white\\/90 { background: rgba(255,248,240,0.85) !important; backdrop-filter: blur(20px) !important; -webkit-backdrop-filter: blur(20px) !important; }
 #echoes-chat [class*="bg-white"].rounded-2xl { background: #fff8f0 !important; opacity: 0.95; }
 #echoes-chat .bg-black\\/50 { background: rgba(0,0,0,0.5) !important; }
-/* 操作菜单、表情面板、模态卡片保持原始深色样式 */
+/* Action menu, sticker panel, modal cards keep original dark style */
 #echoes-chat .bg-\[\#1a1a1a\]\/95 { background: rgba(26,26,26,0.95) !important; color: #fff !important; }
 #echoes-chat .bg-\[\#1a1a1a\]\/95 * { color: #fff !important; }
 #echoes-chat .bg-\[\#1a1a1a\]\\/95 { background: rgba(26,26,26,0.95) !important; color: #fff !important; }
@@ -251,10 +251,10 @@ const OFFICIAL_SKINS = [
 #echoes-chat [class*="bg-white"].rounded-2xl { opacity: 0.95 !important; }
 #echoes-chat .text-red-500 { color: #cc6666 !important; }
 
-/* 开关主题色 */
+/* Toggle theme color */
 #echoes-chat .bg-green-500 { background: #c4a882 !important; }
 #echoes-chat .bg-gray-300 { background: #e8d5c0 !important; }
-/* 按钮选中态白字 */
+/* Button selected state white text */
 #echoes-chat button.bg-black { color: #fff !important; }
 #echoes-chat button.bg-black:hover { color: #fff !important; }
 #echoes-chat button.bg-black * { color: #fff !important; }
@@ -264,12 +264,12 @@ const OFFICIAL_SKINS = [
   },
   {
     id: "midnight",
-    name: "午夜深蓝",
-    desc: "暗色界面，护眼柔和",
+    name: "Midnight Blue",
+    desc: "Dark interface, soft on the eyes",
     preview: "bg-[#1a1a2e]",
     previewColor: "#1a1a2e",
     borderColor: "#99aaff",
-    css: `/* == 午夜深蓝 == */
+    css: `/* == Midnight Blue == */
 #echoes-chat {
   --skin-bg: #1a1a2e;
   --skin-surface: #1e1e38;
@@ -280,11 +280,11 @@ const OFFICIAL_SKINS = [
   --skin-accent-hover: #99aaff;
 }
 #echoes-chat { background: #1a1a2e !important; color: #d0d0e8 !important; }
-/* 主背景 */
+/* Main background */
 #echoes-chat .bg-\\[\\#F2F2F7\\] { background: #1a1a2e !important; }
 #echoes-chat [class*="bg-\\[\\#F2F2F7"] { background: #1a1a2e !important; }
 #echoes-chat .bg-\\[\\#EBEBF0\\] { background: #14142a !important; }
-/* 锁屏装饰 */
+/* Lock screen decoration */
 #echoes-chat .bg-blue-50\\/50 { background: rgba(100,100,255,0.15) !important; }
 #echoes-chat .bg-gray-100\\/60 { background: rgba(80,80,160,0.2) !important; }
 #echoes-chat .bg-gray-300\\/50 { background: rgba(255,255,255,0.1) !important; }
@@ -295,7 +295,7 @@ const OFFICIAL_SKINS = [
 #echoes-chat .text-green-700 { color: #66cc99 !important; }
 #echoes-chat .text-green-600 { color: #55bb88 !important; }
 #echoes-chat .border-green-100 { border-color: rgba(68,170,119,0.3) !important; }
-/* 文字层级 */
+/* Text hierarchy */
 #echoes-chat .text-\\[\\#1a1a1a\\] { color: #e0e0f0 !important; }
 #echoes-chat .text-\\[\\#2C2C2C\\] { color: #c8c8e0 !important; }
 #echoes-chat .text-gray-800 { color: #d0d0e8 !important; }
@@ -306,9 +306,9 @@ const OFFICIAL_SKINS = [
 #echoes-chat .text-gray-500 { color: #8888aa !important; }
 #echoes-chat .text-gray-400 { color: #7777aa !important; }
 #echoes-chat .text-gray-300 { color: #6666aa !important; }
-/* 标题栏 */
+/* Title bar */
 #echoes-chat header { color: #aabbee !important; }
-/* 玻璃面板 - 暗色半透明 */
+/* Glass panel - dark semi-transparent */
 #echoes-chat .glass-panel {
   background: rgba(30,30,60,0.75) !important;
   backdrop-filter: blur(16px) !important;
@@ -325,58 +325,58 @@ const OFFICIAL_SKINS = [
 }
 #echoes-chat .glass-card label { color: #c0c0dd !important; }
 #echoes-chat .glass-card p, #echoes-chat .glass-card span { color: #a0a0cc !important; }
-/* 白色背景全换 */
+/* White backgrounds all replaced */
 #echoes-chat [class*="bg-white"] { background: #252540 !important; }
 #echoes-chat [class*="bg-gray-50"] { background: #1e1e38 !important; }
 #echoes-chat [class*="bg-gray-100"] { background: rgba(255,255,255,0.05) !important; }
-/* 按钮 - 黑色变紫色 */
+/* Button - black to purple */
 #echoes-chat [class*="bg-black"] { background: #5566cc !important; border-color: #5566cc !important; }
 #echoes-chat [class*="bg-black"]:hover { background: #6b7aee !important; }
 #echoes-chat button.bg-black { background: #5566cc !important; }
 #echoes-chat button.bg-black:hover { background: #6b7aee !important; }
-/* 按钮 - #2C2C2C 暗灰变深紫 */
+/* Button - #2C2C2C dark gray to deep purple */
 #echoes-chat [class*="bg-\\[\\#2C2C2C\\]"] { background: #3a3a70 !important; }
 #echoes-chat [class*="bg-\\[\\#2C2C2C\\]"]:hover { background: #4a4a88 !important; }
 #echoes-chat [class*="bg-gray-800"] { background: #3a3a70 !important; }
-/* 按钮文字白变紫白 */
+/* Button text white to purple-white */
 #echoes-chat :not(button):not(button *)[class*="text-white"] { color: #e0e0f0 !important; }
-/* 输入框 */
+/* Input fields */
 #echoes-chat input, #echoes-chat textarea, #echoes-chat [contenteditable] {
   background: #1e1e38 !important;
   color: #d0d0e8 !important;
   border-color: rgba(255,255,255,0.1) !important;
 }
 #echoes-chat input::placeholder, #echoes-chat textarea::placeholder { color: #555588 !important; }
-/* 边框 */
+/* Borders */
 #echoes-chat .border-gray-200 { border-color: rgba(255,255,255,0.08) !important; }
 #echoes-chat .border-gray-200\\/50 { border-color: rgba(255,255,255,0.06) !important; }
 #echoes-chat .border-white\\/50 { border-color: rgba(255,255,255,0.06) !important; }
 #echoes-chat .border-white\\/60 { border-color: rgba(255,255,255,0.08) !important; }
 #echoes-chat .ring-black\\/5 { --tw-ring-color: rgba(255,255,255,0.05) !important; }
-/* 首页 AppIcon 图标文字 */
+/* Home screen AppIcon text */
 #echoes-chat .text-gray-700.group-hover\\:text-black { color: #aabbdd !important; }
 #echoes-chat .text-gray-700.group-hover\\:text-black:hover { color: #ccddff !important; }
-/* 首页 AppIcon 图标颜色 (通过 CSS filter 反转明亮图标) */
+/* Home screen AppIcon colors (via CSS filter to invert bright icons) */
 #echoes-chat .glass-panel svg { stroke: #aabbdd; }
 #echoes-chat .glass-panel:has(img) svg, #echoes-chat [class*="bg-white"] svg { stroke: #aabbdd; }
-/* 通讯/论坛等底部栏 */
+/* Chat/Forum bottom bar */
 #echoes-chat [class*="rounded-\\[24px\\]"].glass-panel {
   background: rgba(30,30,60,0.75) !important;
   border-color: rgba(255,255,255,0.08) !important;
 }
 #echoes-chat [class*="rounded-\\[24px\\]"].glass-panel svg,
 #echoes-chat .flex.justify-around svg { stroke: #99aadd; }
-/* 消息气泡 */
+/* Message bubbles */
 #echoes-chat [class*="bg-\\[\\#1a1a1a\\]"] { background: #252540 !important; color: #d0d0e8 !important; }
-/* 选项/标签 */ 
+/* Options/Labels */ 
 #echoes-chat [class*="bg-black"] { background: #5566cc !important; }
 #echoes-chat .bg-green-500 { background: #44aa77 !important; }
-/* 弹窗背景保留半透明 */
+/* Modal background stays semi-transparent */
 #echoes-chat .fixed.inset-0 { background: rgba(0,0,0,0.5) !important; }
 #echoes-chat .bg-white\\/90 { background: rgba(30,30,60,0.85) !important; backdrop-filter: blur(20px) !important; -webkit-backdrop-filter: blur(20px) !important; }
 #echoes-chat [class*="bg-white"].rounded-2xl { background: #252540 !important; opacity: 0.95; }
 #echoes-chat .bg-black\\/50 { background: rgba(0,0,0,0.5) !important; }
-/* 操作菜单、表情面板、模态卡片保持原始深色样式 */
+/* Action menu, sticker panel, modal cards keep original dark style */
 #echoes-chat .bg-\[\#1a1a1a\]\/95 { background: rgba(26,26,26,0.95) !important; color: #fff !important; }
 #echoes-chat .bg-\[\#1a1a1a\]\/95 * { color: #fff !important; }
 #echoes-chat .bg-\[\#1a1a1a\]\\/95 { background: rgba(26,26,26,0.95) !important; color: #fff !important; }
@@ -391,10 +391,10 @@ const OFFICIAL_SKINS = [
 #echoes-chat [class*="bg-white"].rounded-2xl { opacity: 0.95 !important; }
 #echoes-chat .text-red-500 { color: #ff7799 !important; }
 
-/* 开关主题色 */
+/* Toggle theme color */
 #echoes-chat .bg-green-500 { background: #5566cc !important; }
 #echoes-chat .bg-gray-300 { background: #3a3a6a !important; }
-/* 按钮选中态白字 */
+/* Button selected state white text */
 #echoes-chat button.bg-black { color: #fff !important; }
 #echoes-chat button.bg-black:hover { color: #fff !important; }
 #echoes-chat button.bg-black * { color: #fff !important; }
@@ -404,12 +404,12 @@ const OFFICIAL_SKINS = [
   },
   {
     id: "sweet",
-    name: "甜梦泡泡",
-    desc: "灰粉波点，小熊软萌氛围",
+    name: "Sweet Dream Bubble",
+    desc: "Grey-pink polka dots, cute bear vibe",
     preview: "bg-[#f0e8ed]",
     previewColor: "#f0e8ed",
     borderColor: "#d4959a",
-    css: `/* 甜梦泡泡 */
+    css: `/* Sweet Dream Bubble */
 #echoes-chat { --skin-bg: #f0e8ed; --skin-surface: #f5eff4; --skin-card: #faf5f8; --skin-text: #4a3548; --skin-sub: #8b7088; --skin-accent: #d4959a; --skin-accent-hover: #c08088; }
 #echoes-chat { background-color:#f0e8ed !important; background-image:radial-gradient(circle,rgba(212,149,154,0.45) 1.5px,transparent 1.5px) !important; background-size:18px 18px !important; color:#4a3548 !important; }
 #echoes-chat .bg-\\[\\#F2F2F7\\] { background-color:#f0e8ed !important; background-image:radial-gradient(circle,rgba(212,149,154,0.45) 1.5px,transparent 1.5px) !important; background-size:18px 18px !important; }
@@ -473,62 +473,62 @@ const OFFICIAL_SKINS = [
 #echoes-chat [class*="rounded-lg"],#echoes-chat [class*="rounded-xl"],#echoes-chat [class*="rounded-2xl"],#echoes-chat [class*="rounded-\\[16px\\]"],#echoes-chat [class*="rounded-\\[22px\\]"],#echoes-chat [class*="rounded-\\[24px\\]"],#echoes-chat [class*="rounded-full"],#echoes-chat [class*="rounded-\\[48px\\]"] { border-radius:18px !important; }
 #echoes-chat [class*="rounded-\\[48px\\]"] { border-radius:36px !important; }
 #echoes-chat [class*="rounded-full"] { border-radius:9999px !important; }
-/* 小熊替换生活圈图标 */
-#echoes-chat [data-app-link="生活圈"] svg { display:none !important; }
-#echoes-chat [data-app-link="生活圈"] .glass-panel::after { content:""; position:absolute; inset:6px; background-image:url("./pink-bear.png"); background-size:contain; background-repeat:no-repeat; background-position:center; }
-/* 蝴蝶结替换界面样式标题图标 */
+/* Bear replaces Life Circle icon */
+#echoes-chat [data-app-link="Life Circle"] svg { display:none !important; }
+#echoes-chat [data-app-link="Life Circle"] .glass-panel::after { content:""; position:absolute; inset:6px; background-image:url("./pink-bear.png"); background-size:contain; background-repeat:no-repeat; background-position:center; }
+/* Bow replaces Interface Style title icon */
 #echoes-chat h3[data-section-icon="palette"] svg { display:none !important; }
 #echoes-chat h3[data-section-icon="palette"]::before { content:""; display:inline-block; width:12px; height:12px; background-image:url("./bow.png"); background-size:contain; background-repeat:no-repeat; vertical-align:middle; }
-/* 蝴蝶结替换个性化App图标 */
-#echoes-chat [data-app-link="个性化"] svg { display:none !important; }
-#echoes-chat [data-app-link="个性化"] .glass-panel::after { content:""; position:absolute; inset:6px; background-image:url("./bow.png"); background-size:contain; background-repeat:no-repeat; background-position:center; }
-/* 棒棒糖替换系统设置图标 */
-#echoes-chat [data-app-link="系统设置"] svg { display:none !important; }
-#echoes-chat [data-app-link="系统设置"] .glass-panel::after { content:""; position:absolute; inset:6px; background-image:url("./pink-lollipop.png"); background-size:contain; background-repeat:no-repeat; background-position:center; }
-/* 电话替换浏览器图标 */
-#echoes-chat [data-app-link="浏览器"] svg { display:none !important; }
-#echoes-chat [data-app-link="浏览器"] .glass-panel::after { content:""; position:absolute; inset:6px; background-image:url("./pink-telephone.png"); background-size:contain; background-repeat:no-repeat; background-position:center; }
-/* 爱心替换音乐图标 */
+/* Bow replaces Personalization app icon */
+#echoes-chat [data-app-link="Personalization"] svg { display:none !important; }
+#echoes-chat [data-app-link="Personalization"] .glass-panel::after { content:""; position:absolute; inset:6px; background-image:url("./bow.png"); background-size:contain; background-repeat:no-repeat; background-position:center; }
+/* Lollipop replaces System Settings icon */
+#echoes-chat [data-app-link="System Settings"] svg { display:none !important; }
+#echoes-chat [data-app-link="System Settings"] .glass-panel::after { content:""; position:absolute; inset:6px; background-image:url("./pink-lollipop.png"); background-size:contain; background-repeat:no-repeat; background-position:center; }
+/* Telephone replaces Browser icon */
+#echoes-chat [data-app-link="Browser"] svg { display:none !important; }
+#echoes-chat [data-app-link="Browser"] .glass-panel::after { content:""; position:absolute; inset:6px; background-image:url("./pink-telephone.png"); background-size:contain; background-repeat:no-repeat; background-position:center; }
+/* Heart replaces music icon */
 #echoes-chat [data-app-link="共鸣旋律"] svg { display:none !important; }
 #echoes-chat [data-app-link="共鸣旋律"] .glass-panel::after { content:""; position:absolute; inset:6px; background-image:url("./pink-heart.png"); background-size:contain; background-repeat:no-repeat; background-position:center; }
-/* 蝴蝶结替换智能家图标 */
-#echoes-chat [data-app-link="智能家"] svg { display:none !important; }
-#echoes-chat [data-app-link="智能家"] .glass-panel::after { content:""; position:absolute; inset:6px; background-image:url("./pink-butterfly.png"); background-size:contain; background-repeat:no-repeat; background-position:center; }
-/* 草莓巧克力替换日记图标 */
-#echoes-chat [data-app-link="日记"] svg { display:none !important; }
-#echoes-chat [data-app-link="日记"] .glass-panel::after { content:""; position:absolute; inset:6px; background-image:url("./strawberry-chocolate.png"); background-size:contain; background-repeat:no-repeat; background-position:center; }
-/* 蜡烛替换生活痕迹图标 */
-#echoes-chat [data-app-link="生活痕迹"] svg { display:none !important; }
-#echoes-chat [data-app-link="生活痕迹"] .glass-panel::after { content:""; position:absolute; inset:6px; background-image:url("./pink-candle.png"); background-size:contain; background-repeat:no-repeat; background-position:center; }
-/* 蘑菇替换世界书图标 */
-#echoes-chat [data-app-link="世界书"] svg { display:none !important; }
-#echoes-chat [data-app-link="世界书"] .glass-panel::after { content:""; position:absolute; inset:6px; background-image:url("./pink-mushroom.png"); background-size:contain; background-repeat:no-repeat; background-position:center; }
-/* 饮料替换底部通讯栏图标 */
+/* Bow replaces Smart Home icon */
+#echoes-chat [data-app-link="Smart Home"] svg { display:none !important; }
+#echoes-chat [data-app-link="Smart Home"] .glass-panel::after { content:""; position:absolute; inset:6px; background-image:url("./pink-butterfly.png"); background-size:contain; background-repeat:no-repeat; background-position:center; }
+/* Strawberry chocolate replaces Diaries icon */
+#echoes-chat [data-app-link="Diaries"] svg { display:none !important; }
+#echoes-chat [data-app-link="Diaries"] .glass-panel::after { content:""; position:absolute; inset:6px; background-image:url("./strawberry-chocolate.png"); background-size:contain; background-repeat:no-repeat; background-position:center; }
+/* Candle replaces Life Traces icon */
+#echoes-chat [data-app-link="Life Traces"] svg { display:none !important; }
+#echoes-chat [data-app-link="Life Traces"] .glass-panel::after { content:""; position:absolute; inset:6px; background-image:url("./pink-candle.png"); background-size:contain; background-repeat:no-repeat; background-position:center; }
+/* Mushroom replaces World Book icon */
+#echoes-chat [data-app-link="World Book"] svg { display:none !important; }
+#echoes-chat [data-app-link="World Book"] .glass-panel::after { content:""; position:absolute; inset:6px; background-image:url("./pink-mushroom.png"); background-size:contain; background-repeat:no-repeat; background-position:center; }
+/* Drink replaces bottom chat bar icon */
 #echoes-chat [data-icon="chat"] svg { display:none !important; }
 #echoes-chat [data-icon="chat"]::before { content:""; display:inline-block; width:24px; height:24px; background-image:url("./pink-drink.png"); background-size:contain; background-repeat:no-repeat; vertical-align:middle; }
-/* 发带替换图标定制标题 */
+/* Headband replaces Icon Customization title icon */
 #echoes-chat h3[data-section-icon="customize"] svg { display:none !important; }
 #echoes-chat h3[data-section-icon="customize"]::before { content:""; display:inline-block; width:12px; height:12px; background-image:url("./pink-hair-band.png"); background-size:contain; background-repeat:no-repeat; vertical-align:middle; }
-/* 笔记本替换显示与排版标题 */
+/* Notebook replaces Display & Layout title icon */
 #echoes-chat h3[data-section-icon="display"] svg { display:none !important; }
 #echoes-chat h3[data-section-icon="display"]::before { content:""; display:inline-block; width:12px; height:12px; background-image:url("./pink-laptop.png"); background-size:contain; background-repeat:no-repeat; vertical-align:middle; }
-/* 玩具替换浏览器刷新按钮图标 */
+/* Toy replaces browser refresh button icon */
 #echoes-chat [data-app-link="浏览器刷新"] svg { display:none !important; }
 #echoes-chat [data-app-link="浏览器刷新"]::before { content:""; display:inline-block; width:16px; height:16px; background-image:url("./pink-toy.png"); background-size:contain; background-repeat:no-repeat; vertical-align:middle; margin-right:6px; }
-/* 玩具替换反馈按钮图标 */
-#echoes-chat [data-app-link="反馈"] svg { display:none !important; }
-#echoes-chat [data-app-link="反馈"] .glass-panel::after { content:""; position:absolute; inset:6px; background-image:url("./pink-toy.png"); background-size:contain; background-repeat:no-repeat; background-position:center; }
-/* 弹窗保持半透明 */
+/* Toy replaces Feedback button icon */
+#echoes-chat [data-app-link="Feedback"] svg { display:none !important; }
+#echoes-chat [data-app-link="Feedback"] .glass-panel::after { content:""; position:absolute; inset:6px; background-image:url("./pink-toy.png"); background-size:contain; background-repeat:no-repeat; background-position:center; }
+/* Modal stays semi-transparent */
 #echoes-chat .fixed.inset-0 { background: rgba(0,0,0,0.5) !important; }
 #echoes-chat .bg-white\\/90 { background: rgba(250,245,248,0.85) !important; backdrop-filter: blur(20px) !important; -webkit-backdrop-filter: blur(20px) !important; }
 #echoes-chat [class*="bg-white"].rounded-2xl { background: rgba(250,245,248,0.92) !important; }
 #echoes-chat .bg-black\/50 { background: rgba(0,0,0,0.5) !important; }
 #echoes-chat .bg-black\/40 { background: rgba(0,0,0,0.4) !important; }
 
-/* 开关主题色 */
+/* Toggle theme color */
 #echoes-chat .bg-green-500 { background: #d4959a !important; }
 #echoes-chat .bg-gray-300 { background: #e0d0d8 !important; }
-/* 按钮选中态白字 */
+/* Button selected state white text */
 #echoes-chat button.bg-black { color: #fff !important; }
 #echoes-chat button.bg-black:hover { color: #fff !important; }
 #echoes-chat button.bg-black * { color: #fff !important; }
@@ -539,22 +539,22 @@ const OFFICIAL_SKINS = [
 ];
 
 const PersonalizationPanel = ({
-  // --- 显示设置 Props ---
+  // --- Display Settings Props ---
 
-  // --- 字体设置 Props ---
+  // --- Font Settings Props ---
   fontName,
   handleResetFont,
   handleFontUrlSubmit,
   inputUrl,
   setInputUrl,
 
-  // --- 图标定制 Props ---
+  // --- Icon Customization Props ---
   appList,
   customIcons,
   handleAppIconUpload,
   handleResetIcon,
 
-  // --- 皮肤 Props ---
+  // --- Skin Props ---
   skinCSS,
   setSkinCSS,
   selectedSkin,
@@ -562,26 +562,26 @@ const PersonalizationPanel = ({
 }) => {
   return (
     <div className="space-y-8 pt-4 pb-20 px-1">
-      {/* ---------------- SECTION 1: 显示与排版 ---------------- */}
+      {/* ---------------- SECTION 1: Display & Layout ---------------- */}
       <section>
         <h3 data-section-icon="display" className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-3 border-b border-gray-200/50 pb-1 flex items-center gap-2" >
-          <Monitor size={10} /> 显示与排版
+          <Monitor size={10} /> Display & Layout
         </h3>
 
-        {/* 字体设置 */}
+        {/* Font Settings */}
         <div className="glass-card p-4 rounded-xl space-y-3">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-2">
               <Type size={12} className="text-gray-500" />
               <label className="text-xs font-bold text-gray-700">
-                系统字体
+                System Font
               </label>
             </div>
             <button
               onClick={handleResetFont}
               className="text-[10px] text-red-500 hover:underline flex items-center gap-1"
             >
-              <RotateCcw size={8} /> 恢复默认
+              <RotateCcw size={8} /> Reset
             </button>
           </div>
 
@@ -589,29 +589,29 @@ const PersonalizationPanel = ({
             <input
               value={inputUrl}
               onChange={(e) => setInputUrl(e.target.value)}
-              placeholder="粘贴字体链接 (例如 https://...)"
+              placeholder="Paste font URL (e.g. https://...)"
               className="flex-grow p-2 bg-gray-50 border border-gray-200 rounded-lg text-xs outline-none focus:border-black placeholder:text-gray-300"
             />
             <button
               onClick={handleFontUrlSubmit}
               className="px-3 bg-black text-white rounded-lg text-xs font-bold whitespace-nowrap"
             >
-              应用
+              Apply
             </button>
           </div>
           <p className="text-[9px] text-gray-400 truncate">
-            当前使用: {fontName || "默认字体"}
+            Current: {fontName || "Default font"}
           </p>
         </div>
       </section>
 
-      {/* ---------------- SECTION: 界面样式 ---------------- */}
+      {/* ---------------- SECTION: Interface Style ---------------- */}
       <section>
         <h3 data-section-icon="palette" className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-3 border-b border-gray-200/50 pb-1 flex items-center gap-2">
-          <Palette size={10} /> 界面样式
+          <Palette size={10} /> Interface Style
         </h3>
 
-        {/* 官方皮肤 */}
+        {/* Official Skins */}
         <div className="grid grid-cols-4 gap-2 mb-4">
           {OFFICIAL_SKINS.filter((s) => s.id !== "neon" && s.id !== "pixel" && s.id !== "latte").map((skin) => (
             <button
@@ -638,13 +638,13 @@ const PersonalizationPanel = ({
           ))}
         </div>
 
-        {/* 自定义 CSS */}
+        {/* Custom CSS */}
         <div className="glass-card p-4 rounded-xl space-y-3">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-2">
               <Type size={12} className="text-gray-500" />
               <label className="text-xs font-bold text-gray-700">
-                自定义样式
+                Custom Style
               </label>
             </div>
             {skinCSS && (
@@ -652,7 +652,7 @@ const PersonalizationPanel = ({
                 onClick={() => { setSkinCSS(""); setSelectedSkin(""); }}
                 className="text-[10px] text-red-500 hover:underline flex items-center gap-1"
               >
-                <RotateCcw size={8} /> 恢复默认
+                <RotateCcw size={8} /> Reset
               </button>
             )}
           </div>
@@ -664,12 +664,12 @@ const PersonalizationPanel = ({
                 setSelectedSkin("");
               }
             }}
-            placeholder="粘贴 CSS 代码来自定义界面样式..."
+            placeholder="Paste CSS code to customize interface style..."
             rows={5}
             className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-xs font-mono outline-none focus:border-black resize-y"
           />
           <p className="text-[9px] text-gray-400">
-            使用 <code className="bg-gray-100 px-1 rounded">#echoes-chat</code> 作为选择器前缀，
+            Use <code className="bg-gray-100 px-1 rounded">#echoes-chat</code> as the selector prefix,
             <button
               onClick={() => {
                 const link = document.createElement('a');
@@ -679,16 +679,16 @@ const PersonalizationPanel = ({
               }}
               className="text-blue-500 underline ml-1 cursor-pointer"
             >
-              点击下载主题创作指南
+              Download Theme Guide
             </button>
           </p>
         </div>
       </section>
 
-      {/* ---------------- SECTION 2: 图标定制 ---------------- */}
+      {/* ---------------- SECTION 2: Icon Customization ---------------- */}
       <section>
         <h3 data-section-icon="customize" className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-3 border-b border-gray-200/50 pb-1 flex items-center gap-2">
-          <Asterisk size={10} /> 图标定制
+          <Asterisk size={10} /> Icon Customization
         </h3>
 
         <div className="grid grid-cols-4 gap-y-6 gap-x-2">
@@ -729,7 +729,7 @@ const PersonalizationPanel = ({
                       onClick={() => handleResetIcon(app.id)}
                       className="text-[9px] text-red-400 hover:text-red-600 mt-1 flex items-center gap-0.5 scale-90"
                     >
-                      <RotateCcw size={8} /> 还原
+                      <RotateCcw size={8} /> Reset
                     </button>
                   )}
                 </div>

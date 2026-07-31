@@ -332,7 +332,7 @@ const App = () => {
   const handleBulkImport = (
     text,
     type = "char",
-    targetGroup = "自定义Sticker",
+    targetGroup = "Custom Stickers",
   ) => {
     const lines = text.split("\n");
     const newStickers = [];
@@ -363,11 +363,11 @@ const App = () => {
       }
       if (typeof showToast === "function")
         // 加上第一个参数 "success"
-        showToast("success", `已成功导入 ${newStickers.length} 个Sticker包`);
+        showToast("success", `Successfully imported ${newStickers.length} sticker packs`);
     } else {
       if (typeof showToast === "function")
         // 把 "error" 挪到前面
-        showToast("error", "格式错误 (应为 描述: 链接)");
+        showToast("error", "Format error (expected: description: URL)");
     }
   };
   // -- PERSISTENT STATE --
@@ -400,7 +400,7 @@ const App = () => {
         name: entry.name,
         content: entry.content,
         enabled: entry.enabled !== false,
-        group: entry.group || "预设",
+        group: entry.group || "Default",
       }));
       setWorldBook(presets);
     }
@@ -427,7 +427,7 @@ const App = () => {
       const savedFontName = await echoesDB.getItem("custom-font-name");
       if (savedFontUrl) {
         applyFont("UserCustomFont", savedFontUrl);
-        setFontName(savedFontName || "自定义字体");
+        setFontName(savedFontName || "Custom Font");
       }
     };
     loadFont();
@@ -437,13 +437,13 @@ const App = () => {
     const url = inputUrl.trim(); // 使用你定义好的 inputUrl 状态
     if (url) {
       applyFont("UserCustomFont", url);
-      setFontName("自定义字体");
+      setFontName("Custom Font");
       await echoesDB.setItem("custom-font-url", url);
-      await echoesDB.setItem("custom-font-name", "自定义字体");
+      await echoesDB.setItem("custom-font-name", "Custom Font");
       // setShowFontInput(false); // 如果有这个状态就加上
-      showToast("success", "字体已应用");
+      showToast("success", "Font applied");
     } else {
-      showToast("error", "请输入字体 URL");
+      showToast("error", "Please enter a font URL");
     }
   };
 
@@ -453,10 +453,10 @@ const App = () => {
     const styleElement = document.getElementById("UserCustomFont");
     if (styleElement) styleElement.remove();
     document.body.style.fontFamily = "";
-    setFontName("默认字体");
+    setFontName("Default Font");
     await echoesDB.removeItem("custom-font-url");
     await echoesDB.removeItem("custom-font-name");
-    showToast("info", "Restored默认字体");
+    showToast("info", "Restored default font");
   };
 
   // [新增] 自定义图标状态
@@ -477,14 +477,14 @@ const App = () => {
       const newIcons = { ...customIcons, [appId]: base64 };
       setCustomIcons(newIcons);
       await echoesDB.setItem("my_custom_icons", newIcons);
-      showToast("success", "图标已更新");
+      showToast("success", "Icon updated");
     };
     reader.readAsDataURL(file);
   };
 
   // [新增] 重置图标
   const handleResetIcon = async (appId) => {
-    if (await customConfirm("确定恢复默认图标吗？", "恢复图标")) {
+    if (await customConfirm("Restore default icon?", "Restore Icon")) {
       setCustomIcons((prev) => {
         const newState = { ...prev };
         delete newState[appId];
@@ -504,17 +504,17 @@ const App = () => {
   };
 
   // 替代 window.alert
-  const customAlert = (message, title = "提示") => {
+  const customAlert = (message, title = "Notice") => {
     return showDialog({ type: "alert", title, message });
   };
 
   // 替代 window.confirm
-  const customConfirm = (message, title = "确认", danger = false) => {
+  const customConfirm = (message, title = "Confirm", danger = false) => {
     return showDialog({ type: "confirm", title, message, danger });
   };
 
   // 替代 window.prompt
-  const customPrompt = (message, defaultValue = "", title = "输入") => {
+  const customPrompt = (message, defaultValue = "", title = "Input") => {
     return showDialog({ type: "prompt", title, message, defaultValue });
   };
 
@@ -630,20 +630,20 @@ const App = () => {
   const handleSendTransfer = async () => {
     // async
     const amount = await customPrompt(
-      "请输入Transfer金额 (CNY):",
+      "Enter transfer amount (CNY):",
       "520",
-      "发起Transfer",
+      "Send Transfer",
     );
     if (!amount || isNaN(amount) || parseFloat(amount) <= 0) {
-      if (amount) showToast("error", "请输入有效的金额");
+      if (amount) showToast("error", "Please enter a valid amount");
       return;
     }
 
     // 备注
     const noteInput = await customPrompt(
-      "添加Transfer备注 (可选):",
+      "Add transfer note (optional):",
       "",
-      "Transfer备注",
+      "Transfer Note",
     );
     const note = noteInput === null ? "" : noteInput;
 
@@ -664,14 +664,14 @@ const App = () => {
     msg.transfer.status = action === "accept" ? "accepted" : "rejected";
 
     const amount = msg.transfer.amount;
-    const actionText = action === "accept" ? "已收款" : "已退还";
+    const actionText = action === "accept" ? "Received" : "Refunded";
 
     // 生成系统消息
     const notificationMsg = {
       id: `sys_${Date.now()}`,
       sender: "me",
       isSystem: true,
-      text: `你${actionText} ¥${amount}`,
+      text: `You ${actionText} ¥${amount}`,
       time: formatTime(getCurrentTimeObj()),
       ...(realTimeEnabled ? { timestamp: Date.now() } : {}),
     };
@@ -694,9 +694,9 @@ const App = () => {
       const filtered = prev.filter((item) => item.sourceMsgId !== sourceMsgId);
       if (filtered.length !== prev.length) {
         console.log(
-          `[Echoes] 已回退关联的 User Facts (${
+          `[Echoes] Rolled back related User Facts (${
             prev.length - filtered.length
-          }条)`,
+          } entries)`,
         );
       }
       return filtered;
@@ -707,9 +707,9 @@ const App = () => {
       const filtered = prev.filter((item) => item.sourceMsgId !== sourceMsgId);
       if (filtered.length !== prev.length) {
         console.log(
-          `[Echoes] 已回退关联的 Char Facts (${
+          `[Echoes] Rolled back related Char Facts (${
             prev.length - filtered.length
-          }条)`,
+          } entries)`,
         );
       }
       return filtered;
@@ -720,7 +720,7 @@ const App = () => {
       const filtered = prev.filter((item) => item.sourceMsgId !== sourceMsgId);
       if (filtered.length !== prev.length) {
         console.log(
-          `[Echoes] 已回退关联的 Events (${prev.length - filtered.length}条)`,
+          `[Echoes] Rolled back related Events (${prev.length - filtered.length} entries)`,
         );
       }
       return filtered;
@@ -881,7 +881,7 @@ const App = () => {
   // === 角色生成函数 ===
   const generateCharacterFromDescription = async () => {
     if (!creationInput.trim()) {
-      showToast("error", "请输入角色描述");
+      showToast("error", "Please enter a character description");
       return;
     }
 
@@ -892,7 +892,7 @@ const App = () => {
         {
           prompt: `用户描述: "${creationInput}"
         
-          请根据以上简短描述，生成一个完整、详细的角色卡。确保所有细节都有逻辑支撑。`,
+          Please generate a complete, detailed character card based on the above short description. Ensure all details are logically supported.`,
           systemInstruction: CHARACTER_CREATION_PROMPT,
           isJson: true,
         },
@@ -902,10 +902,10 @@ const App = () => {
 
       if (result) {
         setGeneratedPreview(result);
-        showToast("success", "角色生成成功！");
+        showToast("success", "Character generated successfully!");
       }
     } catch (error) {
-      showToast("error", "生成失败: " + error.message);
+      showToast("error", "Generation failed: " + error.message);
     } finally {
       setIsGeneratingCharacter(false);
     }
@@ -1023,7 +1023,7 @@ const App = () => {
             sourceMsgId: sourceMsgId, // <--- [关键新增]
           }));
           setCharFacts((prev) => [...newEntries, ...prev]);
-          showToast("success", `更新了角色设定 (${newEntries.length}条)`);
+          showToast("success", `更新了角色设定 (${newEntries.length} entries)`);
         }
 
         // 3. 处理 Events
@@ -1268,7 +1268,7 @@ const App = () => {
 
   // 1. 获取所有唯一的分组名
   const getGroups = (list) => {
-    const groups = new Set(list.map((i) => i.group || "自定义Sticker"));
+    const groups = new Set(list.map((i) => i.group || "Custom Stickers"));
     return Array.from(groups);
   };
 
@@ -1363,7 +1363,7 @@ const App = () => {
   const toggleStickerGroup = (groupName, isEnabled) => {
     setCharStickers((prev) =>
       prev.map((s) =>
-        (s.group || "自定义Sticker") === groupName
+        (s.group || "Custom Stickers") === groupName
           ? { ...s, enabled: isEnabled }
           : s,
       ),
@@ -1483,7 +1483,7 @@ const App = () => {
         const compressedBase64 = await compressImage(file);
 
         // 3. [关键修改] 确定分组：如果有传入 targetGroup 就用它，否则用默认值
-        const finalGroup = targetGroup || "自定义Sticker";
+        const finalGroup = targetGroup || "Custom Stickers";
 
         const newSticker = {
           id: `s${Date.now()}`,
@@ -1951,7 +1951,7 @@ const App = () => {
 
     const prompt = promptTemplate
       .replaceAll("{{char}}", p.name)
-      .replaceAll("{{TIME}}", getCurrentTimeObj().toLocaleString("zh-CN", { weekday: "long", year: "numeric", month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" }))
+      .replaceAll("{{TIME}}", getCurrentTimeObj().toLocaleString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" }))
       .replaceAll("{{HISTORY}}", getContextString(chatHistory, effectiveUserName, p, null, contextLimit))
       .replaceAll("{{USER_PERSONA}}", userPersona + "\n" + trackerContext)
       .replaceAll("{{user}}", effectiveUserName);
@@ -2055,7 +2055,7 @@ const App = () => {
             const prompt = prompts.smartwatch_update
               .replaceAll("{{char}}", savedPersonaName)
               .replaceAll("{{MODE_SPATIAL}}", savedInteractionMode === "online" ? "in different locations (NOT together)" : "in the same location together")
-              .replaceAll("{{TIME}}", getCurrentTimeObj().toLocaleString("zh-CN", { weekday: "long", year: "numeric", month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" }))
+              .replaceAll("{{TIME}}", getCurrentTimeObj().toLocaleString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" }))
               .replaceAll("{{HISTORY}}", getContextString(chatHistory, savedUserName, null, null, 5))
               .replaceAll("{{LOCATIONS_LIST}}", savedSmartWatchLocations.map((l) => `ID: ${l.id}, Name: ${l.name}`).join("\n"))
               .replaceAll("{{LAST_LOG}}", savedSmartWatchLogs.length > 0 ? JSON.stringify(savedSmartWatchLogs[0]) : "None");
@@ -2159,7 +2159,7 @@ const App = () => {
         name: extractedName,
         enName: null, // 设为 null，UI层会判断不显示
         title: "Connected Soul",
-        bio: "档案已加载。详细设定将直接用于对话生成。",
+        bio: "Profile loaded. Details will be used directly for dialogue generation.",
         mbti: null, // 设为 null
         tags: [], // 空数组
       };
@@ -2193,8 +2193,8 @@ const App = () => {
     if (
       !(await customConfirm(
         // 替换 window.confirm
-        "确定要登出吗？这将彻底清除当前角色的所有本地数据，无法恢复。",
-        "清除数据",
+        "Log out? This will permanently delete all local data and cannot be recovered.",
+        "Clear Data",
       ))
     ) {
       return;
@@ -2906,7 +2906,7 @@ Requirements:
 
     const prompt = prompts.chat
       .replaceAll("{{char}}", persona.name)
-      .replaceAll("{{TIME}}", getCurrentTimeObj().toLocaleString("zh-CN", { weekday: "long", year: "numeric", month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" }))
+      .replaceAll("{{TIME}}", getCurrentTimeObj().toLocaleString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" }))
       .replaceAll("{{HISTORY}}", historyForPrompt)
       .replaceAll(
         "{{LAST_MSG}}",
@@ -4150,7 +4150,7 @@ Requirements:
 
     const prompt = prompts.summary
       .replaceAll("{{char}}", persona.name)
-      .replaceAll("{{CURRENT_TIME_SECTION}}", realTimeEnabled ? `Current date/time: ${getCurrentTimeObj().toLocaleString("zh-CN")}. ` : "")
+      .replaceAll("{{CURRENT_TIME_SECTION}}", realTimeEnabled ? `Current date/time: ${getCurrentTimeObj().toLocaleString("en-US")}. ` : "")
       .replaceAll("{{EXISTING_MEMORY}}", longMemory || "None")
       .replaceAll("{{RECENT_HISTORY}}", recentHistoryText);
 
@@ -4160,11 +4160,11 @@ Requirements:
       const summaryText = await generateContent(
         { prompt, systemInstruction: simpleSystem, isJson: false },
         apiConfig,
-        (err) => showToast("error", "总结失败: " + err),
+        (err) => showToast("error", "Summary failed: " + err),
       );
 
       if (summaryText) {
-        /* const timeStamp = new Date().toLocaleString("zh-CN", {hour12: false,month: "numeric",day: "numeric",hour: "2-digit",minute: "2-digit",});*/
+        /* const timeStamp = new Date().toLocaleString("en-US", {hour12: false,month: "numeric",day: "numeric",hour: "2-digit",minute: "2-digit",});*/
         const newEntry = `${summaryText}`;
 
         setLongMemory((prev) => (prev ? prev + "\n\n" + newEntry : newEntry));
@@ -4374,7 +4374,7 @@ Requirements:
                       <User />
                     )
                   }
-                  label={persona?.name || "身份档案"}
+                  label={persona?.name || "Identity"}
                   onClick={() => setActiveApp("identity")}
                 />
                 <AppIcon
@@ -4423,14 +4423,14 @@ Requirements:
               <div className="col-span-4 mt-2">
                 <AppIcon
                   icon={<LogOut strokeWidth={1.5} className="text-red-500" />}
-                  label="登出"
+                  label="Log Out"
                   onClick={handleLogout}
                 />
               </div>
             </div>
             <div className="mt-auto pb-6">
               <div
-                data-app-link="通讯"
+                data-app-link="Chat"
                 className="glass-panel rounded-[24px] p-2 flex justify-around items-center shadow-lg cursor-pointer hover:bg-white/40 transition-colors mx-2"
                 onClick={() => setActiveApp("chat")}
               >
@@ -4453,7 +4453,7 @@ Requirements:
           {/* APP: IDENTITY */}
           <AppWindow
             isOpen={activeApp === "identity"}
-            title="身份档案"
+            title="Identity"
             onClose={() => setActiveApp(null)}
           >
             {persona ? (
@@ -5578,7 +5578,7 @@ Requirements:
                           const itemsStr = r.items.map(item => `${item.name}: ${item.price}`).join("\n");
                           const newMsg = {
                             sender: "me",
-                            text: `【转发${persona?.name || "角色"}的消费记录】\n${r.createdAt ? `时间：${formatSmartTime(r.createdAt)}\n` : ""}商家：${r.store}\n${itemsStr}\n合计：${r.total}${r.thought ? `\n\n${persona?.name || "角色"}在作出这笔消费时的心理活动：${r.thought}` : ""}`,
+                            text: `【转发${persona?.name || "角色"}的消费记录】\n${r.createdAt ? `时间：${formatSmartTime(r.createdAt)}\n` : ""}Store: ${r.store}\n${itemsStr}\nTotal: ${r.total}${r.thought ? `\n\n${persona?.name || "角色"}在作出这笔消费时的心理活动：${r.thought}` : ""}`,
                             isForward: true,
                             forwardData: { store: r.store, items: r.items, total: r.total, thought: r.thought, createdAt: r.createdAt, type: "receipt" },
                             time: formatTime(getCurrentTimeObj()),

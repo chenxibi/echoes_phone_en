@@ -1,16 +1,16 @@
 import worldBook from "../components/WorldBook";
 
-// 解析批量链接文本
+// Parse bulk link text
 export const parseStickerLinks = (text) => {
   if (!text) return [];
   return text
     .split("\n")
     .map((line) => {
-      // 兼容中文冒号和英文冒号
+      // Support both Chinese and English colons
       const parts = line.split(/[:：]/);
       if (parts.length >= 2) {
         const desc = parts[0].trim();
-        // 后面可能还有冒号（如 https://），所以合并剩余部分
+        // The rest may contain colons (e.g. https://), so merge the remaining parts
         const url = parts.slice(1).join(":").trim();
         if (desc && url.startsWith("http")) {
           return {
@@ -60,20 +60,20 @@ export const safeJSONParse = (text) => {
     const repairedText = jsonrepair(clean);
     return JSON.parse(repairedText);
   } catch (e) {
-    console.error("[Echoes] JSON 解析失败:", e);
-    console.log("[Echoes] 问题文本:", text);
+    console.error("[Echoes] JSON parse failed:", e);
+    console.log("[Echoes] Problematic text:", text);
     try {
       const simpleRepair = jsonrepair(text);
       return JSON.parse(simpleRepair);
     } catch (err2) {
-      throw new Error(`格式解析失败: ${e.message.slice(0, 30)}...`);
+      throw new Error(`Format parse failed: ${e.message.slice(0, 30)}...`);
     }
   }
 };
 
 export const compressImage = (file, maxWidth = 500, quality = 0.7) => {
   return new Promise((resolve, reject) => {
-    // 如果是 GIF，直接返回原始 DataURL，不经过 Canvas 压缩以保留动图
+  // If it's a GIF, return the original DataURL directly without Canvas compression to preserve animation
     if (file.type === "image/gif") {
       const reader = new FileReader();
       reader.onload = (e) => resolve(e.target.result);
@@ -112,7 +112,7 @@ export const formatTime = (date) =>
     hour12: false,
   });
 export const formatDate = (date) =>
-  date.toLocaleDateString("zh-CN", {
+  date.toLocaleDateString("en-US", {
     month: "long",
     day: "numeric",
     weekday: "short",
@@ -122,56 +122,56 @@ export const formatSmartTime = (timestamp) => {
   if (!timestamp) return "";
   const d = new Date(timestamp);
   const now = new Date();
-  const hm = d.toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit", hour12: false });
+  const hm = d.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false });
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const msgDay = new Date(d.getFullYear(), d.getMonth(), d.getDate());
   const diffDays = Math.floor((today - msgDay) / 86400000);
   if (diffDays === 0) return hm;
-  if (diffDays === 1) return `昨天 ${hm}`;
-  const md = `${d.getMonth() + 1}月${d.getDate()}日`;
+  if (diffDays === 1) return `Yesterday ${hm}`;
+  const md = `${d.getMonth() + 1}/${d.getDate()}`;
   if (d.getFullYear() === now.getFullYear()) return `${md} ${hm}`;
-  return `${d.getFullYear()}年${md} ${hm}`;
+  return `${d.getFullYear()}/${md} ${hm}`;
 };
 
 export const replacePlaceholders = (text, charName, userName) => {
   if (!text) return "";
   return text
-    .replace(/\{\{char\}\}/gi, charName) // gi 表示全局+忽略大小写
+    .replace(/\{\{char\}\}/gi, charName) // gi means global + case-insensitive
     .replace(/\{\{user\}\}/gi, userName);
 };
 
-// --- 辅助函数：根据时间生成话题引导 ---
+// --- Helper function: Generate topic guidance based on time ---
 export const getTimeBasedGuidance = (dateObj) => {
   const hour = dateObj.getHours();
-  const month = dateObj.getMonth() + 1; // 0-11 转 1-12
+  const month = dateObj.getMonth() + 1; // 0-11 to 1-12
 
   let timeVibe = "";
   let seasonalVibe = "";
 
-  // 1. 时间段判断
+  // 1. Time period determination
   if (hour >= 23 || hour < 5) {
-    // 深夜：EMO、成人话题、怪谈、失眠
+    // Late night: Emo, adult topics, urban legends, insomnia
     timeVibe =
       "Late Night (深夜): Emo/Emotional venting, Adult topics/NSFW hints, Urban legends, Insomnia thoughts.";
   } else if (hour >= 6 && hour < 10) {
-    // 早晨：早高峰、早八、上班打卡、早餐、起床气
+    // Morning: Morning rush, clocking in, breakfast, waking up grumpy
     timeVibe =
       "Morning (早晨): Morning rush/Commute, Breakfast choices, Waking up, sleepy.";
   } else if (hour >= 11 && hour <= 13) {
-    // 午饭点：外卖、纠结吃什么、探店、美食推荐
+    // Lunch time: Takeout, deciding what to eat, restaurant visits, food recommendations
     timeVibe =
       "Lunch Time (午饭): Food delivery, 'What to eat?', Hunger, Office break.";
   } else if (hour >= 17 && hour <= 20) {
-    // 晚饭点：做饭、聚餐、团建、下班
+    // Dinner time: Cooking, group meals, team building, getting off work
     timeVibe =
       "Dinner Time (晚饭): Cooking/Recipes, Dining out, Relaxing after work, Night life starting.";
   } else {
-    // 其他时间：摸鱼、日常
+    // Other times: Slacking off, daily routine
     timeVibe =
       "Daily Life (日常): Slacking off at work/school, Afternoon tea, Random gossip.";
   }
 
-  // 2. 月份/季节判断 (仅作氛围参考)
+  // 2. Month/Season determination (for atmosphere reference only)
   if (month === 12) {
     seasonalVibe =
       " Season: Winter/December. (Keywords: Cold, Christmas vibes, End of year).";
@@ -196,7 +196,7 @@ export const getTimeBasedGuidance = (dateObj) => {
 
 let notificationSetter = null;
 
-// 新增一个初始化函数
+// New initialization function
 export const initNotification = (setter) => {
   notificationSetter = setter;
 };
@@ -209,7 +209,7 @@ export const showToast = (type, message) => {
   }
 };
 export const getCurrentTimeObj = (settings) => {
-  // 增加防御性代码，防止 settings 为空
+  // Add defensive code to handle empty settings
   if (!settings) return new Date();
 
   return settings.useSystem
@@ -217,7 +217,7 @@ export const getCurrentTimeObj = (settings) => {
     : new Date(`${settings.customDate}T${settings.customTime}`);
 };
 
-// --- 新增辅助函数：按轮次获取最近消息 ---
+// --- New helper function: Get recent messages by turns ---
 export const getRecentTurns = (history, limit) => {
   if (history.length === 0) return [];
 
@@ -225,21 +225,21 @@ export const getRecentTurns = (history, limit) => {
   let startIndex = 0;
   let currentSender = null;
 
-  // 从后往前遍历，计算轮次
+  // Traverse backwards, counting turns
   for (let i = history.length - 1; i >= 0; i--) {
     const msg = history[i];
-    // 如果发送者变了（或者是最后一条消息），轮次+1
+    // If sender changed (or it's the last message), increment turn count
     if (msg.sender !== currentSender) {
       turnsFound++;
       currentSender = msg.sender;
     }
 
-    // 如果轮次超过限制，停止，当前 i + 1 就是截取点
+    // If turn count exceeds limit, stop, current i + 1 is the slice point
     if (turnsFound > limit) {
       startIndex = i + 1;
       break;
     }
-    // 如果已经遍历到头了，startIndex 保持 0
+    // If we've reached the beginning, startIndex stays 0
   }
 
   return history.slice(startIndex);
@@ -250,23 +250,23 @@ export const getFormattedMessageText = (m, userName, persona, chatStyle) => {
   let content = m.text || "";
 
   if (m.isVoice) {
-    content = `(发送了一条语音): ${m.text.replace("[语音消息] ", "")}`;
+    content = `(Sent a voice message): ${m.text.replace("[语音消息] ", "")}`;
   }
   if (m.sticker) {
     if (!content || !content.trim()) {
-      content = `[发送了表情包: ${m.sticker.desc}]`;
+      content = `[Sent a sticker: ${m.sticker.desc}]`;
     }
   }
   if (m.isForward && m.forwardData) {
     const fwd = m.forwardData;
-    content += ` [转发了${
-      fwd.type === "post" ? "帖子" : "评论"
+    content += ` [Forwarded ${
+      fwd.type === "post" ? "a post" : "a comment"
     }: "${fwd.content.slice(0, 50)}..."]`;
   }
 
   let finalLine = `${senderName}: ${content}`;
 
-  // 使用传入的 chatStyle
+  // Use the passed-in chatStyle
   const msgStyle = m.style || chatStyle;
 
   if (
@@ -293,7 +293,7 @@ export const getContextString = (
   const recent = getRecentTurns(chatHistory, limit);
   if (recent.length === 0) return "None.";
 
-  // 在 map 中传递参数
+  // In map, pass parameters
   return recent
     .map((msg) => getFormattedMessageText(msg, userName, persona, chatStyle))
     .join("\n");
@@ -319,19 +319,19 @@ export const getStickerInstruction = (list = charStickers, stickersEnabled) => {
     3. To send a sticker, use "stickerId" field in JSON. Otherwise, set it to null.`;
 };
 
-/* --- UTILS --- 部分的 cleanCharacterJson 函数替换为： */
+/* --- UTILS --- cleanCharacterJson function replacement: */
 
 export const cleanCharacterJson = (jsonContent) => {
   try {
     const rawObj =
       typeof jsonContent === "string" ? JSON.parse(jsonContent) : jsonContent;
 
-    // 1. 分别获取外层和内层数据
+    // 1. Get outer and inner data separately
     const outerData = rawObj;
     const innerData = rawObj.data || {};
 
-    // 2. 智能提取 Description
-    // 逻辑：如果 innerDesc 包含"同上" 或 长度明显短于 outerDesc，就使用 outerDesc
+    // 2. Smart extract Description
+    // Logic: if innerDesc contains "same as above" or is clearly shorter than outerDesc, use outerDesc
     const outerDesc = outerData.description || outerData.persona || "";
     const innerDesc = innerData.description || innerData.persona || "";
 
@@ -345,26 +345,26 @@ export const cleanCharacterJson = (jsonContent) => {
       finalDesc = outerDesc;
     }
 
-    // 3. 智能提取 Name
+    // 3. Smart extract Name
     const name = innerData.name || outerData.name || "Unknown";
 
-    // 4. 清洗 Description (处理 XML 标签)
-    // 很多时候 Prompt 会生成 <character> 包裹的内容，这里提取出来
+    // 4. Clean Description (handle XML tags)
+    // Often Prompt generates content wrapped in <character>, extract it here
     let richDescription = finalDesc;
     const charTagMatch = finalDesc.match(/<character>([\s\S]*?)<\/character>/i);
     if (charTagMatch) richDescription = charTagMatch[1].trim();
 
-    // 如果还有 personality 字段，追加进去
+    // If there's a personality field, append it
     if (outerData.personality && typeof outerData.personality === "string") {
       richDescription += `\n\n[Personality Traits]: ${outerData.personality}`;
     }
 
-    // 5. 组合最终文本 Key
+    // 5. Combine final text key
     // 5. Combine final text key (first line is plain name, no Name: prefix)
     let cleanText = `${name}\n\nDescription:\n${richDescription}`;
 
-    // 6. 处理 WorldBook (世界书)
-    // 同样优先取有内容的那一边
+    // 6. Process WorldBook
+    // Also prioritize the side with content
     let rawEntries = [];
     if (
       innerData.character_book &&
@@ -382,7 +382,7 @@ export const cleanCharacterJson = (jsonContent) => {
         name: entry.comment || entry.keys?.[0] || entry.name || `Entry`,
         content: entry.content,
         enabled: entry.enabled !== false,
-        group: entry.group || name || "默认分组",
+        group: entry.group || name || "Default Group",
       }))
       .filter((e) => e.content);
 

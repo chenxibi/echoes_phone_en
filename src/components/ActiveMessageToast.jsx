@@ -2,10 +2,10 @@ import React, { useState, useEffect } from "react";
 import { Sparkles, X, MessageSquare } from "lucide-react";
 
 /**
- * 主动消息通知组件
+ * Active Message Toast Component
  * 
- * 设计意图：像朋友随手发来的一句话，不喧哗不打扰
- * 视觉语言：融入现有毛玻璃 + 深红酒红系统，无AI味
+ * Design intent: Like a casual message from a friend, unobtrusive
+ * Visual language: Blends into existing frosted glass + deep wine-red system, no AI feel
  */
 
 const ActiveMessageToast = ({ message, onDismiss, onRead }) => {
@@ -39,14 +39,14 @@ const ActiveMessageToast = ({ message, onDismiss, onRead }) => {
       `}
     >
       <div className="glass-panel rounded-2xl p-4 max-w-md mx-auto relative overflow-hidden">
-        {/* 微妙的左上角高亮 — 模仿光的切角 */}
+        {/* Subtle top-left highlight — mimics light edge */}
         <div
           className="absolute -top-4 -left-4 w-16 h-16 rounded-full opacity-[0.06]"
           style={{ background: "#7A2A3A" }}
         />
 
         <div className="flex items-start gap-3">
-          {/* 图标 — 小火花替代 emoji */}
+          {/* Icon — small spark instead of emoji */}
           <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center"
             style={{ background: "rgba(122,42,58,0.08)" }}>
             <Sparkles size={14} style={{ color: "#7A2A3A" }} />
@@ -76,7 +76,7 @@ const ActiveMessageToast = ({ message, onDismiss, onRead }) => {
           </div>
         </div>
 
-        {/* 底部操作 */}
+        {/* Bottom action */}
         <div className="flex justify-end mt-3 pt-2 border-t border-gray-100/50">
           <button
             onClick={handleRead}
@@ -89,7 +89,7 @@ const ActiveMessageToast = ({ message, onDismiss, onRead }) => {
             onMouseLeave={(e) => e.currentTarget.style.background = "rgba(122,42,58,0.06)"}
           >
             <MessageSquare size={10} />
-            看看
+            View
           </button>
         </div>
       </div>

@@ -16,7 +16,7 @@ import {
   CheckCircle2,
 } from "lucide-react";
 
-// --- 1. 工具函数：解析 LRC ---
+// --- 1. Utility: Parse LRC ---
 const parseLRC = (lrcText) => {
   if (!lrcText) return [];
   const lines = lrcText.split("\n");
@@ -36,7 +36,7 @@ const parseLRC = (lrcText) => {
   return result.sort((a, b) => a.time - b.time);
 };
 
-// --- 2. 动态字号适配 ---
+// --- 2. Dynamic font size adaptation ---
 const getLyricTextSize = (text, isActive) => {
   const len = text?.length || 0;
   if (isActive) {
@@ -48,7 +48,7 @@ const getLyricTextSize = (text, isActive) => {
   return "text-[11px] opacity-75 text-gray-500";
 };
 
-// --- 3. 组件：黑胶唱片 ---
+// --- 3. Component: Vinyl Record ---
 const VinylRecord = ({ isPlaying, coverUrl }) => (
   <div className="relative shrink-0 w-40 h-40 flex items-center justify-center">
     <div className="absolute w-36 h-36 rounded-full bg-black/10 shadow-[0_8px_25px_rgba(0,0,0,0.2)]"></div>
@@ -78,7 +78,7 @@ const VinylRecord = ({ isPlaying, coverUrl }) => (
   </div>
 );
 
-// --- 4. 组件：连接状态 ---
+// --- 4. Component: Connection Status ---
 const ConnectionHeader = ({
   isPlaying,
   userAvatar,
@@ -145,7 +145,7 @@ const ConnectionHeader = ({
   </div>
 );
 
-// --- 5. 主组件 ---
+// --- 5. Main Component ---
 const MusicApp = ({
   persona,
   userAvatar,
@@ -160,7 +160,7 @@ const MusicApp = ({
 }) => {
   const [musicTab, setMusicTab] = useState("together");
   const [playlistName, setPlaylistName] = useStickyState(
-    "我的共鸣旋律",
+    "My Resonance Melody",
     "echoes_pl_name",
   );
   const [playlistCoverFile, setPlaylistCoverFile] = useStickyState(
@@ -190,7 +190,7 @@ const MusicApp = ({
   const lastCommentTime = useRef(0);
   const lastTriggeredLrc = useRef("");
 
-  // --- 关键顺序：先定义数据，再定义 Effect ---
+  // --- Key order: define data first, then Effects ---
   const currentTrack = useMemo(
     () => playlistTracks[currentTrackIndex] || null,
     [playlistTracks, currentTrackIndex],
@@ -200,7 +200,7 @@ const MusicApp = ({
     [currentTrack?.lrcText],
   );
 
-  // 1. 播放进度监听与 AI 点评触发
+  // 1. Playback progress listener & AI commentary trigger
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
@@ -236,7 +236,7 @@ const MusicApp = ({
     };
   }, [currentLrc, activeLrcIndex, audioRef]);
 
-  // 2. 歌词居中滚动
+  // 2. Lyric center scroll
   useEffect(() => {
     if (activeLrcIndex <= 0) return;
     const container = lrcScrollRef.current;
@@ -252,7 +252,7 @@ const MusicApp = ({
     return () => clearTimeout(t);
   }, [activeLrcIndex]);
 
-  // 3. 气泡同步
+  // 3. Bubble sync
   useEffect(() => {
     if (chatHistory?.length > 0) {
       const last = chatHistory[chatHistory.length - 1];
@@ -356,7 +356,7 @@ const MusicApp = ({
       return t;
     });
     if (type !== "lrc") setPlaylistTracks(updated);
-    showToast("success", "存储成功");
+    showToast("success", "Saved successfully");
   };
 
   return (
@@ -366,13 +366,13 @@ const MusicApp = ({
           onClick={() => setMusicTab("together")}
           className={`flex-1 py-1.5 text-[11px] font-bold rounded-lg transition-all ${musicTab === "together" ? "bg-white shadow-sm text-[#7A2A3A]" : "text-gray-400"}`}
         >
-          一起听
+          Listen Together
         </button>
         <button
           onClick={() => setMusicTab("playlist")}
           className={`flex-1 py-1.5 text-[11px] font-bold rounded-lg transition-all ${musicTab === "playlist" ? "bg-white shadow-sm text-[#7A2A3A]" : "text-gray-400"}`}
         >
-          歌单
+          Playlist
         </button>
       </div>
       <div className="flex-grow overflow-hidden">
@@ -389,7 +389,7 @@ const MusicApp = ({
                 userBubble={userBubble}
               />
               <h3 className="text-xs font-bold text-gray-800 truncate mt-3 w-full text-center px-4">
-                {currentTrack?.title || "等待选择歌曲"}
+                {currentTrack?.title || "Waiting for track selection"}
               </h3>
             </div>
             <div
@@ -408,7 +408,7 @@ const MusicApp = ({
                 ))
               ) : (
                 <div className="h-full flex flex-col items-center justify-center opacity-30 text-[10px]">
-                  请上传音频和歌词
+                  Please upload audio and lyrics
                 </div>
               )}
             </div>
@@ -438,8 +438,8 @@ const MusicApp = ({
                 <button
                   disabled={playlistTracks.length === 0 || !apiConfig?.baseUrl || !apiConfig?.key}
                   onClick={() => {
-                    if (playlistTracks.length === 0) { showToast("error", "歌单为空，请先添加音乐"); return; }
-                    if (!apiConfig?.baseUrl || !apiConfig?.key) { showToast("error", "未配置 API 信息，请在设置中输入 Base URL 和 Key"); return; }
+                    if (playlistTracks.length === 0) { showToast("error", "Playlist is empty, please add music first"); return; }
+                    if (!apiConfig?.baseUrl || !apiConfig?.key) { showToast("error", "API not configured, please enter Base URL and Key in Settings"); return; }
                     isPlaying
                       ? audioRef.current.pause()
                       : audioRef.current.play();
@@ -485,7 +485,7 @@ const MusicApp = ({
                 }}
                 className={`text-[10px] px-3 py-1 rounded-full font-bold ${isEditing ? "bg-black text-white" : "bg-gray-100 text-gray-500"}`}
               >
-                {isEditing ? "完成" : "编辑"}
+                {isEditing ? "Done" : "Edit"}
               </button>
             </div>
             <label className="block w-full h-32 bg-gray-200 rounded-xl relative overflow-hidden cursor-pointer shrink-0">
@@ -497,7 +497,7 @@ const MusicApp = ({
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-gray-500 font-bold text-sm">
-                  歌单封面（可上传）
+                  Playlist cover (uploadable)
                 </div>
               )}
               <input
@@ -533,7 +533,7 @@ const MusicApp = ({
                           audioRef.current?.play();
                           setIsPlaying(true);
                         }, 100);
-                      } else showToast("error", "请上传音乐");
+                      } else showToast("error", "Please upload music");
                     }}
                   >
                     {isEditing ? (
@@ -570,7 +570,7 @@ const MusicApp = ({
                     <div className="flex items-center gap-3 text-[10px] text-gray-400 font-bold">
                       <label className="cursor-pointer hover:text-[#7A2A3A] flex items-center gap-0.5">
                         <Upload size={10} />
-                        封面
+                        Cover
                         <input
                           type="file"
                           hidden
@@ -586,7 +586,7 @@ const MusicApp = ({
                       </label>
                       <label className="cursor-pointer hover:text-[#7A2A3A] flex items-center gap-0.5">
                         <Upload size={10} />
-                        音乐
+                        Music
                         <input
                           type="file"
                           hidden
@@ -602,7 +602,7 @@ const MusicApp = ({
                       </label>
                       <label className="cursor-pointer hover:text-[#7A2A3A] flex items-center gap-0.5">
                         <Upload size={10} />
-                        歌词
+                        Lyrics
                         <input
                           type="file"
                           hidden
@@ -622,7 +622,7 @@ const MusicApp = ({
                     ...playlistTracks,
                     {
                       id: Date.now(),
-                      title: "新歌曲",
+                      title: "New Track",
                       audioFile: null,
                       coverFile: null,
                       lrcText: "",
@@ -631,7 +631,7 @@ const MusicApp = ({
                 }
                 className="w-full py-3 border border-dashed border-gray-300 rounded-lg text-gray-300 text-[10px] transition-all"
               >
-                + 添加歌曲
+                + Add Track
               </button>
             </div>
           </div>
@@ -642,7 +642,7 @@ const MusicApp = ({
           <input
             autoFocus
             className="flex-grow bg-gray-50 rounded-xl px-4 py-2 text-xs outline-none"
-            placeholder={`对 ${persona?.name || "TA"} 说...`}
+            placeholder={`Say something to ${persona?.name || "TA"}...`}
             value={replyContent}
             onChange={(e) => setReplyContent(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleUserReply()}

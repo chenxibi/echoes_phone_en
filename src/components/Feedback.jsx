@@ -42,21 +42,21 @@ const Feedback = ({ onClose }) => {
   };
 
   const handleSubmit = async () => {
-    if (!name.trim()) return alert("请填写名字");
-    if (!message.trim()) return alert("请填写反馈内容");
+    if (!name.trim()) return alert("Please enter your name");
+    if (!message.trim()) return alert("Please enter feedback content");
 
     setSending(true);
 
-    // 构建文字消息
-    let textMsg = `📩 <b>Echoes 反馈</b>\n\n`;
-    textMsg += `<b>名字：</b>${name.trim()}\n`;
+    // Build text message
+    let textMsg = `📩 <b>Echoes Feedback</b>\n\n`;
+    textMsg += `<b>Name: </b>${name.trim()}\n`;
     if (contact.trim()) {
-      textMsg += `<b>联系方式：</b>${contact.trim()}\n`;
+      textMsg += `<b>Contact: </b>${contact.trim()}\n`;
     }
-    textMsg += `<b>反馈内容：</b>\n${message.trim()}`;
+    textMsg += `<b>Feedback:</b>\n${message.trim()}`;
 
     try {
-      // 1. 先发文字消息
+      // 1. Send text message first
       const textRes = await fetch(
         `https://api.telegram.org/bot${TG_TOKEN}/sendMessage`,
         {
@@ -72,16 +72,16 @@ const Feedback = ({ onClose }) => {
 
       if (!textRes.ok) {
         const err = await textRes.json();
-        throw new Error(err.description || "文字发送失败");
+        throw new Error(err.description || "Text send failed");
       }
 
-      // 2. 再逐张发图片
+      // 2. Then send images one by one
       for (const f of files) {
         const imgForm = new FormData();
         imgForm.append("chat_id", TG_CHAT_ID);
         imgForm.append("photo", f, f.name);
-        // 图片附带caption说明属于哪个反馈
-        imgForm.append("caption", `来自 ${name.trim()} 的截图 (${f.name})`);
+        // Image caption indicating which feedback it belongs to
+        imgForm.append("caption", `Screenshot from ${name.trim()} (${f.name})`);
 
         const imgRes = await fetch(
           `https://api.telegram.org/bot${TG_TOKEN}/sendPhoto`,
@@ -89,13 +89,13 @@ const Feedback = ({ onClose }) => {
         );
 
         if (!imgRes.ok) {
-          console.warn("图片发送失败:", f.name);
+          console.warn("Image send failed:", f.name);
         }
       }
 
       setSent(true);
     } catch (err) {
-      alert("发送失败：" + (err.message || "请稍后重试"));
+      alert("Send failed: " + (err.message || "Please try again later"));
     } finally {
       setSending(false);
     }
@@ -107,8 +107,8 @@ const Feedback = ({ onClose }) => {
         <div className="p-4 bg-green-50 rounded-full">
           <Send size={32} className="text-green-500" />
         </div>
-        <p className="text-sm font-bold text-gray-700">反馈已发送</p>
-        <p className="text-xs text-gray-400">感谢你的反馈！</p>
+        <p className="text-sm font-bold text-gray-700">Feedback Sent</p>
+        <p className="text-xs text-gray-400">Thank you for your feedback!</p>
         <button
           onClick={() => {
             setSent(false);
@@ -120,7 +120,7 @@ const Feedback = ({ onClose }) => {
           }}
           className="px-6 py-2 bg-gray-100 rounded-full text-xs font-bold text-gray-600 hover:bg-gray-200 transition-colors"
         >
-          返回
+          Back
         </button>
       </div>
     );
@@ -128,38 +128,38 @@ const Feedback = ({ onClose }) => {
 
   return (
     <div className="flex flex-col h-full space-y-4 p-1 animate-in fade-in">
-      {/* 名字 */}
+      {/* Name */}
       <div>
         <label className="block text-[10px] font-bold uppercase text-gray-500 mb-1">
-          名字 <span className="text-red-400">*</span>
+          Name <span className="text-red-400">*</span>
         </label>
         <input
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder="怎么称呼你？"
+          placeholder="What should we call you?"
           className="w-full px-3 py-2 rounded-lg border border-gray-200 text-xs focus:outline-none focus:border-gray-400 transition-colors"
         />
       </div>
 
-      {/* 联系方式 */}
+      {/* Contact */}
       <div>
         <label className="block text-[10px] font-bold uppercase text-gray-500 mb-1">
-          联系方式 <span className="text-gray-300">(选填)</span>
+          Contact <span className="text-gray-300">(optional)</span>
         </label>
         <input
           type="text"
           value={contact}
           onChange={(e) => setContact(e.target.value)}
-          placeholder="邮箱 / 微信 / 手机号..."
+          placeholder="Email / WeChat / Phone..."
           className="w-full px-3 py-2 rounded-lg border border-gray-200 text-xs focus:outline-none focus:border-gray-400 transition-colors"
         />
       </div>
 
-      {/* 上传图片 */}
+      {/* Upload Images */}
       <div>
         <label className="block text-[10px] font-bold uppercase text-gray-500 mb-1">
-          截图/附件 <span className="text-gray-300">(选填 · 最多{MAX_FILES}张 · 每张≤{MAX_SIZE_MB}MB)</span>
+          Screenshots/Attachments <span className="text-gray-300">(optional · max {MAX_FILES} · ≤{MAX_SIZE_MB}MB each)</span>
         </label>
         <div className="flex flex-wrap gap-2 mb-2">
           {files.map((f, i) => (
@@ -198,43 +198,43 @@ const Feedback = ({ onClose }) => {
           className="hidden"
         />
         {tooLargeFiles.length > 0 && (
-          <p className="text-[10px] text-red-400">
-            以下文件过大 (超{MAX_SIZE_MB}MB): {tooLargeFiles.join(", ")}
+            <p className="text-[10px] text-red-400">
+            The following files are too large (over {MAX_SIZE_MB}MB): {tooLargeFiles.join(", ")}
           </p>
         )}
       </div>
 
-      {/* 反馈内容 */}
+      {/* Feedback Content */}
       <div className="flex-1 flex flex-col">
         <label className="block text-[10px] font-bold uppercase text-gray-500 mb-1">
-          反馈内容 <span className="text-red-400">*</span>
+          Feedback <span className="text-red-400">*</span>
         </label>
         <textarea
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          placeholder="请描述你的问题、建议或想法..."
+          placeholder="Describe your issue, suggestion, or idea..."
           className="flex-1 w-full px-3 py-2 rounded-lg border border-gray-200 text-xs focus:outline-none focus:border-gray-400 transition-colors resize-none min-h-[120px]"
         />
       </div>
 
-      {/* 提交 */}
+      {/* Submit */}
       <button
         onClick={handleSubmit}
         disabled={sending}
         className="w-full py-2.5 bg-[#2C2C2C] text-white text-xs font-bold rounded-full flex items-center justify-center gap-2 hover:bg-black transition-colors disabled:opacity-50"
       >
         {sending ? (
-          <>发送中...</>
+          <>Sending...</>
         ) : (
           <>
             <Send size={14} />
-            提交反馈
+            Submit Feedback
           </>
         )}
       </button>
 
       <p className="text-[9px] text-gray-400 text-center">
-        你的反馈将直接发送至开发者
+        Your feedback will be sent directly to the developer
       </p>
     </div>
   );
